@@ -12,7 +12,7 @@ composer require grixu/synchronizer
 
 ## Usage
 
-``` php
+```php
 // You can use facade as well
 use Grixu\Synchronizer\Synchronizer;
 
