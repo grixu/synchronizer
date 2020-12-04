@@ -51,12 +51,12 @@ class SynchronizerLogger
 
     public function save(): void
     {
-        if (config('synchronizer.db_logging') == true) {
+        if (config('synchronizer.db_logging') == true && count($this->changes) > 0) {
             SynchronizerLog::create(
                 [
                     'model' => $this->model,
                     'model_id' => $this->id,
-                    'log' => $this->get()
+                    'log' => $this->get()->changes->toArray(),
                 ]
             );
         }

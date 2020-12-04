@@ -51,14 +51,14 @@ class Synchronizer
     public function sync(bool $empty = true)
     {
         foreach ($this->map->getToSync()->toArray() as $key => $value) {
-            $this->local->$key = $this->foreign->$value;
-
             $this->logger->addChanges(
                 $key,
                 $value,
                 $this->local->$key,
                 $this->foreign->$value
             );
+
+            $this->local->$key = $this->foreign->$value;
         }
 
         if ($empty == true) {

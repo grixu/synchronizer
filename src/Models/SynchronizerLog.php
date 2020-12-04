@@ -24,7 +24,7 @@ class SynchronizerLog extends Model
 
     protected $casts = [
         'model_id' => 'integer',
-        'log' => SynchronizerLogData::class,
+        'log' => 'array',
     ];
 
     protected $fillable = [
