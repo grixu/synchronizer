@@ -55,12 +55,29 @@ class SynchronizerLoggerTest extends BaseTestCase
         $obj->addChanges('name', 'named', 'Lol', 'Rotfl');
         $obj->save();
 
+        $obj = SynchronizerLog::query()->first();
         $this->assertDatabaseCount('synchronizer_logs', 1);
+        $this->assertNotEmpty($obj);
+        $this->assertNotEmpty($obj->model);
+        $this->assertNotEmpty($obj->model_id);
+        $this->assertNotEmpty($obj->log);
+        $this->assertIsArray($obj->log);
+        $this->assertCount(1, $obj->log);
+        $this->assertEquals('Product', $obj->model);
+        $this->assertEquals(1, $obj->model_id);
+        $this->assertEquals('name', $obj->log[0]['localField']);
+        $this->assertEquals('named', $obj->log[0]['foreignField']);
+        $this->assertEquals('Lol', $obj->log[0]['localValue']);
+        $this->assertEquals('Rotfl', $obj->log[0]['foreignValue']);
     }
 
     /** @test */
     public function check_results_when_not_changed_data_was_added()
     {
+        SynchronizerLog::query()->delete();
+
+        $this->assertDatabaseCount('synchronizer_logs', 0);
+
         $obj = new SynchronizerLogger('Product', 1);
 
         $obj->addChanges('name', 'named', 'Lol', 'Lol');
@@ -70,6 +87,10 @@ class SynchronizerLoggerTest extends BaseTestCase
         $this->assertEquals(SynchronizerLogData::class, get_class($results));
         $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
         $this->assertEmpty($results->changes);
+
+        $obj->save();
+
+        $this->assertDatabaseCount('synchronizer_logs', 0);
     }
 
     /** @test */
@@ -93,6 +114,10 @@ class SynchronizerLoggerTest extends BaseTestCase
     /** @test */
     public function check_excluded_from_logging_fields()
     {
+        SynchronizerLog::query()->delete();
+
+        $this->assertDatabaseCount('synchronizer_logs', 0);
+
         $obj = new SynchronizerLogger('Product', 1);
 
         $obj->addChanges('updated_at', 'named', 'some', 'Rotfl');
@@ -102,5 +127,9 @@ class SynchronizerLoggerTest extends BaseTestCase
         $this->assertEquals(SynchronizerLogData::class, get_class($results));
         $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
         $this->assertEmpty($results->changes);
+
+        $obj->save();
+
+        $this->assertDatabaseCount('synchronizer_logs', 0);
     }
 }
