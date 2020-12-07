@@ -24,7 +24,8 @@
         "illuminate/support": "^8.15",
         "jessarcher/laravel-castable-data-transfer-object": "^0.0.2",
         "laravel/slack-notification-channel": "^2.3",
-        "spatie/data-transfer-object": "^2.5"
+        "spatie/data-transfer-object": "^2.5",
+        "ext-json": "*"
     },
     "require-dev": {
         "fakerphp/faker": "^1.11",
