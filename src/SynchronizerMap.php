@@ -71,6 +71,22 @@ class SynchronizerMap
         return $this->map;
     }
 
+    public function getToMd5(): Collection
+    {
+        // Creating assoc array from fields marked in config as timestamps
+        $arrCfg = [];
+        foreach(config('synchronizer.log_turned_off_fields') as $val) {
+            $arrCfg[$val] = 1;
+        }
+
+        // complete toSync field with null update enabled fields
+        $map = $this->getToSync()->merge($this->getExcludedNullUpdate());
+        // map of timestamps
+        $ts = $map->intersectByKeys($arrCfg);
+
+        return $map->diff($ts);
+    }
+
     public function markAsExcluded(string $localField): void
     {
         $row = $this->toSync->search($localField);
