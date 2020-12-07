@@ -16,25 +16,30 @@ composer require grixu/synchronizer
 // You can use facade as well
 use Grixu\Synchronizer\Synchronizer;
 
-// eg. for local model is in $lanaguage, and foreignData is in DTO $languageData
+// At first create assoc array which be map of local field name
+// in a key, and foreign field name in a value
 $map = [
     'name' => 'name',
     'updated_at' => 'updatedAt'
 ];
+// for eg. $language is local model, $languageData is DTO class 
+// which contains data from other (foreign) source (API, database etc.)
 $synchronizer = new Synchronizer($map, $language, $languageData);
 $synchronizer->sync();
 ```
 
 ### Configuration
 
-There are 3 options available in config file to adjust how `synchronizer` should work and behave:
+There are 5 options available in config file to adjust how `synchronizer` should work and behave:
 ```php
 return [
     'send_slack_sum_up' => env('SYNCHRONIZER_SLACK_SUM_UP', true),
     'db_logging' => env('SYNCHRONIZER_DB_LOGGING',true),
     'log_turned_off_fields' => [
         'updated_at'
-    ]
+    ],
+    'md5_control' => env('SYNCHRONIZER_MD5_CONTROL', true),
+    'md5_local_model_field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
 ];
 ```
 
@@ -42,7 +47,16 @@ Option `send_slack_sum_up` should be used to block sending daily sum ups to Slac
 
 `db_logging` flag designed to switch on/off logging changes in local model to database.
 
- In `log_turned_off_fields` array you could define names of fields used as timestamp - which should not be logged as change in local model.
+In `log_turned_off_fields` array you could define names of fields used as timestamp - which should not be logged as change in local model.
+
+For simplify checking changes between local model and foreign DTO, Synchronizer have a built-in
+ feature: comparing md5 generated from last sync with newly generated based on selected fields from
+ foreign DTO. In `Synchronizer` class, method `sync()` on the very beginning call method 
+ `checkChanges()` to calculate and verify md5 checksums. 
+
+To turn on this feature just set up `SYNCHRONIZER_MD5_CONTROL` and `SYNCHRONIZER_MD5_FIELD` in your
+ `.env` file and add a field (name of this field you just set up in `SYNCHRONIZER_MD5_FIELD`)
+ contains md5 checksum in every model you use in synchronization process.
 
 ### Artisan commands
 

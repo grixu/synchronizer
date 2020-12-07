@@ -2,6 +2,13 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 1.1.0 - 2020-12-07
+
+- Added calculating MD5 from fields of DTO (without timestamps excluded in the config)
+- Added method for generate a map without timestamp fields in SynchronizerMap
+- New options in the config to turn on md5 checksums checking, and point a field name in models
+which containing this checksum.
+
 ## 1.0.2 - 2020-12-04
 
 - Bug fixed: Adding empty log entries to DB
