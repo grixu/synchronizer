@@ -30,6 +30,7 @@ class ProductFactory extends Factory
             'index' => Str::random(50),
             'ean' => Str::random(40),
             'weight' => 2.00,
+            'checksum' => $this->faker->md5,
         ];
     }
 }

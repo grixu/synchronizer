@@ -11,6 +11,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property string index
  * @property string ean
  * @property double price
+ * @property string checksum
  * @package Domain\Product\Models
  */
 class Product extends Model
@@ -31,6 +32,7 @@ class Product extends Model
         'ean' => 'string',
         'weight' => 'double',
         'price' => 'double',
+        'checksum' => 'string',
     ];
 
     /**
@@ -42,5 +44,6 @@ class Product extends Model
         'index',
         'ean',
         'eshop',
+        'checksum',
     ];
 }
