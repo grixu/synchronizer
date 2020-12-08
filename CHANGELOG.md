@@ -2,6 +2,11 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 1.2.0 - 2020-12-08
+
+- Added firing event when Synchronizer detects changes 
+- Optimized tests
+
 ## 1.1.0 - 2020-12-07
 
 - Added calculating MD5 from fields of DTO (without timestamps excluded in the config)

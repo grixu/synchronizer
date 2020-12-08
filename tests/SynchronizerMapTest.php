@@ -28,14 +28,34 @@ class SynchronizerMapTest extends BaseTestCase
         ];
     }
 
+    protected function checkClass($obj)
+    {
+        $this->assertEquals(Collection::class, get_class($obj->getMap()));
+        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
+        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
+    }
+
+    protected function checkClassAndEmpty($obj)
+    {
+        $this->checkClass($obj);
+        $this->assertNotEmpty($obj->getMap());
+        $this->assertNotEmpty($obj->getToSync());
+        $this->assertNotEmpty($obj->getExcluded());
+    }
+
+    protected function checkMapCounts($obj)
+    {
+        $this->assertCount(count($this->map), $obj->getMap());
+        $this->assertCount($obj->getMap()->count()-1, $obj->getToSync());
+        $this->assertCount(1, $obj->getExcluded());
+    }
+
     /** @test */
     public function check_constructor_with_no_fields_excluded()
     {
         $obj = new SynchronizerMap($this->map, 'Product');
 
-        $this->assertEquals(Collection::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
-        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
+        $this->checkClass($obj);
         $this->assertEquals(Collection::class, get_class($obj->getExcludedNullUpdate()));
         $this->assertNotEmpty($obj->getMap());
         $this->assertNotEmpty($obj->getToSync());
@@ -56,15 +76,8 @@ class SynchronizerMapTest extends BaseTestCase
 
         $obj = new SynchronizerMap($this->map, 'Product');
 
-        $this->assertEquals(Collection::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
-        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
-        $this->assertNotEmpty($obj->getMap());
-        $this->assertNotEmpty($obj->getToSync());
-        $this->assertNotEmpty($obj->getExcluded());
-        $this->assertCount(count($this->map), $obj->getMap());
-        $this->assertCount($obj->getMap()->count()-1, $obj->getToSync());
-        $this->assertCount(1, $obj->getExcluded());
+        $this->checkClassAndEmpty($obj);
+        $this->checkMapCounts($obj);
         $this->assertCount(1, $obj->getExcludedNullUpdate());
     }
 
@@ -79,9 +92,7 @@ class SynchronizerMapTest extends BaseTestCase
 
         $obj = new SynchronizerMap($this->map, 'Product');
 
-        $this->assertEquals(Collection::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
-        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
+        $this->checkClass($obj);
         $this->assertNotEmpty($obj->getMap());
         $this->assertNotEmpty($obj->getToSync());
         $this->assertEmpty($obj->getExcluded());
@@ -101,15 +112,8 @@ class SynchronizerMapTest extends BaseTestCase
 
         $obj = new SynchronizerMap($this->map, 'Product');
 
-        $this->assertEquals(Collection::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
-        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
-        $this->assertNotEmpty($obj->getMap());
-        $this->assertNotEmpty($obj->getToSync());
-        $this->assertNotEmpty($obj->getExcluded());
-        $this->assertCount(count($this->map), $obj->getMap());
-        $this->assertCount($obj->getMap()->count()-1, $obj->getToSync());
-        $this->assertCount(1, $obj->getExcluded());
+        $this->checkClassAndEmpty($obj);
+        $this->checkMapCounts($obj);
 
         $obj->markAsExcluded('aged');
 
@@ -130,15 +134,8 @@ class SynchronizerMapTest extends BaseTestCase
 
         $obj = new SynchronizerMap($this->map, 'Product');
 
-        $this->assertEquals(Collection::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
-        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
-        $this->assertNotEmpty($obj->getMap());
-        $this->assertNotEmpty($obj->getToSync());
-        $this->assertNotEmpty($obj->getExcluded());
-        $this->assertCount(count($this->map), $obj->getMap());
-        $this->assertCount($obj->getMap()->count()-1, $obj->getToSync());
-        $this->assertCount(1, $obj->getExcluded());
+        $this->checkClassAndEmpty($obj);
+        $this->checkMapCounts($obj);
 
         $obj->markToSync('name');
 
@@ -148,7 +145,7 @@ class SynchronizerMapTest extends BaseTestCase
     }
 
     /** @test */
-    public function check_constructor_with_not_updateable_field()
+    public function check_constructor_with_not_updatable_field()
     {
         SynchronizerFieldFactory::new()->create(
             [
@@ -160,15 +157,8 @@ class SynchronizerMapTest extends BaseTestCase
 
         $obj = new SynchronizerMap($this->map, 'Product');
 
-        $this->assertEquals(Collection::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getExcluded()));
-        $this->assertEquals(Collection::class, get_class($obj->getToSync()));
-        $this->assertNotEmpty($obj->getMap());
-        $this->assertNotEmpty($obj->getToSync());
-        $this->assertNotEmpty($obj->getExcluded());
-        $this->assertCount(count($this->map), $obj->getMap());
-        $this->assertCount($obj->getMap()->count()-1, $obj->getToSync());
-        $this->assertCount(1, $obj->getExcluded());
+        $this->checkClassAndEmpty($obj);
+        $this->checkMapCounts($obj);
         $this->assertCount(0, $obj->getExcludedNullUpdate());
     }
 

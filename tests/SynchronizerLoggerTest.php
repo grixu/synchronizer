@@ -35,8 +35,7 @@ class SynchronizerLoggerTest extends BaseTestCase
 
         $results = $obj->get();
 
-        $this->assertEquals(SynchronizerLogData::class, get_class($results));
-        $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
+        $this->checkClasses($results);
         $this->assertNotEmpty($results->changes);
         $this->assertEquals('name', $results->changes->current()->localField);
         $this->assertEquals('Lol', $results->changes->current()->localValue);
@@ -84,8 +83,7 @@ class SynchronizerLoggerTest extends BaseTestCase
 
         $results = $obj->get();
 
-        $this->assertEquals(SynchronizerLogData::class, get_class($results));
-        $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
+        $this->checkClasses($results);
         $this->assertEmpty($results->changes);
 
         $obj->save();
@@ -102,8 +100,7 @@ class SynchronizerLoggerTest extends BaseTestCase
 
         $results = $obj->get();
 
-        $this->assertEquals(SynchronizerLogData::class, get_class($results));
-        $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
+        $this->checkClasses($results);
         $this->assertNotEmpty($results->changes);
         $this->assertEquals('name', $results->changes->current()->localField);
         $this->assertEmpty($results->changes->current()->localValue);
@@ -124,12 +121,17 @@ class SynchronizerLoggerTest extends BaseTestCase
 
         $results = $obj->get();
 
-        $this->assertEquals(SynchronizerLogData::class, get_class($results));
-        $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
+        $this->checkClasses($results);
         $this->assertEmpty($results->changes);
 
         $obj->save();
 
         $this->assertDatabaseCount('synchronizer_logs', 0);
+    }
+
+    private function checkClasses($results)
+    {
+        $this->assertEquals(SynchronizerLogData::class, get_class($results));
+        $this->assertEquals(SynchronizerLogEntryCollection::class, get_class($results->changes));
     }
 }

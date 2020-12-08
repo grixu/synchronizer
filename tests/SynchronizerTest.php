@@ -4,6 +4,7 @@
 namespace Grixu\Synchronizer\Tests;
 
 
+use Grixu\Synchronizer\Events\SynchronizerDetectChangesEvent;
 use Grixu\Synchronizer\Exceptions\EmptyMd5FieldInModelException;
 use Grixu\Synchronizer\Exceptions\EmptyMd5FieldNameInConfigException;
 use Grixu\Synchronizer\Models\SynchronizerField;
@@ -19,6 +20,7 @@ use Grixu\Synchronizer\Tests\Helpers\ProductFactory;
 use Grixu\Synchronizer\Tests\Helpers\SynchronizerFieldFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Spatie\DataTransferObject\DataTransferObject;
 
 /**
@@ -58,6 +60,48 @@ class SynchronizerTest extends BaseTestCase
         $app->config->set('synchronizer.md5_local_model_field', null);
     }
 
+    protected function startsChecks($obj)
+    {
+        $this->assertNotEquals($this->local->ean, $this->foreign->ean);
+        $this->assertNotEquals($this->local->index, $this->foreign->index);
+        $this->assertNotEquals($this->local->weight, $this->foreign->weight);
+        $this->assertNotEquals($obj->getMd5(), $this->local->checksum);
+    }
+
+    protected function endChecks($obj)
+    {
+        $this->assertEquals($this->foreign->ean, $this->local->ean);
+        $this->assertEquals($this->foreign->index, $this->local->index);
+        $this->assertEquals($this->foreign->weight, $this->local->weight);
+        $this->assertEquals($obj->getMd5(), $this->local->checksum);
+    }
+
+    protected function clearLogsAndCheck()
+    {
+        SynchronizerLog::query()->delete();
+        $this->assertDatabaseCount('synchronizer_logs', 0);
+    }
+
+    protected function clearAndCreateExcludedField(int $update=1)
+    {
+        SynchronizerField::query()->delete();
+        SynchronizerFieldFactory::new()->create(
+            [
+                'model' => get_class($this->local),
+                'field' => 'name',
+                'update_empty' => $update
+            ]
+        );
+    }
+
+    protected function checkMd5($obj)
+    {
+        $this->assertEquals(SynchronizerMap::class, get_class($obj->getMap()));
+        $this->assertEquals(Collection::class, get_class($obj->getMap()->getToMd5()));
+        $this->assertNotEmpty($obj->getMap()->getToMd5());
+        $this->assertNotEmpty($obj->getForeign());
+    }
+
     /** @test */
     public function check_constructor()
     {
@@ -75,157 +119,81 @@ class SynchronizerTest extends BaseTestCase
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
 
         $this->assertNotEquals($this->local->name, $this->foreign->name);
-        $this->assertNotEquals($this->local->ean, $this->foreign->ean);
-        $this->assertNotEquals($this->local->index, $this->foreign->index);
-        $this->assertNotEquals($this->local->weight, $this->foreign->weight);
-        $this->assertNotEquals($obj->getMd5(), $this->local->checksum);
-
-        SynchronizerLog::query()->delete();
-        $this->assertDatabaseCount('synchronizer_logs', 0);
+        $this->startsChecks($obj);
+        $this->clearLogsAndCheck();
 
         $obj->sync(false);
 
         $this->assertDatabaseCount('synchronizer_logs', 1);
-
         $this->assertEquals($this->foreign->name, $this->local->name);
-        $this->assertEquals($this->foreign->ean, $this->local->ean);
-        $this->assertEquals($this->foreign->index, $this->local->index);
-        $this->assertEquals($this->foreign->weight, $this->local->weight);
-        $this->assertEquals($obj->getMd5(), $this->local->checksum);
+        $this->endChecks($obj);
     }
 
     /** @test */
     public function check_sync_with_excluded_nulls()
     {
-        SynchronizerField::query()->delete();
-        SynchronizerFieldFactory::new()->create(
-            [
-                'model' => get_class($this->local),
-                'field' => 'name',
-                'update_empty' => 1
-            ]
-        );
+        $this->clearAndCreateExcludedField();
 
         $this->local->name = null;
-
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
 
         $this->assertEmpty($this->local->name);
         $this->assertNotEmpty($this->foreign->name);
-        $this->assertNotEquals($this->local->ean, $this->foreign->ean);
-        $this->assertNotEquals($this->local->index, $this->foreign->index);
-        $this->assertNotEquals($this->local->weight, $this->foreign->weight);
-        $this->assertNotEquals($obj->getMd5(), $this->local->checksum);
-
-        SynchronizerLog::query()->delete();
-        $this->assertDatabaseCount('synchronizer_logs', 0);
+        $this->startsChecks($obj);
+        $this->clearLogsAndCheck();
 
         $obj->sync();
 
         $this->assertDatabaseCount('synchronizer_logs', 1);
-
         $this->assertEquals($this->foreign->name, $this->local->name);
-        $this->assertEquals($this->foreign->ean, $this->local->ean);
-        $this->assertEquals($this->foreign->index, $this->local->index);
-        $this->assertEquals($this->foreign->weight, $this->local->weight);
-        $this->assertEquals($obj->getMd5(), $this->local->checksum);
+        $this->endChecks($obj);
     }
 
     /** @test */
     public function check_sync_with_excluded_nulls_but_nothing_on_it()
     {
-        SynchronizerField::query()->delete();
-        SynchronizerFieldFactory::new()->create(
-            [
-                'model' => get_class($this->local),
-                'field' => 'name',
-                'update_empty' => 0
-            ]
-        );
-
+        $this->clearAndCreateExcludedField(0);
         $this->local->name = 'check';
-
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
 
         $this->assertNotEquals($this->local->name, $this->foreign->name);
-        $this->assertNotEquals($this->local->ean, $this->foreign->ean);
-        $this->assertNotEquals($this->local->index, $this->foreign->index);
-        $this->assertNotEquals($this->local->weight, $this->foreign->weight);
-        $this->assertNotEquals($obj->getMd5(), $this->local->checksum);
-
-        SynchronizerLog::query()->delete();
-        $this->assertDatabaseCount('synchronizer_logs', 0);
+        $this->startsChecks($obj);
+        $this->clearLogsAndCheck();
 
         $obj->sync();
 
         $this->assertDatabaseCount('synchronizer_logs', 1);
-
         $this->assertNotEquals($this->foreign->name, $this->local->name);
-        $this->assertEquals($this->foreign->ean, $this->local->ean);
-        $this->assertEquals($this->foreign->index, $this->local->index);
-        $this->assertEquals($this->foreign->weight, $this->local->weight);
-        $this->assertEquals($obj->getMd5(), $this->local->checksum);
+        $this->endChecks($obj);
     }
 
     /** @test */
     public function check_sync_with_empty_excluded_field()
     {
-        SynchronizerField::query()->delete();
-        SynchronizerFieldFactory::new()->create(
-            [
-                'model' => get_class($this->local),
-                'field' => 'name',
-                'update_empty' => 0
-            ]
-        );
-
+        $this->clearAndCreateExcludedField(0);
         $this->local->name = null;
-
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
 
         $this->assertEmpty($this->local->name);
-        $this->assertNotEquals($this->local->name, $this->foreign->name);
-        $this->assertNotEquals($this->local->ean, $this->foreign->ean);
-        $this->assertNotEquals($this->local->index, $this->foreign->index);
-        $this->assertNotEquals($this->local->weight, $this->foreign->weight);
-        $this->assertNotEquals($obj->getMd5(), $this->local->checksum);
-
-        SynchronizerLog::query()->delete();
-        $this->assertDatabaseCount('synchronizer_logs', 0);
+        $this->startsChecks($obj);
+        $this->clearLogsAndCheck();
 
         $obj->sync();
 
         $this->assertDatabaseCount('synchronizer_logs', 1);
-
         $this->assertNotEmpty($this->foreign->name);
         $this->assertEmpty($this->local->name);
-        $this->assertEquals($this->foreign->ean, $this->local->ean);
-        $this->assertEquals($this->foreign->index, $this->local->index);
-        $this->assertEquals($this->foreign->weight, $this->local->weight);
-        $this->assertEquals($obj->getMd5(), $this->local->checksum);
+        $this->endChecks($obj);
     }
 
     /** @test */
     public function check_changes()
     {
-        SynchronizerField::query()->delete();
-        SynchronizerFieldFactory::new()->create(
-            [
-                'model' => get_class($this->local),
-                'field' => 'name',
-                'update_empty' => 1
-            ]
-        );
-
+        $this->clearAndCreateExcludedField();
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
-
-        $this->assertEquals(SynchronizerMap::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getMap()->getToMd5()));
-        $this->assertNotEmpty($obj->getMap()->getToMd5());
-        $this->assertNotEmpty($obj->getForeign());
+        $this->checkMd5($obj);
 
         $returned = $obj->checkChanges();
-
         $this->assertTrue($returned);
     }
 
@@ -236,14 +204,9 @@ class SynchronizerTest extends BaseTestCase
     public function check_changes_when_turnoff_md5_check()
     {
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
-
-        $this->assertEquals(SynchronizerMap::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getMap()->getToMd5()));
-        $this->assertNotEmpty($obj->getMap()->getToMd5());
-        $this->assertNotEmpty($obj->getForeign());
+        $this->checkMd5($obj);
 
         $returned = $obj->checkChanges();
-
         $this->assertTrue($returned);
     }
 
@@ -254,11 +217,7 @@ class SynchronizerTest extends BaseTestCase
     public function check_changes_when_no_checksum_field_name_configured()
     {
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
-
-        $this->assertEquals(SynchronizerMap::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getMap()->getToMd5()));
-        $this->assertNotEmpty($obj->getMap()->getToMd5());
-        $this->assertNotEmpty($obj->getForeign());
+        $this->checkMd5($obj);
 
         try {
             $obj->checkChanges();
@@ -273,14 +232,9 @@ class SynchronizerTest extends BaseTestCase
     {
         $this->local->checksum = null;
         $obj = new Synchronizer($this->map, $this->local, $this->foreign);
-
-        $this->assertEquals(SynchronizerMap::class, get_class($obj->getMap()));
-        $this->assertEquals(Collection::class, get_class($obj->getMap()->getToMd5()));
-        $this->assertNotEmpty($obj->getMap()->getToMd5());
-        $this->assertNotEmpty($obj->getForeign());
+        $this->checkMd5($obj);
 
         $returned = $obj->checkChanges();
-
         $this->assertTrue($returned);
     }
 
@@ -292,7 +246,6 @@ class SynchronizerTest extends BaseTestCase
         $this->assertEmpty($obj->getMd5());
 
         $obj->checkChanges();
-
         $this->assertNotEmpty($obj->getMd5());
     }
 
@@ -324,9 +277,52 @@ class SynchronizerTest extends BaseTestCase
         $obj->sync();
 
         $this->assertEquals($this->local->name, $this->foreign->name);
-        $this->assertEquals($this->local->ean, $this->foreign->ean);
-        $this->assertEquals($this->local->index, $this->foreign->index);
-        $this->assertEquals($this->local->weight, $this->foreign->weight);
-        $this->assertEquals($obj->getMd5(), $this->local->checksum);
+        $this->endChecks($obj);
+    }
+
+    /** @test */
+    public function check_event_is_fired()
+    {
+        $obj = new Synchronizer($this->map, $this->local, $this->foreign);
+
+        $this->assertNotEquals($this->local->name, $this->foreign->name);
+        $this->startsChecks($obj);
+        $this->clearLogsAndCheck();
+
+        Event::fake();
+
+        $obj->sync();
+
+        $this->assertDatabaseCount('synchronizer_logs', 1);
+        $this->assertEquals($this->foreign->name, $this->local->name);
+        $this->endChecks($obj);
+
+        Event::assertDispatched(SynchronizerDetectChangesEvent::class);
+    }
+
+    /**
+     * @environment-setup withoutMd5Control
+     * @test
+     */
+    public function check_event_is_no_fired()
+    {
+        $obj = new Synchronizer($this->map, $this->local, $this->foreign);
+
+        $this->assertNotEquals($this->local->name, $this->foreign->name);
+        $this->startsChecks($obj);
+        $this->clearLogsAndCheck();
+
+        Event::fake();
+
+        $obj->sync();
+
+        $this->assertDatabaseCount('synchronizer_logs', 1);
+        $this->assertEquals($this->foreign->name, $this->local->name);
+        $this->assertEquals($this->foreign->ean, $this->local->ean);
+        $this->assertEquals($this->foreign->index, $this->local->index);
+        $this->assertEquals($this->foreign->weight, $this->local->weight);
+        $this->assertEmpty($obj->getMd5());
+
+        Event::assertNotDispatched(SynchronizerDetectChangesEvent::class);
     }
 }
