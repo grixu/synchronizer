@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer;
 
+use Grixu\Synchronizer\Events\SynchronizerDetectChangesEvent;
 use Grixu\Synchronizer\Exceptions\EmptyMd5FieldNameInConfigException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
@@ -83,7 +84,7 @@ class Synchronizer
 
     public function sync(bool $empty = true)
     {
-        if (!$this->checkChanges()) {
+        if (!$this->checkChanges() && config('synchronizer.md5_control') == true) {
             return ;
         }
 
@@ -105,6 +106,8 @@ class Synchronizer
         $md5Field = config('synchronizer.md5_local_model_field');
         if (config('synchronizer.md5_control') == true && !empty($md5Field)) {
             $this->local->$md5Field = $this->md5;
+
+            event(new SynchronizerDetectChangesEvent($this->local));
         }
 
         $this->logger->save();
