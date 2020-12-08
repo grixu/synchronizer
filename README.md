@@ -28,6 +28,12 @@ $synchronizer = new Synchronizer($map, $language, $languageData);
 $synchronizer->sync();
 ```
 
+### Event firing
+
+When Synchronizer detects changes will fire a `SynchronizerDetectChangesEvent`. This event takes
+one argument - local model. So you can easily add a listener in your app and for eg. notify 
+another microservices about data update.
+
 ### Configuration
 
 There are 5 options available in config file to adjust how `synchronizer` should work and behave:
