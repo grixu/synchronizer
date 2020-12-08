@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 1.2.1 - 2020-12-08
+
+- Bug fixed: Added `illuminate/events` as required package
+
 ## 1.2.0 - 2020-12-08
 
 - Added firing event when Synchronizer detects changes 
