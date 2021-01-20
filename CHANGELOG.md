@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 1.2.2 - 2021-01-20
+
+- Updated to compatibility with PHP 8
+
 ## 1.2.1 - 2020-12-08
 
 - Bug fixed: Added `illuminate/events` as required package
