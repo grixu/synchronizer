@@ -1,17 +1,13 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Helpers;
+namespace Grixu\Synchronizer\Factories;
 
-use Grixu\Synchronizer\Models\SynchronizerField;
+use Grixu\Synchronizer\Models\ExcludedField;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
-/**
- * Class SynchronizerFieldFactory
- * @package Grixu\Synchronizer\Tests\Helpers
- */
-class SynchronizerFieldFactory extends Factory
+class ExcludedFieldFactory extends Factory
 {
-    public $model = SynchronizerField::class;
+    public $model = ExcludedField::class;
 
     public function definition()
     {
