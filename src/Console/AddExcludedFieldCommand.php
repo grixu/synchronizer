@@ -2,13 +2,9 @@
 
 namespace Grixu\Synchronizer\Console;
 
-use Grixu\Synchronizer\Models\SynchronizerField;
+use Grixu\Synchronizer\Models\ExcludedField;
 use Illuminate\Console\Command;
 
-/**
- * Class AddExcludedFieldCommand
- * @package Grixu\Synchronizer\Console
- */
 class AddExcludedFieldCommand extends Command
 {
     protected $signature = 'synchronizer:add';
@@ -21,7 +17,7 @@ class AddExcludedFieldCommand extends Command
         $field = $this->ask('Now, enter field name');
         $update = $this->confirm('Update field when empty(null)?');
 
-        SynchronizerField::create(
+        ExcludedField::create(
             [
                 'model' => $model,
                 'field' => $field,
