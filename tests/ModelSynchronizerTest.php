@@ -6,6 +6,7 @@ use Grixu\SociusModels\Product\DataTransferObjects\ProductData;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\MapFactory;
+use Grixu\Synchronizer\Models\Log;
 use Grixu\Synchronizer\ModelSynchronizer;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
@@ -67,7 +68,7 @@ class ModelSynchronizerTest extends TestCase
 
     protected function assertTransfer($model)
     {
-        foreach($this->dto as $key => $value) {
+        foreach ($this->dto as $key => $value) {
             if (is_object($value) && get_class($value) === Carbon::class) {
                 $this->assertEquals($value->timestamp, $model->$key->timestamp);
             } else {
@@ -94,5 +95,29 @@ class ModelSynchronizerTest extends TestCase
         $obj = new ModelSynchronizer($this->dto, $this->model);
         $obj->sync();
         $this->assertDatabaseCount('synchronizer_logs', 1);
+    }
+
+    /** @test */
+    public function it_not_creating_log_from_timestamps()
+    {
+        $this->assertDatabaseCount('synchronizer_logs', 0);
+        $obj = new ModelSynchronizer($this->dto, $this->model);
+        $obj->sync();
+        $this->assertDatabaseCount('synchronizer_logs', 1);
+
+        $model = Log::query()
+            ->where(
+                [
+                    ['model', '=', get_class($this->model)],
+                    ['model_id', '=', $this->model->id]
+                ]
+            )->first();
+
+        foreach ($model->log as $log) {
+            $this->assertEquals(
+                false,
+                in_array($log['modelField'], config('synchronizer.timestamps'))
+            );
+        }
     }
 }
