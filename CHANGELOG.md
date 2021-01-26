@@ -2,6 +2,17 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.0.0 - 2021-01-26
+
+- Rebuilt package in most part
+- New `MapEntry` class which is responsible for keep data about fields, and their in sync or not.
+- `Map` class is simple collection (Laravel Collection) of `MapEntry` with 3 getters
+- `MapFactory` is factory for `Map`. You can build using array map or based on Dto field names.
+- Checksum generation, control, update delegate to `Checksum` class
+- Responsibility for sync data from DTO to Model put into `ModelSynchronizer` class
+- New feature: collection sync is realized via `CollectionSynchronizer`
+- Removed SynchronizerFactory & facade
+
 ## 1.2.1 - 2020-12-08
 
 - Bug fixed: Added `illuminate/events` as required package
