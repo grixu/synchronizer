@@ -18,7 +18,7 @@ class Logger
         $this->changes = [];
     }
 
-    public function addChanges(string $dtoField, string $modelField, ?string $dtoValue, ?string $modelValue): void
+    public function addChanges(string $dtoField, string $modelField, $dtoValue = null, $modelValue = null): void
     {
         if ($dtoValue !== $modelValue && !in_array($modelField, config('synchronizer.timestamps'))) {
             $this->changes[] =
