@@ -6,6 +6,7 @@ use Grixu\SociusModels\Product\DataTransferObjects\ProductDataCollection;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\CollectionSynchronizer;
+use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -110,5 +111,43 @@ class CollectionSynchronizerTest extends TestCase
         Log::shouldReceive('notice')->once()->andReturnNull();
 
         $this->it_sync_collection_with_all_models();
+    }
+
+    /** @test */
+    public function empty_foreign_keys_throws_exception()
+    {
+        try {
+            $this->obj = new CollectionSynchronizer($this->dtoCollection, Product::class, 'some_key');
+            $this->assertTrue(false);
+        } catch (EmptyForeignKeyInDto $exception) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /** @test */
+    public function is_making_map_from_passed_array()
+    {
+        $this->createObj();
+        $this->assertDatabaseCount('products', 0);
+        $this->obj->sync(
+            [
+                'name' => 'name',
+                'index' => 'index',
+                'ean' => 'ean',
+                'measureUnit' => 'measureUnit',
+                'taxGroup' => 'taxGroup',
+                'taxValue' => 'taxValue',
+                'weight' => 'weight',
+                'eshop' => 'eshop',
+                'operatorId' => 'operatorId',
+                'brandId' => 'brandId',
+                'productTypeId' => 'productTypeId',
+                'price' => 'price',
+                'eshopPrice' => 'eshopPrice',
+                'xlId' => 'xlId',
+                'syncTs' => 'syncTs'
+            ]
+        );
+        $this->assertDatabaseCount('products', 10);
     }
 }

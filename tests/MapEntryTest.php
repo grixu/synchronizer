@@ -31,7 +31,8 @@ class MapEntryTest extends TestCase
         $excludedField = ExcludedField::factory()->create(
             [
                 'field' => 'name',
-                'model' => Model::class
+                'model' => Model::class,
+                'update_empty' => false
             ]
         );
 

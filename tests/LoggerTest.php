@@ -9,6 +9,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class LoggerTest extends TestCase
 {
+    protected function dbLoggingOff($app)
+    {
+        $app['config']->set('synchronizer.db_logging', false);
+    }
+
     /** @test */
     public function it_creates()
     {
@@ -44,8 +49,6 @@ class LoggerTest extends TestCase
     /** @test */
     public function check_saving()
     {
-        Log::query()->delete();
-
         $this->assertDatabaseCount('synchronizer_logs', 0);
 
         $obj = new Logger(Model::class, 1);
@@ -71,7 +74,6 @@ class LoggerTest extends TestCase
     /** @test */
     public function check_results_when_not_changed_data_was_added()
     {
-        Log::query()->delete();
         $this->assertDatabaseCount('synchronizer_logs', 0);
 
         $obj = new Logger(Model::class, 1);
@@ -105,9 +107,8 @@ class LoggerTest extends TestCase
      * @test
      * @environment-setup timestampConfig
      */
-    public function check_excluded_from_logging_fields()
+    public function check_excluded_timestamps_are_not_logged()
     {
-        Log::query()->delete();
         $this->assertDatabaseCount('synchronizer_logs', 0);
 
         $obj = new Logger(Model::class, 1);
@@ -115,6 +116,21 @@ class LoggerTest extends TestCase
         $this->assertEmpty($obj->get());
 
         $obj->save();
+        $this->assertDatabaseCount('synchronizer_logs', 0);
+    }
+
+    /**
+     * @test
+     * @environment-setup dbLoggingOff
+     */
+    public function when_db_logging_is_off()
+    {
+        $this->assertDatabaseCount('synchronizer_logs', 0);
+
+        $obj = new Logger(Model::class, 1);
+        $obj->addChanges('name', 'named', 'Lol', 'Rotfl');
+        $obj->save();
+
         $this->assertDatabaseCount('synchronizer_logs', 0);
     }
 }
