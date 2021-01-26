@@ -2,20 +2,23 @@
 
 namespace Grixu\Synchronizer\Models;
 
+use Grixu\Synchronizer\Factories\ExcludedFieldFactory;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class TransformerField
  * @property string model
  * @property string model_id
  * @property bool update_empty
  * @property int id
- * @package Grixu\Transformer
  * @method static create(array $array)
+ * @method static factory()
  */
-class SynchronizerField extends Model
+class ExcludedField extends Model
 {
-    public $table = 'synchronizer_fields';
+    use HasFactory;
+
+    public $table = 'synchronizer_excluded_fields';
     public $timestamps = true;
 
     protected $casts = [
@@ -29,4 +32,9 @@ class SynchronizerField extends Model
         'model',
         'update_empty',
     ];
+
+    public static function newFactory()
+    {
+        return ExcludedFieldFactory::new();
+    }
 }

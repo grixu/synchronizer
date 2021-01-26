@@ -2,14 +2,9 @@
 
 namespace Grixu\Synchronizer\Tests\Commands;
 
-use Grixu\Synchronizer\Tests\Helpers\BaseTestCase;
+use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
-
-/**
- * Class AddExcludedFieldCommandTest
- * @package Grixu\Synchronizer\Tests
- */
-class AddExcludedFieldCommandTest extends BaseTestCase
+class AddExcludedFieldCommandTest extends TestCase
 {
     /** @test */
     public function walkthrough()
