@@ -76,9 +76,4 @@ class ModelSynchronizer
 
         return $data;
     }
-
-    protected function log()
-    {
-
-    }
 }

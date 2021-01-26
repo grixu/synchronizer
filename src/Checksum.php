@@ -29,9 +29,9 @@ class Checksum
         );
     }
 
-    public function validate()
+    public function validate(): bool
     {
-        if (config('synchronizer.checksum_control') == false || empty(config('synchronizer.checksum_control'))) {
+        if (!$this->isChecksumEnabled()) {
             return false;
         }
 
@@ -42,6 +42,11 @@ class Checksum
         }
 
         return $this->model->$md5FieldName === $this->getMd5();
+    }
+
+    protected function isChecksumEnabled(): bool
+    {
+       return config('synchronizer.checksum_control') == true || !empty(config('synchronizer.checksum_control'));
     }
 
     protected function getMd5FieldName(): string
@@ -56,6 +61,9 @@ class Checksum
 
     public function update(): void
     {
+        if (!$this->isChecksumEnabled())
+            return;
+
         $md5FieldName = $this->getMd5FieldName();
         $this->model->$md5FieldName = $this->getMd5();
         $this->model->save();
