@@ -1,6 +1,6 @@
 # Synchronizer
 
-Engine for sync data between two systems (eg. Comarch CDN XL and some custom Laravel app or API). This package allows to exclude some fields from synchronization but still, you can get data from excluded fields if local field is empty. There is logging of changes to database - so you can easily check what was changed and on which fields. 
+Simple library for sync data between two systems (eg. Comarch CDN XL and yours Laravel app). This package allows to exclude some fields from synchronization using simple artisan commands. Yet, you can mark option to filling data from source if your local resource is empty. All changes done on models are logged to database, so you can easily check what and when was updated.
 
 ## Installation
 
@@ -13,64 +13,51 @@ composer require grixu/synchronizer
 ## Usage
 
 ```php
-// You can use facade as well
-use Grixu\Synchronizer\Synchronizer;
+use Grixu\Synchronizer\CollectionSynchronizer;
 
-// At first create assoc array which be map of local field name
-// in a key, and foreign field name in a value
-$map = [
-    'name' => 'name',
-    'updated_at' => 'updatedAt'
-];
-// for eg. $language is local model, $languageData is DTO class 
-// which contains data from other (foreign) source (API, database etc.)
-$synchronizer = new Synchronizer($map, $language, $languageData);
-$synchronizer->sync();
+/** 
+ * @param $dtoCollection \Spatie\DataTransferObject\DataTransferObjectCollection
+ * @param string $model Model class name
+ * @param string $fk Foreign key in DTO used to find your local models 
+ */
+$synchronizer = new CollectionSynchronizer($dtoCollection, Model::class, 'fk');
+
+/**
+* @param array|null $map Assoc array with dtoFieldName => modelFieldName
+ */
+$synchronizer->sync($map);
 ```
 
-### Event firing
-
-When Synchronizer detects changes will fire a `SynchronizerDetectChangesEvent`. This event takes
-one argument - local model. So you can easily add a listener in your app and for eg. notify 
-another microservices about data update.
-
-### Configuration
+## Configuration
 
 There are 5 options available in config file to adjust how `synchronizer` should work and behave:
 ```php
 return [
-    'send_slack_sum_up' => env('SYNCHRONIZER_SLACK_SUM_UP', true),
+    'send_slack_sum_up' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
     'db_logging' => env('SYNCHRONIZER_DB_LOGGING',true),
-    'log_turned_off_fields' => [
+    'timestamps' => [
         'updated_at'
     ],
-    'md5_control' => env('SYNCHRONIZER_MD5_CONTROL', true),
-    'md5_local_model_field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+    'checksum_control' => env('SYNCHRONIZER_MD5_CONTROL', true),
+    'checksum_field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
 ];
 ```
 
-Option `send_slack_sum_up` should be used to block sending daily sum ups to Slack channel. You could still use Slack notifications in your app, but simply turn off notifications from this package.
+Option `send_slack_sum_up` when have true value, `CollectionSynchronizer` will send information to Slack channel about all creation/update changes.
 
-`db_logging` flag designed to switch on/off logging changes in local model to database.
+`db_logging` flag designed to switch on/off logging changes in a database.
 
-In `log_turned_off_fields` array you could define names of fields used as timestamp - which should not be logged as change in local model.
+In `timestamps` array you could define names of fields used as timestamp - which should not be logged as changes.
 
-For simplify checking changes between local model and foreign DTO, Synchronizer have a built-in
- feature: comparing md5 generated from last sync with newly generated based on selected fields from
- foreign DTO. In `Synchronizer` class, method `sync()` on the very beginning call method 
- `checkChanges()` to calculate and verify md5 checksums. 
+For checking changes between local model and foreign DTO, Synchronizer use comparing checksum from last sync with new one. Checksum is generated one from fields which are used in sync and are not timestamps. To use it properly you should an extra field in your local models which are not in DTO. Pass this field name to `checksum_field` in config file.
 
-To turn on this feature just set up `SYNCHRONIZER_MD5_CONTROL` and `SYNCHRONIZER_MD5_FIELD` in your
- `.env` file and add a field (name of this field you just set up in `SYNCHRONIZER_MD5_FIELD`)
- contains md5 checksum in every model you use in synchronization process.
+To turn off this feature just set up `checksum_control` as false.
 
 ### Artisan commands
 
-We have 4 available commands:
+We have 2 available commands:
 - `synchronizer:add` - used to add new excluded field at specified model
 - `synchronizer:list` - to list and delete excluded fields
-- `synchronizer:send` - for sending daily sum ups about amounts of changes in models
-- `synchronizer:set` - to set timestamp (beginning) for daily sum ups. This command should be used after cache purge. Due to last sum ups send timestamp located in a cache. 
 
 ### Testing
 
