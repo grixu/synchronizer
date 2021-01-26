@@ -2,6 +2,11 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.0.2 - 2021-01-26
+
+- Bug fixed in CollectionSynchronizer
+- Added disabling/enabled constrained checks for time os making sync
+
 ## 2.0.1 - 2021-01-26
 
 - Bug fix in Logger

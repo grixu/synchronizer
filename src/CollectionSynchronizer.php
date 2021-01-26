@@ -5,6 +5,7 @@ namespace Grixu\Synchronizer;
 use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Log as LogFacade;
+use Illuminate\Support\Facades\Schema;
 use Spatie\DataTransferObject\DataTransferObjectCollection;
 
 class CollectionSynchronizer
@@ -23,7 +24,7 @@ class CollectionSynchronizer
         $this->model = $model;
 
         foreach ($dtoCollection as $dto) {
-            if (empty($dto->$foreignKey)) {
+            if (is_null($dto->$foreignKey)) {
                 throw new EmptyForeignKeyInDto();
             }
 
@@ -41,6 +42,7 @@ class CollectionSynchronizer
         $idsNotFound = $this->diffCheck($models);
         $fk = $this->foreignKey;
 
+        Schema::disableForeignKeyConstraints();
         foreach ($this->dtoCollection as $dto) {
             if (in_array($dto->$fk, $idsNotFound)) {
                 (new ModelSynchronizer($dto, $this->model, $map))->sync();
@@ -52,6 +54,7 @@ class CollectionSynchronizer
             (new ModelSynchronizer($dto, $model, $map))->sync();
             $this->updated++;
         }
+        Schema::enableForeignKeyConstraints();
 
         $this->sendReport();
     }
