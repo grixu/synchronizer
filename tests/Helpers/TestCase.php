@@ -13,7 +13,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('socius-models.md5_local_model_field', 'checksum');
+        $app['config']->set('socius-models.checksum_field', 'checksum');
     }
 
     protected function setUp(): void
