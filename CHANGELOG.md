@@ -2,6 +2,9 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.0.1 - 2021-01-26
+
+- Bug fix in Logger
 
 ## 2.0.0 - 2021-01-26
 
