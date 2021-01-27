@@ -42,19 +42,21 @@ class CollectionSynchronizer
         $idsNotFound = $this->diffCheck($models);
         $fk = $this->foreignKey;
 
-        Schema::disableForeignKeyConstraints();
         foreach ($this->dtoCollection as $dto) {
             if (in_array($dto->$fk, $idsNotFound)) {
-                (new ModelSynchronizer($dto, $this->model, $map))->sync();
+                $model = (new ModelSynchronizer($dto, $this->model, $map))->sync();
                 $this->created++;
-                continue;
+            } else {
+                $model = $models->where($fk, $dto->$fk)->first();
+                (new ModelSynchronizer($dto, $model, $map))->sync();
+                $this->updated++;
             }
 
-            $model = $models->where($fk, $dto->$fk)->first();
-            (new ModelSynchronizer($dto, $model, $map))->sync();
-            $this->updated++;
+            if (!empty($dto->relationships)) {
+                $rs = new RelationshipSynchronizer($model);
+                $rs->sync($dto->relationships);
+            }
         }
-        Schema::enableForeignKeyConstraints();
 
         $this->sendReport();
     }
