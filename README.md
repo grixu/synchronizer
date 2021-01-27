@@ -13,7 +13,7 @@ composer require grixu/synchronizer
 ## Usage
 
 ```php
-use Grixu\Synchronizer\CollectionSynchronizer;
+use Grixu\Synchronizer\CollectionSynchronizer;use Grixu\Synchronizer\RelationshipSynchronizer;
 
 /** 
  * @param $dtoCollection \Spatie\DataTransferObject\DataTransferObjectCollection
@@ -26,6 +26,13 @@ $synchronizer = new CollectionSynchronizer($dtoCollection, Model::class, 'fk');
 * @param array|null $map Assoc array with dtoFieldName => modelFieldName
  */
 $synchronizer->sync($map);
+
+
+// In case you have separated DTO with relationships based on
+// RelationshipDataTransferObject you can sync them using
+// RelationshipSynchronizer, like below:
+$relationshipSynchronizer = new RelationshipSynchronizer($modelInstance);
+$relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 ```
 
 ## Configuration
