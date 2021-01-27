@@ -2,6 +2,11 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.1.0 - 2021-01-27
+
+- New: Relationship synchronizer
+- Bug fixed in CollectionSynchronizer
+
 ## 2.0.3 - 2021-01-26
 
 - Bug fixed in CollectionSynchronizer
