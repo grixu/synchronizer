@@ -2,13 +2,18 @@
 
 namespace Grixu\Synchronizer\Tests;
 
+use Grixu\RelationshipDataTransferObject\RelationshipDataCollection;
+use Grixu\SociusModels\Operator\Models\Branch;
+use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Product\DataTransferObjects\ProductDataCollection;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
+use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\CollectionSynchronizer;
 use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Log;
 
@@ -146,5 +151,35 @@ class CollectionSynchronizerTest extends TestCase
             ]
         );
         $this->assertDatabaseCount('products', 10);
+    }
+
+    /** @test */
+    public function syncs_relationships()
+    {
+        $brand = Brand::factory()->create();
+
+        $this->dtoCollection = new ProductDataCollection(
+            [
+                ProductDataFactory::new()->create(
+                    [
+                        'relationships' => RelationshipDataCollection::create([
+                            [
+                                'localClass' => Product::class,
+                                'foreignClass' => Brand::class,
+                                'localRelationshipName' => 'brand',
+                                'foreignRelatedFieldName' => 'xlId',
+                                'type' => BelongsTo::class,
+                                'foreignKey' => $brand->xlId,
+                            ]
+                        ]),
+                    ]
+                )
+            ]
+        );
+        $this->createObj();
+
+        $this->assertDatabaseCount('products', 0);
+        $this->obj->sync();
+        $this->assertDatabaseCount('products', 1);
     }
 }
