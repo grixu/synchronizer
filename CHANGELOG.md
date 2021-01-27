@@ -6,6 +6,7 @@ All notable changes to `synchronizer` will be documented in this file
 
 - New: Relationship synchronizer
 - Bug fixed in CollectionSynchronizer
+- Added starting relationships sync during Collection synchronization if DTO have `relationships` data.
 
 ## 2.0.3 - 2021-01-26
 
