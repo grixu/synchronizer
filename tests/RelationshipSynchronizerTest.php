@@ -23,7 +23,7 @@ class RelationshipSynchronizerTest extends TestCase
     protected RelationshipSynchronizer $obj;
     protected RelationshipDataCollection $data;
 
-        /** @test */
+    /** @test */
     public function it_sync_relationship_belongs_to()
     {
         $this->makeBelongsToCase();
@@ -172,5 +172,34 @@ class RelationshipSynchronizerTest extends TestCase
 
         $this->localModel->load('brand');
         $this->assertNotEmpty($this->localModel->brandId);
+    }
+
+    /** @test */
+    public function do_nothing_on_empty_foreign_keys()
+    {
+        $this->makeEmptyForeignKeysCase();
+
+        $this->obj->syncRelationship($this->data->current());
+
+        $this->localModel->load('branches');
+        $this->assertEmpty($this->localModel->branches);
+    }
+
+    protected function makeEmptyForeignKeysCase()
+    {
+        $this->makeManyToManyCase();
+        $this->data = RelationshipDataCollection::create(
+            [
+                [
+                    'localClass' => Operator::class,
+                    'foreignClass' => Branch::class,
+                    'localRelationshipName' => 'branches',
+                    'foreignRelatedFieldName' => 'xlId',
+                    'type' => BelongsTo::class,
+                    'localKey' => (int) $this->localModel->xlId,
+                    'foreignKeys' => [],
+                ]
+            ]
+        );
     }
 }

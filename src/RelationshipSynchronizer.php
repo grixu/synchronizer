@@ -28,6 +28,10 @@ class RelationshipSynchronizer
 
     public function syncRelationship(RelationshipData $relationshipData): void
     {
+        if ($this->isForeignKeysEmpty($relationshipData)) {
+            return;
+        }
+
         $this->checkModelClass($relationshipData->localClass);
 
         $localMethod = $relationshipData->localRelationshipName;
@@ -44,6 +48,15 @@ class RelationshipSynchronizer
         }
 
         $this->model->save();
+    }
+
+    private function isForeignKeysEmpty(RelationshipData $relationshipData): bool
+    {
+        if (is_null($relationshipData->foreignKey) && empty($relationshipData->foreignKeys)) {
+            return true;
+        }
+
+        return false;
     }
 
     private function checkModelClass(string $localModelClass): void
