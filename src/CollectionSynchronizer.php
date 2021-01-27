@@ -24,7 +24,7 @@ class CollectionSynchronizer
         $this->model = $model;
 
         foreach ($dtoCollection as $dto) {
-            if (is_null($dto->$foreignKey)) {
+            if (!isset($dto->$foreignKey) || is_null($dto->$foreignKey)) {
                 throw new EmptyForeignKeyInDto();
             }
 
