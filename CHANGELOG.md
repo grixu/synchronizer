@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.1.1 - 2021-01-27
+
+- Added: not starting sync when there is no foreignKey
+
 ## 2.1.0 - 2021-01-27
 
 - New: Relationship synchronizer
