@@ -17,12 +17,13 @@
     ],
     "require": {
         "php": "^7.4|^8.0",
+        "ext-json": "*",
+        "grixu/relationship-data-transfer-object": "^1.1",
         "illuminate/console": "^8.15",
         "illuminate/database": "^8.15",
         "illuminate/support": "^8.15",
         "laravel/slack-notification-channel": "^2.3",
-        "spatie/data-transfer-object": "^2.5",
-        "ext-json": "*"
+        "spatie/data-transfer-object": "^2.5"
     },
     "require-dev": {
         "fakerphp/faker": "^1.11",

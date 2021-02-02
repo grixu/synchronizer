@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.2.2 - 2021-02-02
+
+- Bug fixed: added `grixu/relationship-data-transfer-object` as dependency
+
 ## 2.1.1 - 2021-01-27
 
 - Added: not starting sync when there is no foreignKey
