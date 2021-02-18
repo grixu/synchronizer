@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.3.0 - 2021-02-18
+
+- There is no more requirement to use `DataTransferObjectCollection` instead just use `Illuminate\Support\Collection`
+
 ## 2.2.2 - 2021-02-02
 
 - Bug fixed: added `grixu/relationship-data-transfer-object` as dependency
