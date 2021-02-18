@@ -3,9 +3,6 @@
 namespace Grixu\Synchronizer\Tests;
 
 use Grixu\RelationshipDataTransferObject\RelationshipDataCollection;
-use Grixu\SociusModels\Operator\Models\Branch;
-use Grixu\SociusModels\Operator\Models\Operator;
-use Grixu\SociusModels\Product\DataTransferObjects\ProductDataCollection;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
@@ -15,6 +12,7 @@ use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 
 class CollectionSynchronizerTest extends TestCase
@@ -22,7 +20,7 @@ class CollectionSynchronizerTest extends TestCase
     use MigrateProductsTrait;
     use RefreshDatabase;
 
-    protected ProductDataCollection $dtoCollection;
+    protected Collection $dtoCollection;
     protected CollectionSynchronizer $obj;
 
     protected function slackConfig($app)
@@ -37,7 +35,7 @@ class CollectionSynchronizerTest extends TestCase
 
         $this->migrateProducts();
 
-        $this->dtoCollection = new ProductDataCollection(
+        $this->dtoCollection = new Collection(
             ProductDataFactory::times(10)->create()->toArray()
         );
 
@@ -90,9 +88,9 @@ class CollectionSynchronizerTest extends TestCase
     {
         $this->createModelsBasedOnDto();
 
-        $this->dtoCollection = new ProductDataCollection(
+        $this->dtoCollection = new Collection(
             array_merge(
-                $this->dtoCollection->items(),
+                $this->dtoCollection->toArray(),
                 ProductDataFactory::times(10)->create()->toArray()
             )
         );
@@ -158,7 +156,7 @@ class CollectionSynchronizerTest extends TestCase
     {
         $brand = Brand::factory()->create();
 
-        $this->dtoCollection = new ProductDataCollection(
+        $this->dtoCollection = new Collection(
             [
                 ProductDataFactory::new()->create(
                     [

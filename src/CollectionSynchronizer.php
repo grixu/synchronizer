@@ -3,14 +3,13 @@
 namespace Grixu\Synchronizer;
 
 use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
-use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log as LogFacade;
-use Illuminate\Support\Facades\Schema;
-use Spatie\DataTransferObject\DataTransferObjectCollection;
 
 class CollectionSynchronizer
 {
-    protected DataTransferObjectCollection $dtoCollection;
+    protected Collection $dtoCollection;
     protected string $model;
     protected string $foreignKey;
     protected array $foreignKeys = [];
@@ -18,7 +17,7 @@ class CollectionSynchronizer
     protected int $created = 0;
     protected int $updated = 0;
 
-    public function __construct(DataTransferObjectCollection $dtoCollection, string $model, string $foreignKey)
+    public function __construct(Collection $dtoCollection, string $model, string $foreignKey)
     {
         $this->dtoCollection = $dtoCollection;
         $this->model = $model;
@@ -61,14 +60,14 @@ class CollectionSynchronizer
         $this->sendReport();
     }
 
-    protected function loadModels(): Collection
+    protected function loadModels(): EloquentCollection
     {
         return $this->model::query()
             ->whereIn($this->foreignKey, $this->foreignKeys)
             ->get();
     }
 
-    protected function diffCheck(Collection $models): array
+    protected function diffCheck(EloquentCollection $models): array
     {
         $idsFound = $models->pluck($this->foreignKey)->toArray();
         return array_diff($this->foreignKeys, $idsFound);
@@ -79,7 +78,7 @@ class CollectionSynchronizer
         if (is_array($map)) {
             return MapFactory::makeFromArray($map, $this->model);
         } else {
-            return MapFactory::makeFromDto($this->dtoCollection->items()[0], $this->model);
+            return MapFactory::makeFromDto($this->dtoCollection->get(0), $this->model);
         }
     }
 
