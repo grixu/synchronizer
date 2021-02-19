@@ -78,7 +78,7 @@ class CollectionSynchronizer
         if (is_array($map)) {
             return MapFactory::makeFromArray($map, $this->model);
         } else {
-            return MapFactory::makeFromDto($this->dtoCollection->get(0), $this->model);
+            return MapFactory::makeFromDto($this->dtoCollection->first(), $this->model);
         }
     }
 

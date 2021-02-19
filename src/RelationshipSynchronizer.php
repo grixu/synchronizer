@@ -39,15 +39,17 @@ class RelationshipSynchronizer
 
         $foreignKeys = $this->loadForeignKeys($relationshipData);
 
-        switch ($relationshipData->type) {
-            case BelongsTo::class:
-                $this->associateBelongsTo($this->model->$localMethod(), $foreignKeys[0]);
-                break;
-            case BelongsToMany::class:
-                $this->attachManyToMany($this->model->$localMethod(), $foreignKeys);
-        }
+        if (!empty($foreignKeys)) {
+            switch ($relationshipData->type) {
+                case BelongsTo::class:
+                    $this->associateBelongsTo($this->model->$localMethod(), $foreignKeys[0]);
+                    break;
+                case BelongsToMany::class:
+                    $this->attachManyToMany($this->model->$localMethod(), $foreignKeys);
+            }
 
-        $this->model->save();
+            $this->model->save();
+        }
     }
 
     private function isForeignKeysEmpty(RelationshipData $relationshipData): bool
