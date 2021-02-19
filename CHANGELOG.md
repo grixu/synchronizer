@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.2.1 - 2021-02-19
+
+- Minor bug fixes
+
 ## 2.2.0 - 2021-02-18
 
 - There is no more requirement to use `DataTransferObjectCollection` instead just use `Illuminate\Support\Collection`
