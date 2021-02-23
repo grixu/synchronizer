@@ -5,12 +5,15 @@ namespace Grixu\Synchronizer\Tests;
 use Grixu\SociusModels\Product\DataTransferObjects\ProductData;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
+use Grixu\Synchronizer\Events\ModelCreatedEvent;
+use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
 use Grixu\Synchronizer\MapFactory;
 use Grixu\Synchronizer\Models\Log;
 use Grixu\Synchronizer\ModelSynchronizer;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Event;
 
 class ModelSynchronizerTest extends TestCase
 {
@@ -119,5 +122,27 @@ class ModelSynchronizerTest extends TestCase
                 in_array($log['modelField'], config('synchronizer.timestamps'))
             );
         }
+    }
+
+    /** @test */
+    public function it_firing_event_when_model_is_created()
+    {
+        Event::fake();
+
+        $this->it_creates_model();
+
+        Event::assertDispatched(ModelCreatedEvent::class);
+        Event::assertNotDispatched(ModelSynchronizedEvent::class);
+    }
+
+    /** @test */
+    public function it_firing_event_when_model_is_synced()
+    {
+        Event::fake();
+
+        $this->it_updates_model();
+
+        Event::assertDispatched(ModelSynchronizedEvent::class);
+        Event::assertNotDispatched(ModelCreatedEvent::class);
     }
 }

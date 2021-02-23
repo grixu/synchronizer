@@ -2,6 +2,8 @@
 
 namespace Grixu\Synchronizer;
 
+use Grixu\Synchronizer\Events\ModelCreatedEvent;
+use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
 use Illuminate\Database\Eloquent\Model;
 use Spatie\DataTransferObject\DataTransferObject;
 
@@ -22,6 +24,7 @@ class ModelSynchronizer
             $map = MapFactory::makeFromDto($dto, $modelName);
         }
 
+        /** @var Map $map */
         $this->map = $map;
     }
 
@@ -30,6 +33,8 @@ class ModelSynchronizer
         if (is_string($this->model)) {
             $this->model = $this->createModel();
             $this->isModelCreated = true;
+
+            event(new ModelCreatedEvent(get_class($this->model)));
         }
 
         $checksum = new Checksum($this->map, $this->model);
@@ -48,6 +53,8 @@ class ModelSynchronizer
         $this->model->save();
         $checksum->update();
         $logger->save();
+
+        event(new ModelSynchronizedEvent(get_class($this->model)));
 
         return $this->model;
     }
