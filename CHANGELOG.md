@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.3.0 - 2021-02-23
+
+- Added firing event when model is created or synchronized.
+
 ## 2.2.1 - 2021-02-19
 
 - Minor bug fixes
