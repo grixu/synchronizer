@@ -22,6 +22,7 @@
         "illuminate/console": "^8.15",
         "illuminate/database": "^8.15",
         "illuminate/support": "^8.15",
+        "illuminate/events": "^8.15",
         "laravel/slack-notification-channel": "^2.3",
         "spatie/data-transfer-object": "^2.5"
     },
