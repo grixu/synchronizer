@@ -26,7 +26,7 @@ class CollectionSynchronizerTest extends TestCase
     protected function slackConfig($app)
     {
         $app['config']->set('synchronizer.send_slack_sum_up', true);
-        $app['config']->set('logging.slack.url', 'http://slack.com');
+        $app['config']->set('logging.channels.slack.url', 'http://slack.com');
     }
 
     protected function setUp(): void

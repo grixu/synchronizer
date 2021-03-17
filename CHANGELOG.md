@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 2.3.1 - 2021-03-17
+
+- Bug fixed in wrong path to Slack webhook url from logging config
+
 ## 2.3.0 - 2021-02-23
 
 - Added firing event when model is created or synchronized.
