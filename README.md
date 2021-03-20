@@ -1,6 +1,9 @@
 # Synchronizer
 
-Simple library for sync data between two systems (eg. Comarch CDN XL and yours Laravel app). This package allows to exclude some fields from synchronization using simple artisan commands. Yet, you can mark option to filling data from source if your local resource is empty. All changes done on models are logged to database, so you can easily check what and when was updated.
+Simple library for sync data between two systems (eg. Comarch CDN XL and yours Laravel app). This package allows to
+exclude some fields from synchronization using simple artisan commands. Yet, you can mark option to filling data from
+source if your local resource is empty. All changes done on models are logged to database, so you can easily check what
+and when was updated.
 
 ## Installation
 
@@ -12,8 +15,11 @@ composer require grixu/synchronizer
 
 ## Usage
 
+### Simple synchronization
+
 ```php
-use Grixu\Synchronizer\CollectionSynchronizer;use Grixu\Synchronizer\RelationshipSynchronizer;
+use Grixu\Synchronizer\CollectionSynchronizer;
+use Grixu\Synchronizer\RelationshipSynchronizer;
 
 /** 
  * @param $dtoCollection \Spatie\DataTransferObject\DataTransferObjectCollection
@@ -35,9 +41,14 @@ $relationshipSynchronizer = new RelationshipSynchronizer($modelInstance);
 $relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 ```
 
+### Advanced use with jobs & dividing to smaller pieces of data
+
+TODO
+
 ## Configuration
 
 There are 5 options available in config file to adjust how `synchronizer` should work and behave:
+
 ```php
 return [
     'send_slack_sum_up' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
@@ -50,19 +61,23 @@ return [
 ];
 ```
 
-Option `send_slack_sum_up` when have true value, `CollectionSynchronizer` will send information to Slack channel about all creation/update changes.
+Option `send_slack_sum_up` when have true value, `CollectionSynchronizer` will send information to Slack channel about
+all creation/update changes.
 
 `db_logging` flag designed to switch on/off logging changes in a database.
 
 In `timestamps` array you could define names of fields used as timestamp - which should not be logged as changes.
 
-For checking changes between local model and foreign DTO, Synchronizer use comparing checksum from last sync with new one. Checksum is generated one from fields which are used in sync and are not timestamps. To use it properly you should an extra field in your local models which are not in DTO. Pass this field name to `checksum_field` in config file.
+For checking changes between local model and foreign DTO, Synchronizer use comparing checksum from last sync with new
+one. Checksum is generated one from fields which are used in sync and are not timestamps. To use it properly you should
+an extra field in your local models which are not in DTO. Pass this field name to `checksum_field` in config file.
 
 To turn off this feature just set up `checksum_control` as false.
 
 ### Artisan commands
 
 We have 2 available commands:
+
 - `synchronizer:add` - used to add new excluded field at specified model
 - `synchronizer:list` - to list and delete excluded fields
 
