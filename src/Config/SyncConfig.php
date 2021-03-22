@@ -5,14 +5,13 @@ namespace Grixu\Synchronizer\Config;
 use Closure;
 use Grixu\Synchronizer\Contracts\LoaderInterface;
 use Grixu\Synchronizer\Contracts\ParserInterface;
-use Grixu\Synchronizer\Traits\CheckInterfaceImplementation;
+use Grixu\Synchronizer\Exceptions\InterfaceNotImplemented;
 use Illuminate\Queue\SerializableClosure;
 use JetBrains\PhpStorm\Pure;
+use ReflectionClass;
 
 class SyncConfig
 {
-    use CheckInterfaceImplementation;
-
     public function __construct(
         protected string $loaderClass,
         protected string $parserClass,
@@ -24,6 +23,18 @@ class SyncConfig
     ) {
         $this->checkClassIsImplementingInterface($loaderClass, LoaderInterface::class);
         $this->checkClassIsImplementingInterface($parserClass, ParserInterface::class);
+    }
+
+    protected function checkClassIsImplementingInterface(string $className, string $interfaceName)
+    {
+        $classReflection = new ReflectionClass($className);
+
+        $interfacesImplemented = array_keys($classReflection->getInterfaces());
+        $isInterfaceImplemented = in_array($interfaceName, $interfacesImplemented);
+
+        if (!$isInterfaceImplemented) {
+            throw new InterfaceNotImplemented();
+        }
     }
 
     #[Pure]
