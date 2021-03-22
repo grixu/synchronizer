@@ -8,4 +8,5 @@ return [
     ],
     'checksum_control' => env('SYNCHRONIZER_MD5_CONTROL', true),
     'checksum_field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+    'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
 ];
