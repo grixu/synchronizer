@@ -3,19 +3,27 @@
 namespace Grixu\Synchronizer\Config;
 
 use Closure;
+use Grixu\Synchronizer\Contracts\LoaderInterface;
+use Grixu\Synchronizer\Contracts\ParserInterface;
+use Grixu\Synchronizer\Traits\CheckInterfaceImplementation;
+use Illuminate\Queue\SerializableClosure;
 use JetBrains\PhpStorm\Pure;
 
 class SyncConfig
 {
+    use CheckInterfaceImplementation;
+
     public function __construct(
         protected string $loaderClass,
         protected string $parserClass,
         protected string $localModel,
         protected string $foreignKey,
         protected ?array $idsToSync = [],
-        protected ?Closure $syncClosure = null,
-        protected ?Closure $errorHandler = null
+        protected Closure|SerializableClosure|null $syncClosure = null,
+        protected Closure|SerializableClosure|null $errorHandler = null
     ) {
+        $this->checkClassIsImplementingInterface($loaderClass, LoaderInterface::class);
+        $this->checkClassIsImplementingInterface($parserClass, ParserInterface::class);
     }
 
     #[Pure]
@@ -55,22 +63,22 @@ class SyncConfig
         $this->idsToSync = $idsToSync;
     }
 
-    public function getSyncClosure(): ?Closure
+    public function getSyncClosure(): Closure|SerializableClosure|null
     {
         return $this->syncClosure;
     }
 
-    public function setSyncClosure(?Closure $syncClosure): void
+    public function setSyncClosure(Closure|SerializableClosure|null $syncClosure): void
     {
         $this->syncClosure = $syncClosure;
     }
 
-    public function getErrorHandler(): ?Closure
+    public function getErrorHandler(): Closure|SerializableClosure|null
     {
         return $this->errorHandler;
     }
 
-    public function setErrorHandler(?Closure $errorHandler): void
+    public function setErrorHandler(Closure|SerializableClosure|null $errorHandler): void
     {
         $this->errorHandler = $errorHandler;
     }
