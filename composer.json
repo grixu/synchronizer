@@ -20,6 +20,7 @@
         "ext-json": "*",
         "grixu/relationship-data-transfer-object": "^1.1",
         "illuminate/console": "^8.15",
+        "illuminate/broadcasting": "^8.15",
         "illuminate/database": "^8.15",
         "illuminate/support": "^8.15",
         "illuminate/events": "^8.15",
