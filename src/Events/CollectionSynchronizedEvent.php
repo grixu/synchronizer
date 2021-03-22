@@ -2,20 +2,8 @@
 
 namespace Grixu\Synchronizer\Events;
 
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Foundation\Events\Dispatchable;
-use Illuminate\Queue\SerializesModels;
+use Grixu\Synchronizer\Abstracts\AbstractSynchronizerEvent;
 
-class CollectionSynchronizedEvent
+class CollectionSynchronizedEvent extends AbstractSynchronizerEvent
 {
-    use Dispatchable;
-    use InteractsWithSockets;
-    use SerializesModels;
-
-    public string $model;
-
-    public function __construct(string $model)
-    {
-        $this->model = $model;
-    }
 }
