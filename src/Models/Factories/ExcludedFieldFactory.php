@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer\Factories;
+namespace Grixu\Synchronizer\Models\Factories;
 
 use Grixu\Synchronizer\Models\ExcludedField;
 use Illuminate\Database\Eloquent\Factories\Factory;

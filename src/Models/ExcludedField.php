@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Models;
 
-use Grixu\Synchronizer\Factories\ExcludedFieldFactory;
+use Grixu\Synchronizer\Models\Factories\ExcludedFieldFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
