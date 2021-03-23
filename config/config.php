@@ -1,16 +1,25 @@
 <?php
 
 return [
-    'send_slack_sum_up' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
-    'db_logging' => env('SYNCHRONIZER_DB_LOGGING',true),
+    'sync' => [
+        'send_notification' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
+        'logging' => env('SYNCHRONIZER_DB_LOGGING',true),
 
-    'timestamps' => [
-        'updatedAt'
+        'timestamps' => [
+            'updatedAt'
+        ],
+
+        'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
     ],
 
-    'checksum_control' => env('SYNCHRONIZER_MD5_CONTROL', true),
-    'checksum_field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
-    'checksum_timestamps_excluded' => false,
+    'checksum' => [
+        'control' => env('SYNCHRONIZER_MD5_CONTROL', true),
+        'field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+        'timestamps_excluded' => false,
+    ],
 
-    'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
+//    'handlers' => [
+//        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,
+//        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class
+//    ],
 ];
