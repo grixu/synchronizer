@@ -8,7 +8,6 @@ use JetBrains\PhpStorm\Pure;
 
 class FakeSyncConfig
 {
-    #[Pure]
     public static function make(): SyncConfig
     {
         return new SyncConfig(
