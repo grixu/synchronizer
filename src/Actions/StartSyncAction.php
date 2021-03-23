@@ -3,6 +3,7 @@
 namespace Grixu\Synchronizer\Actions;
 
 use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
 use Grixu\Synchronizer\Jobs\LoadDataToSyncJob;
 use Illuminate\Bus\Batch;
@@ -38,7 +39,15 @@ class StartSyncAction
     {
         if (is_array($config)) {
             $configCollection = collect($config);
-            $configCollection = $configCollection->map(fn ($item) => SyncConfig::make(...$item));
+            $configCollection = $configCollection->map(function ($item) {
+                if (is_array($item)) {
+                    /** @var SyncConfigFactory $factory */
+                    $factory = app(SyncConfigFactory::class);
+                    return $factory->make(...$item);
+                }
+
+                return $item;
+            });
         } else {
             $configCollection = collect([$config]);
         }
