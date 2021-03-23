@@ -40,12 +40,12 @@ class ChecksumTest extends TestCase
 
     protected function checksumControlOff($app)
     {
-        $app['config']->set('synchronizer.checksum_control', false);
+        $app['config']->set('synchronizer.checksum.control', false);
     }
 
     protected function checksumFieldEmpty($app)
     {
-        $app['config']->set('synchronizer.checksum_field', null);
+        $app['config']->set('synchronizer.checksum.field', null);
     }
 
     /** @test */
@@ -64,8 +64,8 @@ class ChecksumTest extends TestCase
     /** @test */
     public function it_validating_md5()
     {
-        $this->assertNotEmpty(config('synchronizer.checksum_field'));
-        $this->assertTrue(config('synchronizer.checksum_control'));
+        $this->assertNotEmpty(config('synchronizer.checksum.field'));
+        $this->assertTrue(config('synchronizer.checksum.control'));
         $this->assertIsBool($this->obj->validate());
         $this->assertFalse($this->obj->validate());
     }
@@ -110,7 +110,7 @@ class ChecksumTest extends TestCase
         try {
             $this->obj->validate();
             $this->assertTrue(false);
-        } catch (EmptyMd5FieldNameInConfigException $exception) {
+        } catch (EmptyMd5FieldNameInConfigException) {
             $this->assertTrue(true);
         }
     }
@@ -124,7 +124,7 @@ class ChecksumTest extends TestCase
         try {
             $this->obj->update();
             $this->assertTrue(false);
-        } catch (EmptyMd5FieldNameInConfigException $exception) {
+        } catch (EmptyMd5FieldNameInConfigException) {
             $this->assertTrue(true);
         }
     }

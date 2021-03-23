@@ -162,6 +162,6 @@ class MapTest extends TestCase
 
     protected function useChecksumTimestampExcluded($app)
     {
-        $app->config->set('synchronizer.checksum_timestamps_excluded', true);
+        $app->config->set('synchronizer.checksum.timestamps_excluded', true);
     }
 }

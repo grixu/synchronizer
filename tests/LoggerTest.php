@@ -11,7 +11,7 @@ class LoggerTest extends TestCase
 {
     protected function dbLoggingOff($app)
     {
-        $app['config']->set('synchronizer.db_logging', false);
+        $app['config']->set('synchronizer.sync.logging', false);
     }
 
     /** @test */
@@ -123,7 +123,7 @@ class LoggerTest extends TestCase
      * @test
      * @environment-setup dbLoggingOff
      */
-    public function when_db_logging_is_off()
+    public function when_sync_logging_is_off()
     {
         $this->assertDatabaseCount('synchronizer_logs', 0);
 

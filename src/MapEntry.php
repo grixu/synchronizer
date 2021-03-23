@@ -32,7 +32,7 @@ class MapEntry
 
     public function isTimestamp(): bool
     {
-        return in_array($this->modelField, config('synchronizer.timestamps'));
+        return in_array($this->modelField, config('synchronizer.sync.timestamps'));
     }
 
     public function getDtoField(): string

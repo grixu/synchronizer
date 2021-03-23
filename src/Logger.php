@@ -20,7 +20,7 @@ class Logger
 
     public function addChanges(string $dtoField, string $modelField, $dtoValue = null, $modelValue = null): void
     {
-        if ($dtoValue !== $modelValue && !in_array($modelField, config('synchronizer.timestamps'))) {
+        if ($dtoValue !== $modelValue && !in_array($modelField, config('synchronizer.sync.timestamps'))) {
             $this->changes[] =
                 [
                     'dtoField' => $dtoField,
@@ -38,7 +38,7 @@ class Logger
 
     public function save(): void
     {
-        if (config('synchronizer.db_logging') == true && count($this->changes) > 0) {
+        if (config('synchronizer.sync.logging') == true && count($this->changes) > 0) {
             Log::create(
                 [
                     'model' => $this->model,

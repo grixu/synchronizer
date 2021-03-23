@@ -53,7 +53,7 @@ class Map
 
     public function getModelFieldsArray(?Model $model=null): array
     {
-        if (config('synchronizer.checksum_timestamps_excluded')) {
+        if (config('synchronizer.checksum.timestamps_excluded')) {
             $fields = $this->getWithoutTimestamps($model);
         } else {
             $fields = $this->get($model);

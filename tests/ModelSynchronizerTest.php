@@ -119,7 +119,7 @@ class ModelSynchronizerTest extends TestCase
         foreach ($model->log as $log) {
             $this->assertEquals(
                 false,
-                in_array($log['modelField'], config('synchronizer.timestamps'))
+                in_array($log['modelField'], config('synchronizer.sync.timestamps'))
             );
         }
     }
@@ -164,7 +164,7 @@ class ModelSynchronizerTest extends TestCase
 
     protected function useChecksumTimestampExcluded($app)
     {
-        $app->config->set('synchronizer.checksum_timestamps_excluded', true);
+        $app->config->set('synchronizer.checksum.timestamps_excluded', true);
     }
 
     /**

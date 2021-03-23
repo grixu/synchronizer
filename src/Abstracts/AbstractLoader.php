@@ -35,7 +35,7 @@ abstract class AbstractLoader implements LoaderInterface
     {
         $this->checkIsDataLoaded();
 
-        return $this->data->chunk(config('synchronizer.default_chunk_size'));
+        return $this->data->chunk(config('synchronizer.sync.default_chunk_size'));
     }
 
     public function getRaw(): Collection
