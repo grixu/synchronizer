@@ -115,28 +115,54 @@ There are 5 options available in config file to adjust how `synchronizer` should
 
 ```php
 return [
-    'send_slack_sum_up' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
-    'db_logging' => env('SYNCHRONIZER_DB_LOGGING',true),
-    'timestamps' => [
-        'updated_at'
+    'sync' => [
+        'send_notification' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
+        'logging' => env('SYNCHRONIZER_DB_LOGGING',true),
+
+        'timestamps' => [
+            'updatedAt'
+        ],
+
+        'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
     ],
-    'checksum_control' => env('SYNCHRONIZER_MD5_CONTROL', true),
-    'checksum_field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+
+    'checksum' => [
+        'control' => env('SYNCHRONIZER_MD5_CONTROL', true),
+        'field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+        'timestamps_excluded' => false,
+    ],
+
+//    'handlers' => [
+//        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,
+//        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class
+//    ],
 ];
 ```
 
-Option `send_slack_sum_up` when have true value, `CollectionSynchronizer` will send information to Slack channel about
-all creation/update changes.
+### Sync block
 
-`db_logging` flag designed to switch on/off logging changes in a database.
+When option `send_notification` is equals true, `CollectionSynchronizer` after sync send information to Slack channel
+about all creation/update changes.
 
-In `timestamps` array you could define names of fields used as timestamp - which should not be logged as changes.
+`logging` flag is designed to switch on/off logging changes in a database.
+
+In `timestamps` array you could define names of fields used as timestamp in all your models - those fields would not be
+logged as change by logger.
+
+### Checksum block
 
 For checking changes between local model and foreign DTO, Synchronizer use comparing checksum from last sync with new
 one. Checksum is generated one from fields which are used in sync and are not timestamps. To use it properly you should
 an extra field in your local models which are not in DTO. Pass this field name to `checksum_field` in config file.
 
-To turn off this feature just set up `checksum_control` as false.
+To turn off this feature just set up `control` as false.
+
+Option `timestamp_excluded` when enabled do not use timestamp fields to generate a checksum.
+
+### Handlers block
+
+By default, this block is disabled because it is not necessary to synchronizer work properly. It gives you possibility
+to customize sync process and error handling in `SyncDataParsedJob` and `StartSyncAction`.
 
 ### Artisan commands
 
