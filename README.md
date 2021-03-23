@@ -132,6 +132,10 @@ We have 2 available commands:
 
 ### Testing
 
+Before you start running test, please create .sqlite database which contains example tables from a database you would
+like to sync. More information about it, you can find in: `tests/Helpers/SyncTestCase`. Test which extending
+that `SyncTestCase` need access to this database.
+
 ``` bash
 composer test
 ```
