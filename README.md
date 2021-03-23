@@ -43,7 +43,56 @@ $relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 
 ### Advanced use with jobs & dividing to smaller pieces of data
 
-TODO
+```php
+use Grixu\Synchronizer\Actions\StartSyncAction;
+
+$obj = new StartSyncAction();
+$config = new \Grixu\Synchronizer\Config\SyncConfig(
+    loaderClass: SomeLoaderClass::class,
+    parserClass: SomeParserClass::class,
+    localModel: Model::class,
+    foreignKey: 'fkId',
+    idsToSync: null,
+    syncClosure: new \Illuminate\Queue\SerializableClosure(function ($collection, $config) {}),
+    errorHandler: new \Illuminate\Queue\SerializableClosure(function ($exception) {})
+);
+
+$obj->execute($config, 'sync_queue');
+```
+
+Quite a bunch of code, let's explain it!
+
+Whole process of sync we divide into 3 steps:
+
+- loading data & splitting it to chunks
+- parsing each chunk of loaded data to DTO Collection
+- syncing those collections of DTO to local database
+
+To achieve that goal, we create 3 Job classes:
+
+- `LoadDataToSyncJob`
+- `ParseLoadedDataJob`
+- `SyncDataParsedJob`
+
+An every data source have different origin and way of parsing incoming data to DTO. To provide way of customize those
+two factors, we provide two interfaces:
+
+- `LoaderInterface`
+- `ParserInterface`
+
+You should create your own loader & parser classes which will implement those interfaces accordingly.
+
+Then you create `SyncConfig` object, which take loader & parser classes as constructor arguments to pass them to Jobs
+which handling loading, parsing to use them during whole process. Just run `execute` method to start whole sync in
+single batch. You can also provide a custom name of queue which should be used in this process, like in
+e.g. `sync_queue`.
+
+Remember: you need to run queue workers by yourself! :)
+
+#### AbstractLoader
+
+If you synchronize data from database to database you can use built-in `AbstractLoader` which is prepared for handling
+such type of operations. Just create your own loader class extending `AbstractLoader` and add `buildQuery()` method.
 
 ## Configuration
 
