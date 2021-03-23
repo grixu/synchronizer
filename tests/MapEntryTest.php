@@ -61,10 +61,7 @@ class MapEntryTest extends TestCase
         $this->assertGetters($obj);
     }
 
-    /**
-     * @test
-     * @environment-setup timestampConfig
-     */
+    /** @test */
     public function field_is_timestamp()
     {
         $obj = new MapEntry('updatedAt', 'updatedAt');
@@ -72,5 +69,16 @@ class MapEntryTest extends TestCase
         $this->assertTrue($obj->isSyncable());
         $this->assertTrue($obj->isTimestamp());
         $this->assertGetters($obj, 'updatedAt');
+    }
+
+    /** @test */
+    public function field_name_on_dto_is_timestamp_not_marking_entry_as_timestamp()
+    {
+        $obj = new MapEntry('updatedAt', 'updated_at');
+
+        $this->assertTrue($obj->isSyncable());
+        $this->assertFalse($obj->isTimestamp());
+        $this->assertEquals('updatedAt', $obj->getDtoField());
+        $this->assertEquals('updated_at', $obj->getModelField());
     }
 }
