@@ -80,4 +80,15 @@ class StartSyncActionTest extends SyncTestCase
             return $request->url() == 'http://testable.dev';
         });
     }
+
+    /** @test */
+    public function it_could_use_array_of_sync_configs_too()
+    {
+        $this->runBatchAndCheckIt(
+            [
+                'customer' => FakeSyncConfig::make(),
+                'another_but_same' => FakeSyncConfig::make()
+            ]
+        );
+    }
 }
