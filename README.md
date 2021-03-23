@@ -94,6 +94,21 @@ Remember: you need to run queue workers by yourself! :)
 If you synchronize data from database to database you can use built-in `AbstractLoader` which is prepared for handling
 such type of operations. Just create your own loader class extending `AbstractLoader` and add `buildQuery()` method.
 
+#### Default sync handler
+
+Synchronizer provide `SyncHandlerInterface` which you can use to create custom class which be returning
+SerializableClosure containing code which will be used to handle synchronization in `SyncDataParsedJob`
+and `StartSyncAction`. Such Closure should take 2 arguments:
+
+- DtoCollection (`Illuminate\Support\Collection`)
+- Config (`Grixu\Config\SyncConfig`)
+
+#### Default error handler
+
+Also, there is an `ErrorHandlerInterface` that you can use to create custom class which be returning SerializableClosure
+containing code which will be fired in catch block of standard sync method in `SyncDataParsedJob`. Such a Closure should
+take 1 argument which is `Exception` class.
+
 ## Configuration
 
 There are 5 options available in config file to adjust how `synchronizer` should work and behave:
