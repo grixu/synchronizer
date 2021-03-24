@@ -7,7 +7,6 @@ use Grixu\Synchronizer\Jobs\LoadDataToSyncJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
-use Illuminate\Bus\Batch;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
