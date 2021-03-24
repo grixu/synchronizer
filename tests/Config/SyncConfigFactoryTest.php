@@ -23,6 +23,7 @@ class SyncConfigFactoryTest extends TestCase
         $this->obj = new SyncConfigFactory();
     }
 
+    /** @test */
     public function it_returns_sync_config_object()
     {
         $config = $this->obj->make(
