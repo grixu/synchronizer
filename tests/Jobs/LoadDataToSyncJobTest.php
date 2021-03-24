@@ -4,7 +4,7 @@ namespace Grixu\Synchronizer\Tests\Jobs;
 
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Jobs\LoadDataToSyncJob;
-use Grixu\Synchronizer\Tests\Helpers\FakerCancelJob;
+use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Bus\Batch;
@@ -110,7 +110,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         $job = new LoadDataToSyncJob($this->config);
         $batch = Bus::batch(
             [
-                (new FakerCancelJob()),
+                (new FakeCancelJob()),
                 $job->delay(1000)
             ]
         );

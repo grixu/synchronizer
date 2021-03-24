@@ -9,7 +9,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 
-class FakerCancelJob implements ShouldQueue
+class FakeCancelJob implements ShouldQueue
 {
     use Batchable;
     use Dispatchable;

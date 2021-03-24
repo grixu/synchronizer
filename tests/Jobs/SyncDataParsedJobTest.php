@@ -7,7 +7,7 @@ use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Jobs\SyncDataParsedJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
-use Grixu\Synchronizer\Tests\Helpers\FakerCancelJob;
+use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -151,7 +151,7 @@ class SyncDataParsedJobTest extends SyncTestCase
         $job = new SyncDataParsedJob($this->dtoCollection, $this->config);
         $batch = Bus::batch(
             [
-                (new FakerCancelJob()),
+                (new FakeCancelJob()),
                 $job->delay(1000)
             ]
         );
