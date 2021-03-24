@@ -3,6 +3,8 @@
 namespace Grixu\Synchronizer\Tests\Actions;
 
 use Grixu\Synchronizer\Actions\StartSyncAction;
+use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
+use Grixu\Synchronizer\Jobs\SyncDataParsedJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
@@ -11,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Client\Request;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
 
@@ -90,5 +93,51 @@ class StartSyncActionTest extends SyncTestCase
                 'another_but_same' => FakeSyncConfig::make()
             ]
         );
+    }
+
+    /** @test */
+    public function it_could_use_single_config_object_too()
+    {
+        Queue::fake();
+        $bus = Bus::fake();
+
+        $this->obj->execute(FakeSyncConfig::make());
+
+        $bus->assertBatched(
+            function ($batch) {
+                return $batch->jobs->count() == 1;
+            }
+        );
+    }
+
+    /** @test */
+    public function it_send_event_when_batch_finished()
+    {
+        Event::fake();
+
+        $this->obj->execute(
+            [
+                'customer' => FakeSyncConfig::make(),
+            ]
+        );
+
+        Event::assertDispatched(CollectionSynchronizedEvent::class, 1);
+    }
+
+    /** @test */
+    public function it_runs_exception_handler_for_each_config()
+    {
+        Http::fake();
+
+        $config = FakeSyncConfig::make();
+        $config->setSyncClosure(new SerializableClosure(function ($e) {
+            Http::get('http://testable.dev');
+        }));
+
+        $this->obj->execute($config);
+
+        Http::assertSent(function (Request $request) {
+            return $request->url() == 'http://testable.dev';
+        });
     }
 }
