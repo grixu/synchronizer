@@ -4,8 +4,10 @@ namespace Grixu\Synchronizer\Tests\Jobs;
 
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Jobs\LoadDataToSyncJob;
+use Grixu\Synchronizer\Tests\Helpers\FakerCancelJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
+use Illuminate\Bus\Batch;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;
@@ -100,5 +102,21 @@ class LoadDataToSyncJobTest extends SyncTestCase
                 return $batch->jobs->count() > 0;
             }
         );
+    }
+
+    /** @test */
+    public function it_reacts_to_cancellation()
+    {
+        $job = new LoadDataToSyncJob($this->config);
+        $batch = Bus::batch(
+            [
+                (new FakerCancelJob()),
+                $job->delay(1000)
+            ]
+        );
+
+        $finishedBatch = $batch->dispatch();
+
+        $this->assertTrue($finishedBatch->cancelled());
     }
 }

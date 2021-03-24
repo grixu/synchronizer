@@ -5,6 +5,7 @@ namespace Grixu\Synchronizer\Tests\Jobs;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Jobs\ParseLoadedDataJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
+use Grixu\Synchronizer\Tests\Helpers\FakerCancelJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
@@ -84,5 +85,21 @@ class ParseLoadedDataJobTest extends SyncTestCase
             ->dispatch();
 
         $this->assertGreaterThan(1, $batch->totalJobs);
+    }
+
+    /** @test */
+    public function it_reacts_to_cancellation()
+    {
+        $job = new ParseLoadedDataJob($this->dataCollection, $this->config);
+        $batch = Bus::batch(
+            [
+                (new FakerCancelJob()),
+                $job->delay(1000)
+            ]
+        );
+
+        $finishedBatch = $batch->dispatch();
+
+        $this->assertTrue($finishedBatch->cancelled());
     }
 }
