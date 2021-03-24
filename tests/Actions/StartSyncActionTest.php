@@ -4,6 +4,7 @@ namespace Grixu\Synchronizer\Tests\Actions;
 
 use Grixu\Synchronizer\Actions\StartSyncAction;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
+use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
 use Grixu\Synchronizer\Jobs\SyncDataParsedJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
@@ -115,12 +116,13 @@ class StartSyncActionTest extends SyncTestCase
     {
         Event::fake();
 
-        $this->obj->execute(
+        $batch = $this->obj->execute(
             [
                 'customer' => FakeSyncConfig::make(),
             ]
         );
 
+        $this->assertTrue($batch->finished());
         Event::assertDispatched(CollectionSynchronizedEvent::class, 1);
     }
 
