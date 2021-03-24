@@ -18,6 +18,12 @@ return [
         'timestamps_excluded' => false,
     ],
 
+    'jobs' => [
+        'load' => \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
+        'parse' => \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
+        'sync' => \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+    ],
+
 //    'handlers' => [
 //        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,
 //        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class
