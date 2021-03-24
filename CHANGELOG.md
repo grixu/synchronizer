@@ -2,12 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
-## 3.0.0 - 2021-03-23
+## 3.0.0 - 2021-03-24
 
-- Improvement in timestamps: added option in configuration though which you can decide to exclude timestamps from
-  a checksum. If you do so, models will not update if only timestamps have changed. Due to it is change from default way
+- Improvement in timestamps: added option in configuration though which you can decide to exclude timestamps from a
+  checksum. If you do so, models will not update if only timestamps have changed. Due to it is change from default way
   of how synchronizer v2 worked, we decided to keep it off by default.
-  
+
 - DTO field names are no longer checked as timestamps
 - Added Jobs fo handling sync in queues
 - An updated README with example how to use Jobs to sync big bunch of data in queues.
@@ -15,7 +15,12 @@ All notable changes to `synchronizer` will be documented in this file
 - Added `AbstractLoader` to DRY work during SQL based data loading using models with just another database connection
 - Added `StartSyncAction` which start sync in batch
 - Unified events by common abstract base class: `AbstractSynchronizerEvent`
-- Created SyncConfig class which contains
+- Created SyncConfig class which contains: loader, parser, local model class names, foreign key values which we want to
+  synchronize and sync & error handling closures.
+  
+- Created SyncConfigFactory 
+- Created interfaces for making own factories of sync & error handlers and set them as default ones.
+- Refactored config file
 
 ## 2.3.1 - 2021-03-17
 
