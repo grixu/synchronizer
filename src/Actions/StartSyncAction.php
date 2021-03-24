@@ -19,6 +19,7 @@ class StartSyncAction
 
         return Bus::batch($jobs)
             ->allowFailures()
+            // @codeCoverageIgnoreStart
             ->then(function (Batch $batch) use($configCollection) {
                 foreach ($configCollection as $config) {
                     /** @var SyncConfig $config */
@@ -31,6 +32,7 @@ class StartSyncAction
                         $config->getErrorHandler()($exception);
                 });
             })
+            // @codeCoverageIgnoreEnd
             ->onQueue($queue)
             ->dispatch();
     }
