@@ -133,8 +133,6 @@ class SyncDataParsedJobTest extends SyncTestCase
 
         $this->dtoCollection->push($brokenDto);
 
-        ray($this->dtoCollection);
-
         $obj = new SyncDataParsedJob($this->dtoCollection, $this->config);
 
         $this->assertDatabaseCount('customers', 0);
@@ -161,5 +159,23 @@ class SyncDataParsedJobTest extends SyncTestCase
         $finishedBatch = $batch->dispatch();
 
         $this->assertTrue($finishedBatch->cancelled());
+    }
+
+    /** @test */
+    public function check_sync_closure_execution()
+    {
+        Http::fake();
+
+        $this->config->setSyncClosure(function ($e) {
+            Http::get('http://testable.dev');
+        });
+
+        $obj = new SyncDataParsedJob($this->dtoCollection, $this->config);
+
+        $obj->handle();
+
+        Http::assertSent(function (Request $request) {
+            return $request->url() == 'http://testable.dev';
+        });
     }
 }
