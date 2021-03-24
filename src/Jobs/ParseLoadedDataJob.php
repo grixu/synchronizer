@@ -34,12 +34,14 @@ class ParseLoadedDataJob implements ShouldQueue
         /** @var ParserInterface $parser */
         $parser = app($parserClass);
 
-        $dtoCollection = $this->dataToParse->map(fn($item) => $parser->parse($item));
+        $dtoCollection = $parser->parse($this->dataToParse);
 
         if ($this->batch()) {
+            $jobClass = config('synchronizer.jobs.sync');
+
             $this->batch()->add(
                 [
-                    new SyncDataParsedJob($dtoCollection, $this->config)
+                    new $jobClass($dtoCollection, $this->config)
                 ]
             );
         }
