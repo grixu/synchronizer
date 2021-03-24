@@ -38,9 +38,10 @@ class LoadDataToSyncJob implements ShouldQueue
 
         if ($this->batch()) {
             $jobs = [];
+            $jobClass = config('synchronizer.jobs.parse');
 
             foreach ($dataCollection as $data) {
-                $jobs[] = new ParseLoadedDataJob($data, $this->config);
+                $jobs[] = new $jobClass($data, $this->config);
             }
 
             $this->batch()->add($jobs);
