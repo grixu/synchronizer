@@ -37,7 +37,7 @@ class SyncDataParsedJobTest extends SyncTestCase
         $dataCollection = $loader->get()->first();
 
         $parser = new FakeParser();
-        $this->dtoCollection = $dataCollection->map(fn($item) => $parser->parse($item));
+        $this->dtoCollection = $parser->parse($dataCollection);
     }
 
     /** @test */
