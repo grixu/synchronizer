@@ -2,6 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.1.0 - 2021-03-24
+
+- New interface: SingleElementParserInterface 
+- Parser conception is more prepared for other sources that SQL databases like API
+- Added new block in configuration which gives possibility to fully replace one of 3 jobs which handling sync process 
+
 ## 3.0.0 - 2021-03-24
 
 - Improvement in timestamps: added option in configuration though which you can decide to exclude timestamps from a
