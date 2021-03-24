@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Actions;
 
+use Exception;
 use Grixu\Synchronizer\Actions\StartSyncAction;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
 use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
@@ -141,5 +142,24 @@ class StartSyncActionTest extends SyncTestCase
         Http::assertSent(function (Request $request) {
             return $request->url() == 'http://testable.dev';
         });
+    }
+
+    /**
+     * @test
+     * @environment-setup useEmptyLoadJob
+     */
+    public function it_throws_exception_when_no_loading_job_defined_in_config()
+    {
+        try {
+            $this->runBatchAndCheckIt([FakeSyncConfig::makeArray()]);
+            $this->assertTrue(false);
+        } catch (Exception) {
+            $this->assertTrue(true);
+        }
+    }
+
+    protected function useEmptyLoadJob($app)
+    {
+        $app->config->set('synchronizer.jobs.load', null);
     }
 }
