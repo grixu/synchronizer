@@ -84,7 +84,7 @@ class CollectionSynchronizer
 
     protected function sendReport(): void
     {
-        if (config('synchronizer.send_slack_sum_up') == true && !empty(config('logging.channels.slack.url'))) {
+        if (!empty(config('logging.channels.slack.url'))) {
             LogFacade::channel('slack')
                 ->notice(
                     sprintf(

@@ -8,7 +8,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected function getPackageProviders($app)
     {
-        return [SynchronizerServiceProvider::class];
+        return [
+            SynchronizerServiceProvider::class,
+            \Spatie\LaravelRay\RayServiceProvider::class,
+        ];
     }
 
     protected function getEnvironmentSetUp($app)
@@ -25,6 +28,6 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function timestampConfig($app)
     {
-        $app['config']->set('synchronizer.timestamps', ['updatedAt']);
+        $app['config']->set('synchronizer.sync.timestamps', ['updatedAt']);
     }
 }

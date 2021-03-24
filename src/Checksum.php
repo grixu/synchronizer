@@ -46,12 +46,12 @@ class Checksum
 
     protected function isChecksumEnabled(): bool
     {
-       return config('synchronizer.checksum_control') == true || !empty(config('synchronizer.checksum_control'));
+       return config('synchronizer.checksum.control') == true || !empty(config('synchronizer.checksum.control'));
     }
 
     protected function getMd5FieldName(): string
     {
-        $md5FieldName = config('synchronizer.checksum_field');
+        $md5FieldName = config('synchronizer.checksum.field');
         if (empty($md5FieldName)) {
             throw new EmptyMd5FieldNameInConfigException();
         }

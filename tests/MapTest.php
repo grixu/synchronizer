@@ -147,4 +147,21 @@ class MapTest extends TestCase
         $this->assertBasicThingsAboutArray();
         $this->assertCount(1, $this->obj->getModelFieldsArray($model));
     }
+
+    /**
+     * @test
+     * @environment-setup useChecksumTimestampExcluded
+     */
+    public function get_array_with_models_fields_when_timestamps_exclude_is_on()
+    {
+        $this->createObj();
+
+        $this->assertBasicThingsAboutArray();
+        $this->assertCount(2, $this->obj->getModelFieldsArray());
+    }
+
+    protected function useChecksumTimestampExcluded($app)
+    {
+        $app->config->set('synchronizer.checksum.timestamps_excluded', true);
+    }
 }

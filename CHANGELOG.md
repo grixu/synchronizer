@@ -2,6 +2,26 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.0.0 - 2021-03-24
+
+- Improvement in timestamps: added option in configuration though which you can decide to exclude timestamps from a
+  checksum. If you do so, models will not update if only timestamps have changed. Due to it is change from default way
+  of how synchronizer v2 worked, we decided to keep it off by default.
+
+- DTO field names are no longer checked as timestamps
+- Added Jobs fo handling sync in queues
+- An updated README with example how to use Jobs to sync big bunch of data in queues.
+- A created interfaces to provide customization of data loading & parsing
+- Added `AbstractLoader` to DRY work during SQL based data loading using models with just another database connection
+- Added `StartSyncAction` which start sync in batch
+- Unified events by common abstract base class: `AbstractSynchronizerEvent`
+- Created SyncConfig class which contains: loader, parser, local model class names, foreign key values which we want to
+  synchronize and sync & error handling closures.
+  
+- Created SyncConfigFactory 
+- Created interfaces for making own factories of sync & error handlers and set them as default ones.
+- Refactored config file
+
 ## 2.3.1 - 2021-03-17
 
 - Bug fixed in wrong path to Slack webhook url from logging config
@@ -64,15 +84,15 @@ All notable changes to `synchronizer` will be documented in this file
 
 ## 1.2.0 - 2020-12-08
 
-- Added firing event when Synchronizer detects changes 
+- Added firing event when Synchronizer detects changes
 - Optimized tests
 
 ## 1.1.0 - 2020-12-07
 
 - Added calculating MD5 from fields of DTO (without timestamps excluded in the config)
 - Added method for generate a map without timestamp fields in SynchronizerMap
-- New options in the config to turn on md5 checksums checking, and point a field name in models
-which containing this checksum.
+- New options in the config to turn on md5 checksums checking, and point a field name in models which containing this
+  checksum.
 
 ## 1.0.2 - 2020-12-04
 

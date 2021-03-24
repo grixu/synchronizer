@@ -25,7 +25,7 @@ class CollectionSynchronizerTest extends TestCase
 
     protected function slackConfig($app)
     {
-        $app['config']->set('synchronizer.send_slack_sum_up', true);
+        $app['config']->set('synchronizer.sync.send_notification', true);
         $app['config']->set('logging.channels.slack.url', 'http://slack.com');
     }
 
@@ -122,7 +122,7 @@ class CollectionSynchronizerTest extends TestCase
         try {
             $this->obj = new CollectionSynchronizer($this->dtoCollection, Product::class, 'some_key');
             $this->assertTrue(false);
-        } catch (EmptyForeignKeyInDto $exception) {
+        } catch (EmptyForeignKeyInDto) {
             $this->assertTrue(true);
         }
     }

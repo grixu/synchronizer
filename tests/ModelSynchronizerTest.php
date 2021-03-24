@@ -119,7 +119,7 @@ class ModelSynchronizerTest extends TestCase
         foreach ($model->log as $log) {
             $this->assertEquals(
                 false,
-                in_array($log['modelField'], config('synchronizer.timestamps'))
+                in_array($log['modelField'], config('synchronizer.sync.timestamps'))
             );
         }
     }
@@ -145,4 +145,35 @@ class ModelSynchronizerTest extends TestCase
         Event::assertDispatched(ModelSynchronizedEvent::class);
         Event::assertNotDispatched(ModelCreatedEvent::class);
     }
+
+    /**
+     * @test
+     * @environment-setup useChecksumTimestampExcluded
+     */
+    public function it_not_syncing_timestamp_when_excluded_option_is_on()
+    {
+        $obj = new ModelSynchronizer($this->dto, $this->model);
+        $model = $obj->sync();
+        $this->model = $model;
+
+        $obj = new ModelSynchronizer($this->dto, $model);
+        $obj->sync();
+
+        $this->assertTrue($model === $this->model);
+    }
+
+    protected function useChecksumTimestampExcluded($app)
+    {
+        $app->config->set('synchronizer.checksum.timestamps_excluded', true);
+    }
+
+    /**
+     * @test
+     * @environment-setup useChecksumTimestampExcluded
+     */
+    public function it_sync_timestamp_when_excluded_option_is_on_but_not_excluded_field_in_dto_changed()
+    {
+        $this->it_updates_model();
+    }
+
 }
