@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Actions;
 
+use Exception;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
@@ -14,6 +15,7 @@ class StartSyncAction
 {
     public function execute(SyncConfig|array $config, string $queue = 'default'): Batch
     {
+        $this->checkConfig();
         $configCollection = $this->prepareConfig($config);
         $jobs = $this->prepareJobs($configCollection);
 
@@ -35,6 +37,13 @@ class StartSyncAction
             // @codeCoverageIgnoreEnd
             ->onQueue($queue)
             ->dispatch();
+    }
+
+    protected function checkConfig(): void
+    {
+        if (empty(config('synchronizer.jobs.load'))) {
+            throw new Exception('Empty configuration: no LoadingJob configured');
+        }
     }
 
     protected function prepareConfig(SyncConfig|array $config): Collection
@@ -60,9 +69,10 @@ class StartSyncAction
     protected function prepareJobs(Collection $configCollection): array
     {
         $jobs = [];
+        $jobClass = config('synchronizer.jobs.load');
 
         foreach ($configCollection as $config) {
-            $jobs[] = new LoadDataToSyncJob($config);
+            $jobs[] = new $jobClass($config);
         }
 
         return $jobs;
