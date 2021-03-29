@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer\Tests\Helpers;
 
 use Grixu\SociusModels\Customer\Models\Customer;
 use Grixu\Synchronizer\Config\SyncConfig;
-use JetBrains\PhpStorm\Pure;
 
 class FakeSyncConfig
 {
@@ -14,18 +13,20 @@ class FakeSyncConfig
             FakeLoader::class,
             FakeParser::class,
             Customer::class,
-            'xlId'
+            'xlId',
+            config('synchronizer.jobs.default')
+
         );
     }
 
-    #[Pure]
     public static function makeArray(): array
     {
         return [
             FakeLoader::class,
             FakeParser::class,
             Customer::class,
-            'xlId'
+            'xlId',
+            config('synchronizer.jobs.default')
         ];
     }
 }
