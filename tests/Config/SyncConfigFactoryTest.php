@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Config;
 
+use Exception;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler;
@@ -101,5 +102,57 @@ class SyncConfigFactoryTest extends TestCase
         $obj->setIdsToSync([1, 2, 3]);
 
         $this->assertNotEmpty($obj->getIdsToSync());
+    }
+
+    /** @test */
+    public function it_could_take_config_string()
+    {
+        $config = $this->obj->make(
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
+            jobsConfig: 'default',
+            idsToSync: null,
+            syncClosure: new SerializableClosure(function ($collection, $config) {}),
+            errorHandler: new SerializableClosure(function ($e) {})
+        );
+
+        $this->assertJobs($config);
+    }
+
+    protected function assertJobs(SyncConfig $config)
+    {
+        $this->assertNotEmpty($config->getCurrentJob());
+        $this->assertNotEmpty($config->getNextJob());
+    }
+
+
+    /** @test */
+    public function it_set_default_job_config()
+    {
+        $config = $this->makeObj();
+        $this->assertJobs($config);
+    }
+
+    /**
+     * @test
+     * @environment-setup useEmptyJobConfig
+     */
+    public function it_throws_exception_if_there_is_no_default_job_config()
+    {
+        try {
+            $this->makeObj();
+            $this->assertTrue(false);
+        } catch (Exception) {
+            $this->assertTrue(true);
+        }
+    }
+
+    protected function useEmptyJobConfig($app)
+    {
+        $app->config->set('synchronizer.jobs', [
+            'default' => [],
+        ]);
     }
 }
