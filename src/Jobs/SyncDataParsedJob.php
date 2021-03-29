@@ -48,7 +48,8 @@ class SyncDataParsedJob implements ShouldQueue
             $synchronizer = new CollectionSynchronizer(
                 $this->dtoCollection,
                 $this->config->getLocalModel(),
-                $this->config->getForeignKey()
+                $this->config->getForeignKey(),
+                $this->config->getErrorHandler(),
             );
         } catch (EmptyForeignKeyInDto) {
             return;
