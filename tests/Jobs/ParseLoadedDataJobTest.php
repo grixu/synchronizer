@@ -74,8 +74,6 @@ class ParseLoadedDataJobTest extends SyncTestCase
     /** @test */
     public function it_start_parsing_job()
     {
-        ray()->disable();
-
         $obj = new ParseLoadedDataJob($this->dataCollection, $this->config);
         $batch = Bus::batch(
             [
