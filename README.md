@@ -45,13 +45,17 @@ $relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 
 ```php
 use Grixu\Synchronizer\Actions\StartSyncAction;
+use Grixu\Synchronizer\Config\SyncConfigFactory;
 
 $obj = new StartSyncAction();
-$config = new \Grixu\Synchronizer\Config\SyncConfig(
+$configFactory = new SyncConfigFactory();
+
+$config = $configFactory->make(
     loaderClass: SomeLoaderClass::class,
     parserClass: SomeParserClass::class,
     localModel: Model::class,
     foreignKey: 'fkId',
+    jobsConfig: 'default',
     idsToSync: null,
     syncClosure: new \Illuminate\Queue\SerializableClosure(function ($collection, $config) {}),
     errorHandler: new \Illuminate\Queue\SerializableClosure(function ($exception) {})
@@ -115,6 +119,10 @@ Also, there is an `ErrorHandlerInterface` that you can use to create custom clas
 containing code which will be fired in catch block of standard sync method in `SyncDataParsedJob`. Such a Closure should
 take 1 argument which is `Exception` class.
 
+#### Jobs configuration
+
+You can define you own jobs stack in synchronizer configuration (see more information below).
+
 ## Advanced use with own custom jobs
 
 You might have another vision of how many steps synchronization should have. You can still use most Synchronizer
@@ -144,9 +152,11 @@ return [
     ],
     
     'jobs' => [
-        'load' => \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
-        'parse' => \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
-        'sync' => \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+        'default' => [
+            \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
+            \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
+            \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+        ]
     ],
 
 //    'handlers' => [
@@ -178,7 +188,24 @@ Option `timestamp_excluded` when enabled do not use timestamp fields to generate
 
 ### Jobs block
 
-You can adjust jobs class names which will be used in each step of synchronization. Or even add your own steps!
+You can adjust jobs class names which will be used in each step of synchronization. Or even add your own steps or many
+configurations. The `default` stack is mandatory to properly running `StartSyncAction`. Each stack could be build with
+one or more jobs which each of one should dispatch next.
+
+Take a look for example from `LoadDataToSyncJob`:
+
+```php
+if ($this->batch()) {
+    $jobs = [];
+    $jobClass = $this->config->getNextJob();
+
+    foreach ($dataCollection as $data) {
+        $jobs[] = new $jobClass($data, $this->config);
+    }
+
+    $this->batch()->add($jobs);
+}
+```
 
 ### Handlers block
 
