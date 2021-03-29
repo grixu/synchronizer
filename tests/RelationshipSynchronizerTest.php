@@ -3,7 +3,6 @@
 namespace Grixu\Synchronizer\Tests;
 
 use Grixu\RelationshipDataTransferObject\RelationshipDataCollection;
-use Grixu\SociusModels\Description\Models\ProductDescription;
 use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Product\Models\Brand;
@@ -15,6 +14,8 @@ use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Http\Client\Request;
+use Illuminate\Support\Facades\Http;
 
 class RelationshipSynchronizerTest extends TestCase
 {
@@ -201,5 +202,20 @@ class RelationshipSynchronizerTest extends TestCase
                 ]
             ]
         );
+    }
+
+    /** @test */
+    public function it_accept_error_handler_as_argument()
+    {
+        Http::fake();
+
+        $this->makeDisruptedCaseOne();
+        $this->obj->sync($this->data, function($e) {
+            Http::get('http://testable.dev');
+        });
+
+        Http::assertSent(function (Request $request) {
+            return $request->url() == 'http://testable.dev';
+        });
     }
 }

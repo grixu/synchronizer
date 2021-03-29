@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer;
 
+use Closure;
 use Grixu\RelationshipDataTransferObject\RelationshipData;
 use Grixu\RelationshipDataTransferObject\RelationshipDataCollection;
 use Grixu\Synchronizer\Exceptions\WrongLocalModelException;
@@ -12,17 +13,22 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class RelationshipSynchronizer
 {
-    protected Model $model;
-
-    public function __construct(Model $model)
+    public function __construct(protected Model $model)
     {
-        $this->model = $model;
     }
 
-    public function sync(RelationshipDataCollection $relationships): void
+    public function sync(RelationshipDataCollection $relationships, Closure|null $errorHandler = null): void
     {
         foreach ($relationships as $relationship) {
-            $this->syncRelationship($relationship);
+            try {
+                $this->syncRelationship($relationship);
+            } catch (WrongLocalModelException | WrongRelationTypeException $e) {
+                if (!empty($errorHandler)) {
+                    $errorHandler($e);
+                }
+
+                continue;
+            }
         }
     }
 
@@ -63,14 +69,16 @@ class RelationshipSynchronizer
 
     private function checkModelClass(string $localModelClass): void
     {
-        if (get_class($this->model) !== $localModelClass)
+        if (get_class($this->model) !== $localModelClass) {
             throw new WrongLocalModelException();
+        }
     }
 
     private function checkRelationType(string $localKey, string $relationType): void
     {
-        if (get_class($this->model->$localKey()) !== $relationType)
+        if (get_class($this->model->$localKey()) !== $relationType) {
             throw new WrongRelationTypeException();
+        }
     }
 
     private function loadForeignKeys(RelationshipData $relationshipData): array

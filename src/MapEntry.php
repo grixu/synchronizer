@@ -6,16 +6,14 @@ use Grixu\Synchronizer\Models\ExcludedField;
 
 class MapEntry
 {
-    protected string $dtoField;
-    protected string $modelField;
     protected bool $updateOnNull = false;
     protected bool $isExcluded = false;
 
-    public function __construct(string $dtoField, string $modelField, ?ExcludedField $excludedField = null)
-    {
-        $this->dtoField = $dtoField;
-        $this->modelField = $modelField;
-
+    public function __construct(
+        protected string $dtoField,
+        protected string $modelField,
+        ?ExcludedField $excludedField = null
+    ) {
         if (!empty($excludedField)) {
             $this->isExcluded = true;
 

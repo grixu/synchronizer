@@ -25,6 +25,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
         parent::setUp();
 
         $this->config = FakeSyncConfig::make();
+        $this->config->setCurrentJob(1);
 
         $loader = new FakeLoader();
         $this->dataCollection = $loader->get()->first();
@@ -73,8 +74,6 @@ class ParseLoadedDataJobTest extends SyncTestCase
     /** @test */
     public function it_start_parsing_job()
     {
-        ray()->disable();
-
         $obj = new ParseLoadedDataJob($this->dataCollection, $this->config);
         $batch = Bus::batch(
             [

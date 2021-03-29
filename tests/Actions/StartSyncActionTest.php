@@ -4,8 +4,6 @@ namespace Grixu\Synchronizer\Tests\Actions;
 
 use Grixu\Synchronizer\Actions\StartSyncAction;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
-use Grixu\Synchronizer\Jobs\SyncDataParsedJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
@@ -132,7 +130,7 @@ class StartSyncActionTest extends SyncTestCase
         Http::fake();
 
         $config = FakeSyncConfig::make();
-        $config->setSyncClosure(new SerializableClosure(function ($e) {
+        $config->setSyncClosure(new SerializableClosure(function () {
             Http::get('http://testable.dev');
         }));
 

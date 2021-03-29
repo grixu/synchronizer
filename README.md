@@ -41,17 +41,21 @@ $relationshipSynchronizer = new RelationshipSynchronizer($modelInstance);
 $relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 ```
 
-### Advanced use with jobs & dividing to smaller pieces of data
+### Advanced use with jobs & dividing to smaller pieces of data (built-in jobs)
 
 ```php
 use Grixu\Synchronizer\Actions\StartSyncAction;
+use Grixu\Synchronizer\Config\SyncConfigFactory;
 
 $obj = new StartSyncAction();
-$config = new \Grixu\Synchronizer\Config\SyncConfig(
+$configFactory = new SyncConfigFactory();
+
+$config = $configFactory->make(
     loaderClass: SomeLoaderClass::class,
     parserClass: SomeParserClass::class,
     localModel: Model::class,
     foreignKey: 'fkId',
+    jobsConfig: 'default',
     idsToSync: null,
     syncClosure: new \Illuminate\Queue\SerializableClosure(function ($collection, $config) {}),
     errorHandler: new \Illuminate\Queue\SerializableClosure(function ($exception) {})
@@ -94,6 +98,12 @@ Remember: you need to run queue workers by yourself! :)
 If you synchronize data from database to database you can use built-in `AbstractLoader` which is prepared for handling
 such type of operations. Just create your own loader class extending `AbstractLoader` and add `buildQuery()` method.
 
+#### AbstractParser
+
+To provide support for actions you might have in your application already which parsing `Model` to `DataTransferObject`
+we create extra interface `SingleElementParserInterface` and supporting it abstract class `AbstractParser` which have
+implemented simple `parse()` method return map of input `Collection` via `parseElement` function.
+
 #### Default sync handler
 
 Synchronizer provide `SyncHandlerInterface` which you can use to create custom class which be returning
@@ -108,6 +118,15 @@ and `StartSyncAction`. Such Closure should take 2 arguments:
 Also, there is an `ErrorHandlerInterface` that you can use to create custom class which be returning SerializableClosure
 containing code which will be fired in catch block of standard sync method in `SyncDataParsedJob`. Such a Closure should
 take 1 argument which is `Exception` class.
+
+#### Jobs configuration
+
+You can define you own jobs stack in synchronizer configuration (see more information below).
+
+## Advanced use with own custom jobs
+
+You might have another vision of how many steps synchronization should have. You can still use most Synchronizer
+built-in mechanisms. In the config, you can change classes which be called in `StartSyncAction` or from built-in Jobs.
 
 ## Configuration
 
@@ -130,6 +149,14 @@ return [
         'control' => env('SYNCHRONIZER_MD5_CONTROL', true),
         'field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
         'timestamps_excluded' => false,
+    ],
+    
+    'jobs' => [
+        'default' => [
+            \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
+            \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
+            \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+        ]
     ],
 
 //    'handlers' => [
@@ -158,6 +185,27 @@ an extra field in your local models which are not in DTO. Pass this field name t
 To turn off this feature just set up `control` as false.
 
 Option `timestamp_excluded` when enabled do not use timestamp fields to generate a checksum.
+
+### Jobs block
+
+You can adjust jobs class names which will be used in each step of synchronization. Or even add your own steps or many
+configurations. The `default` stack is mandatory to properly running `StartSyncAction`. Each stack could be build with
+one or more jobs which each of one should dispatch next.
+
+Take a look for example from `LoadDataToSyncJob`:
+
+```php
+if ($this->batch()) {
+    $jobs = [];
+    $jobClass = $this->config->getNextJob();
+
+    foreach ($dataCollection as $data) {
+        $jobs[] = new $jobClass($data, $this->config);
+    }
+
+    $this->batch()->add($jobs);
+}
+```
 
 ### Handlers block
 

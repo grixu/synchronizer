@@ -8,13 +8,8 @@ class Logger
 {
     protected array $changes;
 
-    protected string $model;
-    protected int $id;
-
-    public function __construct(string $model, int $id)
+    public function __construct(protected string $model, protected int $id)
     {
-        $this->model = $model;
-        $this->id = $id;
         $this->changes = [];
     }
 

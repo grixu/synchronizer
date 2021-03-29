@@ -5,10 +5,10 @@ namespace Grixu\Synchronizer\Actions;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Jobs\LoadDataToSyncJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
+use Throwable;
 
 class StartSyncAction
 {
@@ -26,7 +26,7 @@ class StartSyncAction
                     event(new CollectionSynchronizedEvent($config->getLocalModel()));
                 }
             })
-            ->catch(function (Batch $batch, \Throwable $exception) use ($configCollection) {
+            ->catch(function (Batch $batch, Throwable $exception) use ($configCollection) {
                 $configCollection->each(function ($config) use ($exception) {
                     if ($config->getErrorHandler() != null)
                         $config->getErrorHandler()($exception);
@@ -45,7 +45,7 @@ class StartSyncAction
                 if (is_array($item)) {
                     /** @var SyncConfigFactory $factory */
                     $factory = app(SyncConfigFactory::class);
-                    return $factory->make(...$item);
+                    $item = $factory->make(...$item);
                 }
 
                 return $item;
@@ -62,7 +62,10 @@ class StartSyncAction
         $jobs = [];
 
         foreach ($configCollection as $config) {
-            $jobs[] = new LoadDataToSyncJob($config);
+            /** @var SyncConfig $config */
+            $jobClass = $config->getCurrentJob();
+
+            $jobs[] = new $jobClass($config);
         }
 
         return $jobs;

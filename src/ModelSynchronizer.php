@@ -10,17 +10,15 @@ use Spatie\DataTransferObject\DataTransferObject;
 class ModelSynchronizer
 {
     protected Map $map;
-    protected $model;
     protected bool $isModelCreated = false;
-    protected DataTransferObject $dto;
 
-    public function __construct(DataTransferObject $dto, $model, ?Map $map = null)
-    {
-        $this->dto = $dto;
-        $this->model = $model;
-
-        $modelName = is_object($model) ? get_class($model) : $model;
-        if (empty($map) ) {
+    public function __construct(
+        protected DataTransferObject $dto,
+        protected Model|string $model,
+        ?Map $map = null
+    ) {
+        $modelName = is_object($model) ? $model::class : $model;
+        if (empty($map)) {
             $map = MapFactory::makeFromDto($dto, $modelName);
         }
 
@@ -43,7 +41,7 @@ class ModelSynchronizer
             $checksum->update();
         }
 
-        if($checksum->validate()) {
+        if ($checksum->validate()) {
             return $this->model;
         }
 
