@@ -95,8 +95,6 @@ class CollectionSynchronizerTest extends TestCase
             )
         );
 
-        ray($this->dtoCollection);
-
         $this->assertCountAndChecksums(10, 0);
         $this->createObj();
         $this->obj->sync();
