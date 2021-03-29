@@ -2,11 +2,8 @@
 
 namespace Grixu\Synchronizer\Tests\Actions;
 
-use Exception;
 use Grixu\Synchronizer\Actions\StartSyncAction;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
-use Grixu\Synchronizer\Jobs\SyncDataParsedJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
@@ -133,7 +130,7 @@ class StartSyncActionTest extends SyncTestCase
         Http::fake();
 
         $config = FakeSyncConfig::make();
-        $config->setSyncClosure(new SerializableClosure(function ($e) {
+        $config->setSyncClosure(new SerializableClosure(function () {
             Http::get('http://testable.dev');
         }));
 
@@ -142,24 +139,5 @@ class StartSyncActionTest extends SyncTestCase
         Http::assertSent(function (Request $request) {
             return $request->url() == 'http://testable.dev';
         });
-    }
-
-    /**
-     * @test
-     * @environment-setup useEmptyLoadJob
-     */
-    public function it_throws_exception_when_no_loading_job_defined_in_config()
-    {
-        try {
-            $this->runBatchAndCheckIt([FakeSyncConfig::makeArray()]);
-            $this->assertTrue(false);
-        } catch (Exception) {
-            $this->assertTrue(true);
-        }
-    }
-
-    protected function useEmptyLoadJob($app)
-    {
-        $app->config->set('synchronizer.jobs.load', null);
     }
 }
