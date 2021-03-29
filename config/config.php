@@ -3,7 +3,7 @@
 return [
     'sync' => [
         'send_notification' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
-        'logging' => env('SYNCHRONIZER_DB_LOGGING',true),
+        'logging' => env('SYNCHRONIZER_DB_LOGGING', true),
 
         'timestamps' => [
             'updatedAt'
@@ -19,9 +19,11 @@ return [
     ],
 
     'jobs' => [
-        'load' => \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
-        'parse' => \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
-        'sync' => \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+        'default' => [
+            \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
+            \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
+            \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+        ]
     ],
 
 //    'handlers' => [
