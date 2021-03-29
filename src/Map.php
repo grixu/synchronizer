@@ -35,7 +35,7 @@ class Map
             ->first();
     }
 
-    public function get(?Model $model = null)
+    public function get(?Model $model = null): Collection
     {
         return $this->map->filter(function ($item) use ($model) {
             $field = $item->getModelField();
@@ -43,7 +43,7 @@ class Map
         });
     }
 
-    public function getWithoutTimestamps(?Model $model = null)
+    public function getWithoutTimestamps(?Model $model = null): Collection
     {
         return $this->map->filter(function ($item) use ($model) {
             $field = $item->getModelField();

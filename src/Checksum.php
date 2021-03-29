@@ -9,13 +9,8 @@ class Checksum
 {
     protected ?string $md5 = null;
 
-    protected Map $map;
-    protected Model $model;
-
-    public function __construct(Map $map, Model $model)
+    public function __construct(protected Map $map, protected Model $model)
     {
-        $this->map = $map;
-        $this->model = $model;
     }
 
     protected function calculate(): void
