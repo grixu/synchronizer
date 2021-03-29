@@ -2,20 +2,18 @@
 
 namespace Grixu\Synchronizer\Actions;
 
-use Exception;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Jobs\LoadDataToSyncJob;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
+use Throwable;
 
 class StartSyncAction
 {
     public function execute(SyncConfig|array $config, string $queue = 'default'): Batch
     {
-        $this->checkConfig();
         $configCollection = $this->prepareConfig($config);
         $jobs = $this->prepareJobs($configCollection);
 
@@ -28,7 +26,7 @@ class StartSyncAction
                     event(new CollectionSynchronizedEvent($config->getLocalModel()));
                 }
             })
-            ->catch(function (Batch $batch, \Throwable $exception) use ($configCollection) {
+            ->catch(function (Batch $batch, Throwable $exception) use ($configCollection) {
                 $configCollection->each(function ($config) use ($exception) {
                     if ($config->getErrorHandler() != null)
                         $config->getErrorHandler()($exception);
@@ -39,13 +37,6 @@ class StartSyncAction
             ->dispatch();
     }
 
-    protected function checkConfig(): void
-    {
-        if (empty(config('synchronizer.jobs.load'))) {
-            throw new Exception('Empty configuration: no LoadingJob configured');
-        }
-    }
-
     protected function prepareConfig(SyncConfig|array $config): Collection
     {
         if (is_array($config)) {
@@ -54,7 +45,7 @@ class StartSyncAction
                 if (is_array($item)) {
                     /** @var SyncConfigFactory $factory */
                     $factory = app(SyncConfigFactory::class);
-                    return $factory->make(...$item);
+                    $item = $factory->make(...$item);
                 }
 
                 return $item;
@@ -69,9 +60,11 @@ class StartSyncAction
     protected function prepareJobs(Collection $configCollection): array
     {
         $jobs = [];
-        $jobClass = config('synchronizer.jobs.load');
 
         foreach ($configCollection as $config) {
+            /** @var SyncConfig $config */
+            $jobClass = $config->getCurrentJob();
+
             $jobs[] = new $jobClass($config);
         }
 
