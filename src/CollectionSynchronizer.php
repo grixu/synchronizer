@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer;
 
+use Closure;
 use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Support\Collection;
@@ -9,19 +10,17 @@ use Illuminate\Support\Facades\Log as LogFacade;
 
 class CollectionSynchronizer
 {
-    protected Collection $dtoCollection;
-    protected string $model;
-    protected string $foreignKey;
     protected array $foreignKeys = [];
 
     protected int $created = 0;
     protected int $updated = 0;
 
-    public function __construct(Collection $dtoCollection, string $model, string $foreignKey)
-    {
-        $this->dtoCollection = $dtoCollection;
-        $this->model = $model;
-
+    public function __construct(
+        protected Collection $dtoCollection,
+        protected string $model,
+        protected string $foreignKey,
+        protected Closure|null $errorHandler = null
+    ) {
         foreach ($dtoCollection as $dto) {
             if (!isset($dto->$foreignKey) || is_null($dto->$foreignKey)) {
                 throw new EmptyForeignKeyInDto();
@@ -29,8 +28,6 @@ class CollectionSynchronizer
 
             $this->foreignKeys[] = $dto->$foreignKey;
         }
-
-        $this->foreignKey = $foreignKey;
     }
 
     public function sync(?array $map = null)
@@ -53,7 +50,7 @@ class CollectionSynchronizer
 
             if (!empty($dto->relationships)) {
                 $rs = new RelationshipSynchronizer($model);
-                $rs->sync($dto->relationships);
+                $rs->sync($dto->relationships, $this->errorHandler);
             }
         }
 
