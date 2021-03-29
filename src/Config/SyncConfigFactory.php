@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Config;
 
+use Exception;
 use Grixu\Synchronizer\Contracts\ErrorHandlerInterface;
 use Grixu\Synchronizer\Contracts\SyncHandlerInterface;
 use Grixu\Synchronizer\Traits\CheckClassImplementsInterface;
@@ -16,6 +17,7 @@ class SyncConfigFactory
         string $parserClass,
         string $localModel,
         string $foreignKey,
+        array|string|null $jobsConfig = null,
         ?array $idsToSync = [],
         SerializableClosure|null $syncClosure = null,
         SerializableClosure|null $errorHandler = null
@@ -34,11 +36,24 @@ class SyncConfigFactory
             );
         }
 
+        if (!empty($jobsConfig) && is_string($jobsConfig)) {
+            $jobsConfig = config('synchronizer.jobs.' . $jobsConfig);
+        }
+
+        if (empty($jobsConfig)) {
+            $jobsConfig = config('synchronizer.jobs.default');
+        }
+
+        if (empty($jobsConfig)) {
+            throw new Exception('Empty jobs configuration');
+        }
+
         return new SyncConfig(
             loaderClass: $loaderClass,
             parserClass: $parserClass,
             localModel: $localModel,
             foreignKey: $foreignKey,
+            jobsConfig: $jobsConfig,
             idsToSync: $idsToSync,
             syncClosure: $syncClosure,
             errorHandler: $errorHandler
