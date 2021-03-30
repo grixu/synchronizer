@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests;
 
+use Exception;
 use Grixu\RelationshipDataTransferObject\RelationshipDataCollection;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
@@ -177,5 +178,18 @@ class CollectionSynchronizerTest extends TestCase
         $this->assertDatabaseCount('products', 0);
         $this->obj->sync();
         $this->assertDatabaseCount('products', 1);
+    }
+
+    /** @test */
+    public function it_throws_exception_on_empty_collection_given()
+    {
+        $this->dtoCollection = collect();
+
+        try {
+            $this->obj->sync();
+            $this->assertTrue(false);
+        } catch (Exception) {
+            $this->assertTrue(true);
+        }
     }
 }
