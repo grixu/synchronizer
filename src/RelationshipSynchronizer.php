@@ -10,6 +10,7 @@ use Grixu\Synchronizer\Exceptions\WrongRelationTypeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Queue\SerializableClosure;
 
 class RelationshipSynchronizer
 {
@@ -17,7 +18,7 @@ class RelationshipSynchronizer
     {
     }
 
-    public function sync(RelationshipDataCollection $relationships, Closure|null $errorHandler = null): void
+    public function sync(RelationshipDataCollection $relationships, SerializableClosure|Closure|null $errorHandler = null): void
     {
         foreach ($relationships as $relationship) {
             try {

@@ -12,7 +12,7 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
-use TypeError;
+use Throwable;
 
 class SyncDataParsedJob implements ShouldQueue
 {
@@ -57,7 +57,7 @@ class SyncDataParsedJob implements ShouldQueue
 
         try {
             $synchronizer->sync();
-        } catch (TypeError $e) {
+        } catch (Throwable $e) {
             if ($this->config->getErrorHandler() !== null)
                 $this->config->getErrorHandler()($e);
 

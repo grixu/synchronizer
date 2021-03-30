@@ -93,6 +93,10 @@ class SyncConfig
 
     public function setSyncClosure(Closure|SerializableClosure|null $syncClosure): void
     {
+        if ($syncClosure::class === Closure::class) {
+            $syncClosure = new SerializableClosure($syncClosure);
+        }
+
         $this->syncClosure = $syncClosure;
     }
 
@@ -103,6 +107,10 @@ class SyncConfig
 
     public function setErrorHandler(Closure|SerializableClosure|null $errorHandler): void
     {
+        if ($errorHandler::class === Closure::class) {
+            $errorHandler = new SerializableClosure($errorHandler);
+        }
+
         $this->errorHandler = $errorHandler;
     }
 }

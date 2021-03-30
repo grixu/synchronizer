@@ -2,6 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.1.1 - 2021-03-30
+
+- Bug fixed in `CollectionSynchronizer`. Also added checking is Collection is not empty and filtering to eliminate empty entries.
+- Bug fixes in `RelationshipSynchronizer`
+- Added converting `Closure` to `SerializableClosure` in setters of `syncClosure` and `errorHandler` in `SyncConfig`
+
 ## 3.1.0 - 2021-03-29
 
 - New interface: SingleElementParserInterface 
