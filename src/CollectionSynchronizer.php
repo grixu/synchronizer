@@ -30,14 +30,20 @@ class CollectionSynchronizer
 
             $this->foreignKeys[] = $dto->$foreignKey;
 
+            $this->checkIsCollectionNotEmpty();
             $this->dtoCollection = $this->dtoCollection->filter();
+        }
+    }
+
+    protected function checkIsCollectionNotEmpty(): void
+    {
+        if ($this->dtoCollection->count() <= 0) {
+            throw new Exception('Empty Collection, nothing to sync');
         }
     }
 
     public function sync(?array $map = null)
     {
-        $this->checkIsCollectionNotEmpty();
-
         $map = $this->makeMap($map);
 
         $models = $this->loadModels();
@@ -61,13 +67,6 @@ class CollectionSynchronizer
         }
 
         $this->sendReport();
-    }
-
-    protected function checkIsCollectionNotEmpty(): void
-    {
-        if ($this->dtoCollection->count() <= 0) {
-            throw new Exception('Empty Collection, nothing to sync');
-        }
     }
 
     protected function loadModels(): EloquentCollection
