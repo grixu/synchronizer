@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.1.2 - 2021-03-30
+
+- Updated dependencies
+
 ## 3.1.1 - 2021-03-30
 
 - Bug fixed in `CollectionSynchronizer`. Also added checking is Collection is not empty and filtering to eliminate empty entries.
