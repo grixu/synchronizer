@@ -3,8 +3,10 @@
 namespace Grixu\Synchronizer;
 
 use Closure;
+use Exception;
 use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log as LogFacade;
 
@@ -19,7 +21,7 @@ class CollectionSynchronizer
         protected Collection $dtoCollection,
         protected string $model,
         protected string $foreignKey,
-        protected Closure|null $errorHandler = null
+        protected SerializableClosure|Closure|null $errorHandler = null
     ) {
         foreach ($dtoCollection as $dto) {
             if (!isset($dto->$foreignKey) || is_null($dto->$foreignKey)) {
@@ -27,11 +29,15 @@ class CollectionSynchronizer
             }
 
             $this->foreignKeys[] = $dto->$foreignKey;
+
+            $this->dtoCollection = $this->dtoCollection->filter();
         }
     }
 
     public function sync(?array $map = null)
     {
+        $this->checkIsCollectionNotEmpty();
+
         $map = $this->makeMap($map);
 
         $models = $this->loadModels();
@@ -55,6 +61,13 @@ class CollectionSynchronizer
         }
 
         $this->sendReport();
+    }
+
+    protected function checkIsCollectionNotEmpty(): void
+    {
+        if ($this->dtoCollection->count() <= 0) {
+            throw new Exception('Empty Collection, nothing to sync');
+        }
     }
 
     protected function loadModels(): EloquentCollection
