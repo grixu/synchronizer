@@ -10,6 +10,7 @@ use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Exceptions\WrongLocalModelException;
 use Grixu\Synchronizer\Exceptions\WrongRelationTypeException;
 use Grixu\Synchronizer\RelationshipSynchronizer;
+use Grixu\Synchronizer\Tests\Helpers\FakeExtendedModel;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -217,5 +218,41 @@ class RelationshipSynchronizerTest extends TestCase
         Http::assertSent(function (Request $request) {
             return $request->url() == 'http://testable.dev';
         });
+    }
+
+    /** @test */
+    public function it_reflect_given_class_to_check_is_have_attribute()
+    {
+        $this->makeBelongsToCase();
+        $fake = new FakeExtendedModel();
+        $fake->fill($this->localModel->toArray());
+        $fake->save();
+        $this->localModel = $fake;
+        $this->obj = new RelationshipSynchronizer($this->localModel);
+
+
+        $this->assertEmpty($this->localModel->brand_id);
+
+        $this->obj->syncRelationship($this->data->current());
+
+        $this->localModel->load('brand');
+        $this->assertNotEmpty($this->localModel->brandId);
+    }
+
+    /** @test */
+    public function it_throws_exception_when_relationship_local_model_is_not_found_in_attributes()
+    {
+        $this->makeBelongsToCase();
+        $failedExtendedClass = new class extends Product {};
+        $this->localModel = $failedExtendedClass;
+        $this->obj = new RelationshipSynchronizer($failedExtendedClass);
+
+        $this->assertEmpty($this->localModel->brand_id);
+        try {
+            $this->obj->syncRelationship($this->data->current());
+            $this->assertTrue(false);
+        } catch (WrongLocalModelException) {
+            $this->assertTrue(true);
+        }
     }
 }
