@@ -2,21 +2,33 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.2.0 - 2021-03-31
+
+- Created `SynchronizeWith` attribute to provide way to make relationship sync on custom(or extended) models than in
+  defined in RelationshipData
+- Rebuilt method `checkModelClass` which now checking provided in constructor object through `ReflectionClass` is it
+  have `SynchronizeWith` attribute with proper model name.
+- Updated tests for `RelationshipSynchronizer` & `CollectionSynchronizer`
+- Rebuilt the `try..catch` block on `SyncDataParsedJob`. Now all exception thrown by CollectionSynchronizer in this job
+  will be handled by provided in `SyncConfig` Closure
+- Renamed `SyncDataParsedJob` to `SyncParsedDataJob` (finally!)
+
 ## 3.1.2 - 2021-03-30
 
 - Updated dependencies
 
 ## 3.1.1 - 2021-03-30
 
-- Bug fixed in `CollectionSynchronizer`. Also added checking is Collection is not empty and filtering to eliminate empty entries.
+- Bug fixed in `CollectionSynchronizer`. Also added checking is Collection is not empty and filtering to eliminate empty
+  entries.
 - Bug fixes in `RelationshipSynchronizer`
 - Added converting `Closure` to `SerializableClosure` in setters of `syncClosure` and `errorHandler` in `SyncConfig`
 
 ## 3.1.0 - 2021-03-29
 
-- New interface: SingleElementParserInterface 
+- New interface: SingleElementParserInterface
 - Parser conception is more prepared for other sources that SQL databases like API
-- Added new block in configuration which gives possibility to fully replace one of 3 jobs which handling sync process 
+- Added new block in configuration which gives possibility to fully replace one of 3 jobs which handling sync process
 - Added possibility of define many jobs stack to run
 - Added new methods in SyncConfig: `setCurrentJob`, `getCurrentJob` & `getNextJob`
 - Added new required parameter in `SyncConfig` constructor & added auto filling it in `SyncConfigFactory`
@@ -36,8 +48,8 @@ All notable changes to `synchronizer` will be documented in this file
 - Unified events by common abstract base class: `AbstractSynchronizerEvent`
 - Created SyncConfig class which contains: loader, parser, local model class names, foreign key values which we want to
   synchronize and sync & error handling closures.
-  
-- Created SyncConfigFactory 
+
+- Created SyncConfigFactory
 - Created interfaces for making own factories of sync & error handlers and set them as default ones.
 - Refactored config file
 

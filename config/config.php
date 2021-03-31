@@ -22,7 +22,7 @@ return [
         'default' => [
             \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
             \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
-            \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
         ]
     ],
 

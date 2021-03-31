@@ -183,10 +183,10 @@ class CollectionSynchronizerTest extends TestCase
     /** @test */
     public function it_throws_exception_on_empty_collection_given()
     {
-        $this->dtoCollection = collect();
+        $this->dtoCollection = new Collection();
 
         try {
-            $this->obj->sync();
+            $this->createObj();
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);

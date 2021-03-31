@@ -5,12 +5,14 @@ namespace Grixu\Synchronizer;
 use Closure;
 use Grixu\RelationshipDataTransferObject\RelationshipData;
 use Grixu\RelationshipDataTransferObject\RelationshipDataCollection;
+use Grixu\Synchronizer\Attributes\SynchronizeWith;
 use Grixu\Synchronizer\Exceptions\WrongLocalModelException;
 use Grixu\Synchronizer\Exceptions\WrongRelationTypeException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Queue\SerializableClosure;
+use ReflectionClass;
 
 class RelationshipSynchronizer
 {
@@ -68,9 +70,24 @@ class RelationshipSynchronizer
         return false;
     }
 
-    private function checkModelClass(string $localModelClass): void
+    private function checkModelClass(string $originalModel): void
     {
-        if (get_class($this->model) !== $localModelClass) {
+        if ($this->model::class === $originalModel) {
+            return;
+        }
+
+        $reflection = new ReflectionClass($this->model);
+        $attributes = $reflection->getAttributes(SynchronizeWith::class);
+        $bindModels = [];
+
+        foreach ($attributes as $attribute) {
+            /** @var SynchronizeWith $attributeInstance */
+            $attributeInstance = $attribute->newInstance();
+
+            $bindModels[] = $attributeInstance->className;
+        }
+
+        if (!in_array($originalModel, $bindModels)) {
             throw new WrongLocalModelException();
         }
     }

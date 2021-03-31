@@ -41,6 +41,12 @@ $relationshipSynchronizer = new RelationshipSynchronizer($modelInstance);
 $relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 ```
 
+#### Custom model classes
+
+If you want to use different model than your source returns in `localClass` field in `relationships` block - you can
+easily achieve this with using PHP 8 attributes. Just add `SynchronizeWith` attribute do your model with FQCN (Fully
+Qualified Class Name) of original class name (that used in `localClass` field)
+
 ### Advanced use with jobs & dividing to smaller pieces of data (built-in jobs)
 
 ```php
@@ -155,7 +161,7 @@ return [
         'default' => [
             \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
             \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
-            \Grixu\Synchronizer\Jobs\SyncDataParsedJob::class
+            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
         ]
     ],
 
