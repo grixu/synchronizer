@@ -96,10 +96,6 @@ class RelationshipSynchronizer
 
     private function checkRelationType(string $localKey, string $relationType): void
     {
-        if ($this->model->$localKey()::class === $relationType) {
-            return;
-        }
-
         if ($this->model->$localKey() instanceof $relationType) {
             return;
         }
