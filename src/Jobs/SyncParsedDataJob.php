@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer\Jobs;
 
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\CollectionSynchronizer;
-use Grixu\Synchronizer\Exceptions\EmptyForeignKeyInDto;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -14,7 +13,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Collection;
 use Throwable;
 
-class SyncDataParsedJob implements ShouldQueue
+class SyncParsedDataJob implements ShouldQueue
 {
     use Batchable;
     use Dispatchable;
@@ -51,11 +50,7 @@ class SyncDataParsedJob implements ShouldQueue
                 $this->config->getForeignKey(),
                 $this->config->getErrorHandler(),
             );
-        } catch (EmptyForeignKeyInDto) {
-            return;
-        }
 
-        try {
             $synchronizer->sync();
         } catch (Throwable $e) {
             if ($this->config->getErrorHandler() !== null)
