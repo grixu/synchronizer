@@ -29,10 +29,10 @@ class CollectionSynchronizer
             }
 
             $this->foreignKeys[] = $dto->$foreignKey;
-
-            $this->checkIsCollectionNotEmpty();
-            $this->dtoCollection = $this->dtoCollection->filter();
         }
+
+        $this->checkIsCollectionNotEmpty();
+        $this->dtoCollection = $this->dtoCollection->filter();
     }
 
     protected function checkIsCollectionNotEmpty(): void
