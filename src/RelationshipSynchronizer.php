@@ -20,8 +20,10 @@ class RelationshipSynchronizer
     {
     }
 
-    public function sync(RelationshipDataCollection $relationships, SerializableClosure|Closure|null $errorHandler = null): void
-    {
+    public function sync(
+        RelationshipDataCollection $relationships,
+        SerializableClosure|Closure|null $errorHandler = null
+    ): void {
         foreach ($relationships as $relationship) {
             try {
                 $this->syncRelationship($relationship);
@@ -94,9 +96,22 @@ class RelationshipSynchronizer
 
     private function checkRelationType(string $localKey, string $relationType): void
     {
-        if (get_class($this->model->$localKey()) !== $relationType) {
-            throw new WrongRelationTypeException();
+        if ($this->model->$localKey()::class === $relationType) {
+            return;
         }
+
+        if ($this->model->$localKey() instanceof $relationType) {
+            return;
+        }
+
+        throw new WrongRelationTypeException(
+            sprintf(
+                "Required type: %s on %s. But present is: %s",
+                $relationType,
+                $localKey,
+                $this->model->$localKey()::class
+            )
+        );
     }
 
     private function loadForeignKeys(RelationshipData $relationshipData): array

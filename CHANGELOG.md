@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.2.1 - 2021-03-31
+
+- Added extra check in `checkRelationType()` method in `RelationshipSynchronizer`
+
 ## 3.2.0 - 2021-03-31
 
 - Created `SynchronizeWith` attribute to provide way to make relationship sync on custom(or extended) models than in
