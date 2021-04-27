@@ -13,8 +13,8 @@ return [
     ],
 
     'checksum' => [
-        'control' => env('SYNCHRONIZER_MD5_CONTROL', true),
-        'field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+        'control' => env('SYNCHRONIZER_CHECKSUM_CONTROL', true),
+        'field' => env('SYNCHRONIZER_CHECKSUM_FIELD', 'checksum'),
         'timestamps_excluded' => false,
     ],
 
