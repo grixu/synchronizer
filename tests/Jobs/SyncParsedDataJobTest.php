@@ -28,7 +28,7 @@ class SyncParsedDataJobTest extends SyncTestCase
     {
         parent::setUp();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/customer/2020_09_30_102037_create_customers_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_customers_table.php.stub';
         (new \CreateCustomersTable())->up();
 
         $this->config = FakeSyncConfig::make();
@@ -139,7 +139,8 @@ class SyncParsedDataJobTest extends SyncTestCase
 
         $obj->handle();
 
-        $this->assertTrue(Customer::count() > 0);
+        $this->assertDatabaseCount('customers', 0);
+
         Http::assertSent(function (Request $request) {
             return $request->url() == 'http://testable.dev';
         });

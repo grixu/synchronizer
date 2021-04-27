@@ -112,7 +112,7 @@ class LoggerTest extends TestCase
         $this->assertDatabaseCount('synchronizer_logs', 0);
 
         $obj = new Logger(Model::class, 1);
-        $obj->addChanges('updatedAt', 'updatedAt', 'some', 'Rotfl');
+        $obj->addChanges('updatedAt', 'updated_at', 'some', 'Rotfl');
         $this->assertEmpty($obj->get());
 
         $obj->save();

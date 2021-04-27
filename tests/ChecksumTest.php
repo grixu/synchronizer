@@ -23,15 +23,15 @@ class ChecksumTest extends TestCase
         $this->migrateProducts();
         $this->model = Product::factory()->create(
             [
-                'brandId' => null,
-                'productTypeId' => null
+                'brand_id' => null,
+                'product_type_id' => null
             ]
         );
 
         $map = new Map(
             [
                 'name' => 'name',
-                'updatedAt' => 'updatedAt'
+                'updatedAt' => 'updated_at'
             ], Product::class
         );
 
