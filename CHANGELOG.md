@@ -2,6 +2,13 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.3.0 - 2021-04-27
+
+- Added possibility of use extended models without using Attribute
+- Added possibility to synchronize collection of arrays (not only DTOs)
+- Now using snake_case on model fields - conversion from camelCase used in DTOs or array is automatically
+- Socius Models updated to v2 (used in test suites only)
+
 ## 3.2.1 - 2021-03-31
 
 - Added extra check in `checkRelationType()` method in `RelationshipSynchronizer`
