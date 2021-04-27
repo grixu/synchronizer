@@ -6,7 +6,7 @@ return [
         'logging' => env('SYNCHRONIZER_DB_LOGGING', true),
 
         'timestamps' => [
-            'updatedAt'
+            'updated_at'
         ],
 
         'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
