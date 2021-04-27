@@ -43,9 +43,16 @@ $relationshipSynchronizer->sync($dtoCollectionWithRelationships);
 
 #### Custom model classes
 
+You can use extended models from Synchronizer v3.3.0!
+
 If you want to use different model than your source returns in `localClass` field in `relationships` block - you can
 easily achieve this with using PHP 8 attributes. Just add `SynchronizeWith` attribute do your model with FQCN (Fully
 Qualified Class Name) of original class name (that used in `localClass` field)
+
+#### Use Array instead of DTO classes
+
+If you want just to synchronize data without relationships, you can use Collection of arrays instead of DTOs. It's
+possible from version 3.3.0
 
 ### Advanced use with jobs & dividing to smaller pieces of data (built-in jobs)
 
