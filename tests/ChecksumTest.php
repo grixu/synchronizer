@@ -8,6 +8,7 @@ use Grixu\Synchronizer\Exceptions\EmptyMd5FieldNameInConfigException;
 use Grixu\Synchronizer\Map;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Illuminate\Support\Facades\Hash;
 
 class ChecksumTest extends TestCase
 {
@@ -15,6 +16,7 @@ class ChecksumTest extends TestCase
 
     protected Checksum $obj;
     protected Product $model;
+    protected Map $map;
 
     protected function setUp(): void
     {
@@ -28,14 +30,14 @@ class ChecksumTest extends TestCase
             ]
         );
 
-        $map = new Map(
+        $this->map = new Map(
             [
                 'name' => 'name',
                 'updatedAt' => 'updated_at'
             ], Product::class
         );
 
-        $this->obj = new Checksum($map, $this->model);
+        $this->obj = new Checksum($this->map, $this->model);
     }
 
     protected function checksumControlOff($app)
@@ -55,14 +57,14 @@ class ChecksumTest extends TestCase
     }
 
     /** @test */
-    public function it_calculates_md5()
+    public function it_calculates_checksum()
     {
-        $this->assertNotEmpty($this->obj->getMd5());
-        $this->assertIsString($this->obj->getMd5());
+        $this->assertNotEmpty($this->obj->getChecksum());
+        $this->assertIsString($this->obj->getChecksum());
     }
 
     /** @test */
-    public function it_validating_md5()
+    public function it_validating_checksum()
     {
         $this->assertNotEmpty(config('synchronizer.checksum.field'));
         $this->assertTrue(config('synchronizer.checksum.control'));
@@ -71,12 +73,34 @@ class ChecksumTest extends TestCase
     }
 
     /** @test */
-    public function it_updating_md5()
+    public function it_updating_checksum()
     {
         $this->obj->update();
 
         $this->model->refresh();
         $this->assertNotEmpty($this->model->checksum);
+    }
+
+    /** @test */
+    public function it_validates_checksum_properly()
+    {
+        $this->model->checksum = $this->obj->getChecksum();
+        $this->obj = new Checksum($this->map, $this->model);
+
+        $this->assertTrue($this->obj->validate());
+    }
+
+    /** @test */
+    public function hash_can_be_used()
+    {
+        $preGenerated =
+            json_encode(
+                $this->model->only(
+                    $this->map->getModelFieldsArray()
+                )
+            );
+
+        $this->assertTrue(Hash::check($preGenerated, $this->obj->getChecksum()));
     }
 
     /**
