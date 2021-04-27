@@ -4,22 +4,21 @@ namespace Grixu\Synchronizer;
 
 use Grixu\Synchronizer\Exceptions\EmptyMd5FieldNameInConfigException;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 
 class Checksum
 {
-    protected ?string $md5 = null;
+    protected ?string $checksum = null;
 
     public function __construct(protected Map $map, protected Model $model)
     {
     }
 
-    protected function calculate(): void
+    protected function prepareChecksumData(): string
     {
-        $this->md5 = md5(
-            json_encode(
-                $this->model->only(
-                    $this->map->getModelFieldsArray()
-                )
+        return json_encode(
+            $this->model->only(
+                $this->map->getModelFieldsArray()
             )
         );
     }
@@ -30,21 +29,21 @@ class Checksum
             return false;
         }
 
-        $md5FieldName = $this->getMd5FieldName();
+        $checksumFieldName = $this->getChecksumFieldName();
 
-        if (empty($this->model->$md5FieldName)) {
+        if (empty($this->model->$checksumFieldName)) {
             return false;
         }
 
-        return $this->model->$md5FieldName === $this->getMd5();
+        return Hash::check($this->prepareChecksumData(), $this->model->$checksumFieldName);
     }
 
     protected function isChecksumEnabled(): bool
     {
-       return config('synchronizer.checksum.control') == true || !empty(config('synchronizer.checksum.control'));
+        return config('synchronizer.checksum.control') == true || !empty(config('synchronizer.checksum.control'));
     }
 
-    protected function getMd5FieldName(): string
+    protected function getChecksumFieldName(): string
     {
         $md5FieldName = config('synchronizer.checksum.field');
         if (empty($md5FieldName)) {
@@ -56,20 +55,21 @@ class Checksum
 
     public function update(): void
     {
-        if (!$this->isChecksumEnabled())
+        if (!$this->isChecksumEnabled()) {
             return;
+        }
 
-        $md5FieldName = $this->getMd5FieldName();
-        $this->model->$md5FieldName = $this->getMd5();
+        $md5FieldName = $this->getChecksumFieldName();
+        $this->model->$md5FieldName = $this->getChecksum();
         $this->model->save();
     }
 
-    public function getMd5(): string
+    public function getChecksum(): string
     {
-        if (empty($this->md5)) {
-            $this->calculate();
+        if (empty($this->checksum)) {
+            $this->checksum = Hash::make($this->prepareChecksumData());
         }
 
-        return $this->md5;
+        return $this->checksum;
     }
 }
