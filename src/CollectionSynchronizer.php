@@ -9,6 +9,8 @@ use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log as LogFacade;
+use Illuminate\Support\Str;
+use Spatie\DataTransferObject\DataTransferObject;
 
 class CollectionSynchronizer
 {
@@ -24,15 +26,32 @@ class CollectionSynchronizer
         protected SerializableClosure|Closure|null $errorHandler = null
     ) {
         foreach ($dtoCollection as $dto) {
-            if (!isset($dto->$foreignKey) || is_null($dto->$foreignKey)) {
-                throw new EmptyForeignKeyInDto();
-            }
+            $this->checkForeignKey($dto, $foreignKey);
 
-            $this->foreignKeys[] = $dto->$foreignKey;
+            $this->foreignKeys[] = ($dto instanceof DataTransferObject) ? $dto->$foreignKey : $dto[$foreignKey];
         }
 
         $this->checkIsCollectionNotEmpty();
         $this->dtoCollection = $this->dtoCollection->filter();
+    }
+
+    protected function checkForeignKey($dto, $foreignKey)
+    {
+        if ($dto instanceof DataTransferObject) {
+            if (!isset($dto->$foreignKey) || is_null($dto->$foreignKey)) {
+                throw new EmptyForeignKeyInDto();
+            }
+        }
+
+        if (is_array($dto)) {
+            if (!isset($dto[$foreignKey]) || is_null($dto[$foreignKey])) {
+                throw new EmptyForeignKeyInDto();
+            }
+        }
+
+        if (!is_array($dto) && !$dto instanceof DataTransferObject) {
+            throw new Exception('Inappropriate data format');
+        }
     }
 
     protected function checkIsCollectionNotEmpty(): void
@@ -51,18 +70,29 @@ class CollectionSynchronizer
         $fk = $this->foreignKey;
 
         foreach ($this->dtoCollection as $dto) {
-            if (in_array($dto->$fk, $idsNotFound)) {
+            $dtoFk = ($dto instanceof DataTransferObject) ? $dto->$fk : $dto[$fk];
+
+            if (in_array($dtoFk, $idsNotFound)) {
                 $model = (new ModelSynchronizer($dto, $this->model, $map))->sync();
                 $this->created++;
             } else {
-                $model = $models->where($fk, $dto->$fk)->first();
+                $model = $models->where(Str::snake($fk), $dtoFk)->first();
                 (new ModelSynchronizer($dto, $model, $map))->sync();
                 $this->updated++;
             }
 
-            if (!empty($dto->relationships)) {
+            $dtoRelationships = null;
+            if ($dto instanceof DataTransferObject) {
+                $dtoRelationships = $dto->relationships;
+            } else {
+                if (isset($dto['relationships'])) {
+                    $dtoRelationships = $dto['relationships'];
+                }
+            }
+
+            if (!empty($dtoRelationships)) {
                 $rs = new RelationshipSynchronizer($model);
-                $rs->sync($dto->relationships, $this->errorHandler);
+                $rs->sync($dtoRelationships, $this->errorHandler);
             }
         }
 
@@ -72,23 +102,29 @@ class CollectionSynchronizer
     protected function loadModels(): EloquentCollection
     {
         return $this->model::query()
-            ->whereIn($this->foreignKey, $this->foreignKeys)
+            ->whereIn(Str::snake($this->foreignKey), $this->foreignKeys)
             ->get();
     }
 
     protected function diffCheck(EloquentCollection $models): array
     {
-        $idsFound = $models->pluck($this->foreignKey)->toArray();
+        $idsFound = $models->pluck(Str::snake($this->foreignKey))->toArray();
         return array_diff($this->foreignKeys, $idsFound);
     }
 
     protected function makeMap(?array $map): Map
     {
         if (is_array($map)) {
-            return MapFactory::makeFromArray($map, $this->model);
-        } else {
-            return MapFactory::makeFromDto($this->dtoCollection->first(), $this->model);
+            return MapFactory::make($map, $this->model);
         }
+
+        $element = $this->dtoCollection->first();
+
+        if ($element instanceof DataTransferObject) {
+            return MapFactory::makeFromDto($element, $this->model);
+        }
+
+        return MapFactory::makeFromArray($element, $this->model);
     }
 
     protected function sendReport(): void
