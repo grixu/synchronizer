@@ -8,6 +8,7 @@ All notable changes to `synchronizer` will be documented in this file
 - Added possibility to synchronize collection of arrays (not only DTOs)
 - Now using snake_case on model fields - conversion from camelCase used in DTOs or array is automatically
 - Socius Models updated to v2 (used in test suites only)
+- Change checksum generation method from `md5()` to `Hash::make()`
 
 ## 3.2.1 - 2021-03-31
 
