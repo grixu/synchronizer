@@ -6,28 +6,28 @@ trait MigrateProductsTrait
 {
     protected function migrateProducts()
     {
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/operator/2020_09_30_135749_create_branches_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_branches_table.php.stub';
         (new \CreateBranchesTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/operator/2020_09_30_082556_create_operator_roles_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_operator_roles_table.php.stub';
         (new \CreateOperatorRolesTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/operator/2020_09_30_092119_create_operators_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_operators_table.php.stub';
         (new \CreateOperatorsTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/operator/2020_10_01_064502_create_operator_branch_pivot_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.php.stub';
         (new \CreateOperatorBranchPivotTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/product/2020_09_25_081701_create_brands_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_brands_table.php.stub';
         (new \CreateBrandsTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/product/2020_09_25_081724_create_product_types_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_product_types_table.php.stub';
         (new \CreateProductTypesTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/product/2020_09_25_081713_create_categories_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_categories_table.php.stub';
         (new \CreateCategoriesTable())->up();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/product/2020_09_25_081823_create_products_table.php';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_products_table.php.stub';
         (new \CreateProductsTable())->up();
     }
 }
