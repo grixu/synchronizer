@@ -230,8 +230,6 @@ class RelationshipSynchronizerTest extends TestCase
         $this->localModel = $fake;
         $this->obj = new RelationshipSynchronizer($this->localModel);
 
-        ray($this->obj);
-
         $this->assertEmpty($this->localModel->brand_id);
 
         $this->obj->syncRelationship($this->data->current());
