@@ -28,7 +28,7 @@ class SyncParsedDataJobTest extends SyncTestCase
     {
         parent::setUp();
 
-        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_customers_table.php.stub';
+        require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_customers_table.stub';
         (new \CreateCustomersTable())->up();
 
         $this->config = FakeSyncConfig::make();

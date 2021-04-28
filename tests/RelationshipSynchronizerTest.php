@@ -38,8 +38,8 @@ class RelationshipSynchronizerTest extends TestCase
 
     protected function makeBelongsToCase(): void
     {
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_brands_table.php.stub';
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_products_table.php.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_brands_table.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_products_table.stub';
         (new \CreateBrandsTable())->up();
         (new \CreateProductsTable())->up();
 
@@ -76,9 +76,9 @@ class RelationshipSynchronizerTest extends TestCase
 
     protected function makeManyToManyCase(): void
     {
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_operators_table.php.stub';
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_branches_table.php.stub';
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.php.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_operators_table.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_branches_table.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.stub';
         (new \CreateOperatorsTable())->up();
         (new \CreateBranchesTable())->up();
         (new \CreateOperatorBranchPivotTable())->up();
