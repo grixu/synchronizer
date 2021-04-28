@@ -44,4 +44,13 @@ abstract class AbstractLoader implements LoaderInterface
 
         return $this->data;
     }
+
+    public function getBuilder(): Builder
+    {
+        if (empty($this->query)) {
+            $this->buildQuery();
+        }
+
+        return $this->query;
+    }
 }
