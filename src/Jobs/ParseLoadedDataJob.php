@@ -47,8 +47,6 @@ class ParseLoadedDataJob implements ShouldQueue
             return;
         }
 
-        ray($this->dataToParse);
-
         $parserClass = $this->config->getParserClass();
         /** @var ParserInterface $parser */
         $parser = app($parserClass);

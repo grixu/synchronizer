@@ -52,7 +52,6 @@ class LoadDataToSyncJob implements ShouldQueue
 
         $loader->buildQuery($this->config->getIdsToSync());
         $dataCollection = $loader->get();
-        ray($dataCollection);
 
         if ($this->batch()) {
             $jobs = [];
@@ -62,7 +61,6 @@ class LoadDataToSyncJob implements ShouldQueue
                 $jobs[] = new $jobClass($data, $this->config);
             }
 
-            ray($jobs);
             $this->batch()->add($jobs);
         }
     }
