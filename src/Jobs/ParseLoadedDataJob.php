@@ -9,6 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Grixu\Synchronizer\Contracts\ParserInterface;
 
@@ -20,8 +21,24 @@ class ParseLoadedDataJob implements ShouldQueue
     use Queueable;
     use SerializesModels;
 
+    public $timeout = 300;
+    public $tries = 0;
+    public $maxExceptions = 3;
+
     public function __construct(public Collection $dataToParse, public SyncConfig $config)
     {
+    }
+
+    public function backoff(): int
+    {
+        return 30 * $this->attempts();
+    }
+
+    public function retryUntil(): Carbon
+    {
+        return now()->addSeconds(
+            $this->timeout * $this->maxExceptions + $this->backoff()
+        );
     }
 
     public function handle()
@@ -29,6 +46,8 @@ class ParseLoadedDataJob implements ShouldQueue
         if (optional($this->batch())->cancelled()) {
             return;
         }
+
+        ray($this->dataToParse);
 
         $parserClass = $this->config->getParserClass();
         /** @var ParserInterface $parser */
