@@ -4,6 +4,7 @@ namespace Grixu\Synchronizer\Tests\Abstracts;
 
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Collection;
 
 class AbstractLoaderTest extends SyncTestCase
@@ -46,5 +47,14 @@ class AbstractLoaderTest extends SyncTestCase
         $this->assertNotEmpty($returnedData);
         $this->assertTrue($returnedData instanceof Collection);
         $this->assertCount($this->obj->getCount(), $returnedData);
+    }
+
+    /** @test */
+    public function it_returns_builder_obj()
+    {
+        $returnedData = $this->obj->getBuilder();
+
+        $this->assertNotEmpty($returnedData);
+        $this->assertEquals(Builder::class, $returnedData::class);
     }
 }
