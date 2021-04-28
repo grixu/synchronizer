@@ -2,7 +2,7 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
-## 3.3.0 - 2021-04-27
+## 3.3.0 - 2021-04-28
 
 - Added possibility of use extended models without using Attribute
 - Added possibility to synchronize collection of arrays (not only DTOs)
