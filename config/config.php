@@ -23,6 +23,14 @@ return [
             \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
             \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
             \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
+        ],
+        'load-all-and-parse' => [
+            \Grixu\Synchronizer\Jobs\LoadAllAndParseJob::class,
+            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
+        ],
+        'chunk-load-and-parse' => [
+            \Grixu\Synchronizer\Jobs\ChunkLoadAndParseJob::class,
+            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
         ]
     ],
 
