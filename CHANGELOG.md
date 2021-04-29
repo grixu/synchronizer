@@ -10,6 +10,7 @@ All notable changes to `synchronizer` will be documented in this file
 - Socius Models updated to v2 (used in test suites only)
 - Change checksum generation method from `md5()` to `Hash::make()`
 - Added possibility to access query builder in `AbstractLoader`
+- Added 2 new configurations of job processing and 2 new Jobs
 
 ## 3.2.1 - 2021-03-31
 
