@@ -74,7 +74,7 @@ class CollectionSynchronizerTest extends TestCase
     protected function createModelsBasedOnDto()
     {
         foreach ($this->dtoCollection as $dto) {
-            Product::factory()->create(['xlId' => $dto->xlId]);
+            Product::factory()->create(['xl_id' => $dto->xlId]);
         }
     }
 
@@ -116,8 +116,21 @@ class CollectionSynchronizerTest extends TestCase
     }
 
     /** @test */
-    public function empty_foreign_keys_throws_exception()
+    public function empty_foreign_keys_throws_exception_in_dto()
     {
+        try {
+            $this->obj = new CollectionSynchronizer($this->dtoCollection, Product::class, 'some_key');
+            $this->assertTrue(false);
+        } catch (EmptyForeignKeyInDto) {
+            $this->assertTrue(true);
+        }
+    }
+
+    /** @test */
+    public function empty_foreign_keys_throws_exception_in_array()
+    {
+        $this->dtoCollection = $this->dtoCollection->map(fn($item) => $item->toArray());
+
         try {
             $this->obj = new CollectionSynchronizer($this->dtoCollection, Product::class, 'some_key');
             $this->assertTrue(false);
@@ -136,22 +149,37 @@ class CollectionSynchronizerTest extends TestCase
                 'name' => 'name',
                 'index' => 'index',
                 'ean' => 'ean',
-                'measureUnit' => 'measureUnit',
-                'taxGroup' => 'taxGroup',
-                'taxValue' => 'taxValue',
+                'measureUnit' => 'measure_unit',
+                'taxGroup' => 'tax_group',
+                'taxValue' => 'tax_value',
                 'weight' => 'weight',
                 'eshop' => 'eshop',
                 'price' => 'price',
-                'eshopPrice' => 'eshopPrice',
-                'xlId' => 'xlId',
-                'syncTs' => 'syncTs'
+                'eshopPrice' => 'eshop_price',
+                'xlId' => 'xl_id',
+                'syncTs' => 'sync_ts'
             ]
         );
         $this->assertDatabaseCount('products', 10);
     }
 
     /** @test */
-    public function syncs_relationships()
+    public function is_making_map_from_array_in_collection()
+    {
+        $this->dtoCollection = collect(
+            [
+                ProductDataFactory::new()->create()->toArray()
+            ]
+        );
+
+        $this->createObj();
+        $this->assertDatabaseCount('products', 0);
+        $this->obj->sync();
+        $this->assertDatabaseCount('products', 1);
+    }
+
+    /** @test */
+    public function syncs_relationships_using_dto()
     {
         $brand = Brand::factory()->create();
 
@@ -159,18 +187,51 @@ class CollectionSynchronizerTest extends TestCase
             [
                 ProductDataFactory::new()->create(
                     [
-                        'relationships' => RelationshipDataCollection::create([
+                        'relationships' => RelationshipDataCollection::create(
                             [
-                                'localClass' => Product::class,
-                                'foreignClass' => Brand::class,
-                                'localRelationshipName' => 'brand',
-                                'foreignRelatedFieldName' => 'xlId',
-                                'type' => BelongsTo::class,
-                                'foreignKey' => $brand->xlId,
+                                [
+                                    'localClass' => Product::class,
+                                    'foreignClass' => Brand::class,
+                                    'localRelationshipName' => 'brand',
+                                    'foreignRelatedFieldName' => 'xl_id',
+                                    'type' => BelongsTo::class,
+                                    'foreignKey' => $brand->xlId,
+                                ]
                             ]
-                        ]),
+                        ),
                     ]
                 )
+            ]
+        );
+        $this->createObj();
+
+        $this->assertDatabaseCount('products', 0);
+        $this->obj->sync();
+        $this->assertDatabaseCount('products', 1);
+    }
+
+    /** @test */
+    public function syncs_relationships_using_array()
+    {
+        $brand = Brand::factory()->create();
+
+        $arrEntry = ProductDataFactory::new()->create()->toArray();
+        $arrEntry['relationships'] = RelationshipDataCollection::create(
+            [
+                [
+                    'localClass' => Product::class,
+                    'foreignClass' => Brand::class,
+                    'localRelationshipName' => 'brand',
+                    'foreignRelatedFieldName' => 'xl_id',
+                    'type' => BelongsTo::class,
+                    'foreignKey' => $brand->xlId,
+                ]
+            ]
+        );
+
+        $this->dtoCollection = new Collection(
+            [
+                $arrEntry
             ]
         );
         $this->createObj();

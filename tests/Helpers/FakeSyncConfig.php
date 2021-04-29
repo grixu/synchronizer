@@ -19,6 +19,30 @@ class FakeSyncConfig
         );
     }
 
+    public static function makeLoadAllAndParse(): SyncConfig
+    {
+        return new SyncConfig(
+            FakeLoader::class,
+            FakeParser::class,
+            Customer::class,
+            'xlId',
+            config('synchronizer.jobs.load-all-and-parse')
+
+        );
+    }
+
+    public static function makeChunkLoadAndParse(): SyncConfig
+    {
+        return new SyncConfig(
+            FakeLoader::class,
+            FakeParser::class,
+            Customer::class,
+            'xlId',
+            config('synchronizer.jobs.chunk-load-and-parse')
+
+        );
+    }
+
     public static function makeArray(): array
     {
         return [

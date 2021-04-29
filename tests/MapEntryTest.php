@@ -6,6 +6,7 @@ use Grixu\Synchronizer\MapEntry;
 use Grixu\Synchronizer\Models\ExcludedField;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 class MapEntryTest extends TestCase
 {
@@ -22,7 +23,7 @@ class MapEntryTest extends TestCase
     protected function assertGetters($obj, $field = 'name')
     {
         $this->assertEquals($field, $obj->getDtoField());
-        $this->assertEquals($field, $obj->getModelField());
+        $this->assertEquals(Str::snake($field), $obj->getModelField());
     }
 
     /** @test */
@@ -64,21 +65,10 @@ class MapEntryTest extends TestCase
     /** @test */
     public function field_is_timestamp()
     {
-        $obj = new MapEntry('updatedAt', 'updatedAt');
+        $obj = new MapEntry('updatedAt', 'updated_at');
 
         $this->assertTrue($obj->isSyncable());
         $this->assertTrue($obj->isTimestamp());
         $this->assertGetters($obj, 'updatedAt');
-    }
-
-    /** @test */
-    public function field_name_on_dto_is_timestamp_not_marking_entry_as_timestamp()
-    {
-        $obj = new MapEntry('updatedAt', 'updated_at');
-
-        $this->assertTrue($obj->isSyncable());
-        $this->assertFalse($obj->isTimestamp());
-        $this->assertEquals('updatedAt', $obj->getDtoField());
-        $this->assertEquals('updated_at', $obj->getModelField());
     }
 }

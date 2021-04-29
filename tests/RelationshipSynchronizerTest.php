@@ -33,13 +33,13 @@ class RelationshipSynchronizerTest extends TestCase
         $this->obj->syncRelationship($this->data->current());
 
         $this->localModel->load('brand');
-        $this->assertNotEmpty($this->localModel->brandId);
+        $this->assertNotEmpty($this->localModel->brand_id);
     }
 
     protected function makeBelongsToCase(): void
     {
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/product/2020_09_25_081701_create_brands_table.php';
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/product/2020_09_25_081823_create_products_table.php';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_brands_table.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_products_table.stub';
         (new \CreateBrandsTable())->up();
         (new \CreateProductsTable())->up();
 
@@ -52,10 +52,10 @@ class RelationshipSynchronizerTest extends TestCase
                     'localClass' => Product::class,
                     'foreignClass' => Brand::class,
                     'localRelationshipName' => 'brand',
-                    'foreignRelatedFieldName' => 'xlId',
+                    'foreignRelatedFieldName' => 'xl_id',
                     'type' => BelongsTo::class,
-                    'localKey' => (int) $this->localModel->xlId,
-                    'foreignKey' => (int) $this->relatedModel->xlId,
+                    'localKey' => (int) $this->localModel->xl_id,
+                    'foreignKey' => (int) $this->relatedModel->xl_id,
                 ]
             ]
         );
@@ -76,9 +76,9 @@ class RelationshipSynchronizerTest extends TestCase
 
     protected function makeManyToManyCase(): void
     {
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/operator/2020_09_30_092119_create_operators_table.php';
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/operator/2020_09_30_135749_create_branches_table.php';
-        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/operator/2020_10_01_064502_create_operator_branch_pivot_table.php';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_operators_table.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_branches_table.stub';
+        require_once __DIR__.'/../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.stub';
         (new \CreateOperatorsTable())->up();
         (new \CreateBranchesTable())->up();
         (new \CreateOperatorBranchPivotTable())->up();
@@ -92,10 +92,10 @@ class RelationshipSynchronizerTest extends TestCase
                     'localClass' => Operator::class,
                     'foreignClass' => Branch::class,
                     'localRelationshipName' => 'branches',
-                    'foreignRelatedFieldName' => 'xlId',
+                    'foreignRelatedFieldName' => 'xl_id',
                     'type' => BelongsToMany::class,
-                    'localKey' => (int) $this->localModel->xlId,
-                    'foreignKeys' => [$this->relatedModel->xlId],
+                    'localKey' => (int) $this->localModel->xl_id,
+                    'foreignKeys' => [$this->relatedModel->xl_id],
                 ]
             ]
         );
@@ -125,10 +125,10 @@ class RelationshipSynchronizerTest extends TestCase
                     'localClass' => Brand::class,
                     'foreignClass' => Brand::class,
                     'localRelationshipName' => 'brand',
-                    'foreignRelatedFieldName' => 'xlId',
+                    'foreignRelatedFieldName' => 'xl_id',
                     'type' => BelongsTo::class,
-                    'localKey' => (int) $this->localModel->xlId,
-                    'foreignKey' => (int) $this->relatedModel->xlId,
+                    'localKey' => (int) $this->localModel->xl_id,
+                    'foreignKey' => (int) $this->relatedModel->xl_id,
                 ]
             ]
         );
@@ -156,10 +156,10 @@ class RelationshipSynchronizerTest extends TestCase
                     'localClass' => Operator::class,
                     'foreignClass' => Branch::class,
                     'localRelationshipName' => 'branches',
-                    'foreignRelatedFieldName' => 'xlId',
+                    'foreignRelatedFieldName' => 'xl_id',
                     'type' => BelongsTo::class,
-                    'localKey' => (int) $this->localModel->xlId,
-                    'foreignKeys' => [$this->relatedModel->xlId],
+                    'localKey' => (int) $this->localModel->xl_id,
+                    'foreignKeys' => [$this->relatedModel->xl_id],
                 ]
             ]
         );
@@ -173,7 +173,7 @@ class RelationshipSynchronizerTest extends TestCase
         $this->obj->sync($this->data);
 
         $this->localModel->load('brand');
-        $this->assertNotEmpty($this->localModel->brandId);
+        $this->assertNotEmpty($this->localModel->brand_id);
     }
 
     /** @test */
@@ -196,9 +196,9 @@ class RelationshipSynchronizerTest extends TestCase
                     'localClass' => Operator::class,
                     'foreignClass' => Branch::class,
                     'localRelationshipName' => 'branches',
-                    'foreignRelatedFieldName' => 'xlId',
+                    'foreignRelatedFieldName' => 'xl_id',
                     'type' => BelongsTo::class,
-                    'localKey' => (int) $this->localModel->xlId,
+                    'localKey' => (int) $this->localModel->xl_id,
                     'foreignKeys' => [],
                 ]
             ]
@@ -230,29 +230,48 @@ class RelationshipSynchronizerTest extends TestCase
         $this->localModel = $fake;
         $this->obj = new RelationshipSynchronizer($this->localModel);
 
-
         $this->assertEmpty($this->localModel->brand_id);
 
         $this->obj->syncRelationship($this->data->current());
 
         $this->localModel->load('brand');
-        $this->assertNotEmpty($this->localModel->brandId);
+        $this->assertNotEmpty($this->localModel->brand_id);
     }
 
     /** @test */
-    public function it_throws_exception_when_relationship_local_model_is_not_found_in_attributes()
+    public function it_accept_when_local_model_is_extended_original_one()
     {
         $this->makeBelongsToCase();
-        $failedExtendedClass = new class extends Product {};
-        $this->localModel = $failedExtendedClass;
-        $this->obj = new RelationshipSynchronizer($failedExtendedClass);
+        $extendedClass = new class extends Product {};
+        $this->localModel = $extendedClass;
+        $this->obj = new RelationshipSynchronizer($extendedClass);
 
         $this->assertEmpty($this->localModel->brand_id);
+        try {
+            $this->obj->syncRelationship($this->data->current());
+            $this->assertTrue(true);
+        } catch (\Illuminate\Database\QueryException) {
+            $this->assertTrue(true);
+        } catch (\Exception) {
+            $this->assertFalse(true);
+        }
+    }
+
+    /** @test */
+    public function it_fails_when_model_is_not_extend_or_having_an_attribute()
+    {
+        $this->makeBelongsToCase();
+        $extendedClass = new class extends Model{};
+        $this->localModel = $extendedClass;
+        $this->obj = new RelationshipSynchronizer($extendedClass);
+
         try {
             $this->obj->syncRelationship($this->data->current());
             $this->assertTrue(false);
         } catch (WrongLocalModelException) {
             $this->assertTrue(true);
+        } catch (\Exception) {
+            $this->assertFalse(false);
         }
     }
 }

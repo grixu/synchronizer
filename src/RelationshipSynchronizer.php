@@ -74,7 +74,7 @@ class RelationshipSynchronizer
 
     private function checkModelClass(string $originalModel): void
     {
-        if ($this->model::class === $originalModel) {
+        if ($this->model instanceof $originalModel) {
             return;
         }
 

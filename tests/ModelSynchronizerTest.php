@@ -12,15 +12,17 @@ use Grixu\Synchronizer\Models\Log;
 use Grixu\Synchronizer\ModelSynchronizer;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 
 class ModelSynchronizerTest extends TestCase
 {
     use MigrateProductsTrait;
 
-    protected ProductData $dto;
-    protected Product $model;
+    protected ProductData|array $dto;
+    protected Product|Model $model;
 
     protected function setUp(): void
     {
@@ -30,8 +32,8 @@ class ModelSynchronizerTest extends TestCase
         $this->dto = ProductDataFactory::new()->create();
         $this->model = Product::factory()->create(
             [
-                'brandId' => null,
-                'productTypeId' => null
+                'brand_id' => null,
+                'product_type_id' => null
             ]
         );
     }
@@ -46,8 +48,16 @@ class ModelSynchronizerTest extends TestCase
     }
 
     /** @test */
-    public function it_creates_itself_without_map()
+    public function it_creates_itself_without_map_using_dto()
     {
+        $obj = new ModelSynchronizer($this->dto, $this->model);
+        $this->assertEquals(ModelSynchronizer::class, get_class($obj));
+    }
+
+    /** @test */
+    public function it_creates_itself_without_map_using_array()
+    {
+        $this->dto = ProductDataFactory::new()->create()->toArray();
         $obj = new ModelSynchronizer($this->dto, $this->model);
         $this->assertEquals(ModelSynchronizer::class, get_class($obj));
     }
@@ -72,6 +82,7 @@ class ModelSynchronizerTest extends TestCase
     protected function assertTransfer($model)
     {
         foreach ($this->dto as $key => $value) {
+            $key = Str::snake($key);
             if (is_object($value) && get_class($value) === Carbon::class) {
                 $this->assertEquals($value->timestamp, $model->$key->timestamp);
             } else {

@@ -10,6 +10,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Throwable;
 
@@ -19,10 +20,25 @@ class SyncParsedDataJob implements ShouldQueue
     use Dispatchable;
     use InteractsWithQueue;
     use Queueable;
-    use SerializesModels;
+
+    public $timeout = 600;
+    public $tries = 0;
+    public $maxExceptions = 4;
 
     public function __construct(public Collection $dtoCollection, public SyncConfig $config)
     {
+    }
+
+    public function backoff(): int
+    {
+        return 30 * $this->attempts();
+    }
+
+    public function retryUntil(): Carbon
+    {
+        return now()->addSeconds(
+            $this->timeout * $this->maxExceptions + $this->backoff()
+        );
     }
 
     public function handle()

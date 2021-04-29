@@ -23,7 +23,7 @@ class Map
         }
     }
 
-    protected function getExcludedField(string $model, string $field): ?ExcludedField
+    protected function getExcludedField(string $model, string $field): ExcludedField | null
     {
         return ExcludedField::query()
             ->where(
@@ -32,7 +32,7 @@ class Map
                     ['field', '=', $field]
                 ]
             )
-            ->first();
+            ->firstOr(fn() => null);
     }
 
     public function get(?Model $model = null): Collection

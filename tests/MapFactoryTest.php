@@ -14,7 +14,7 @@ class MapFactoryTest extends TestCase
     public function making_map_based_on_dto()
     {
         $dto = ProductDataFactory::new()->create();
-        $map = MapFactory::makeFromDto($dto,Product::class);
+        $map = MapFactory::makeFromDto($dto, Product::class);
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
@@ -22,14 +22,28 @@ class MapFactoryTest extends TestCase
     }
 
     /** @test */
-    public function making_map_based_on_array()
+    public function making_map_from_array()
     {
-        $map = MapFactory::makeFromArray([
-            'name' => 'name'
-                                         ], Product::class);
+        $map = MapFactory::make(
+            [
+                'name' => 'name'
+            ],
+            Product::class
+        );
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
         $this->assertCount(1, $map->get());
+    }
+
+    /** @test */
+    public function making_map_based_on_array()
+    {
+        $dto = ProductDataFactory::new()->create()->toArray();
+        $map = MapFactory::makeFromArray($dto, Product::class);
+
+        $this->assertEquals(Map::class, get_class($map));
+        $this->assertNotEmpty($map->get());
+        $this->assertCount(count($dto), $map->get());
     }
 }

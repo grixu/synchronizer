@@ -13,13 +13,18 @@ class ModelSynchronizer
     protected bool $isModelCreated = false;
 
     public function __construct(
-        protected DataTransferObject $dto,
+        protected DataTransferObject|array $dto,
         protected Model|string $model,
         ?Map $map = null
     ) {
         $modelName = is_object($model) ? $model::class : $model;
+
         if (empty($map)) {
-            $map = MapFactory::makeFromDto($dto, $modelName);
+            if ($dto instanceof DataTransferObject) {
+                $map = MapFactory::makeFromDto($dto, $modelName);
+            } else {
+                $map = MapFactory::makeFromArray($dto, $modelName);
+            }
         }
 
         /** @var Map $map */
@@ -67,15 +72,18 @@ class ModelSynchronizer
         $data = [];
 
         foreach ($this->map->get($model) as $entry) {
-            $dtoField = $entry->getDtoField();
-            $modelField = $entry->getModelField();
-            $data[$modelField] = $this->dto->$dtoField;
+            $dtoFieldName = $entry->getDtoField();
+            $modelFieldName = $entry->getModelField();
+
+            $dtoField = ($this->dto instanceof DataTransferObject) ? $this->dto->$dtoFieldName : $this->dto[$dtoFieldName];
+
+            $data[$modelFieldName] = $dtoField;
 
             optional($logger)->addChanges(
+                $dtoFieldName,
+                $modelFieldName,
                 $dtoField,
-                $modelField,
-                $this->dto->$dtoField,
-                optional($model)->$modelField
+                optional($model)->$modelFieldName
             );
         }
 

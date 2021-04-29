@@ -6,15 +6,15 @@ return [
         'logging' => env('SYNCHRONIZER_DB_LOGGING', true),
 
         'timestamps' => [
-            'updatedAt'
+            'updated_at'
         ],
 
         'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
     ],
 
     'checksum' => [
-        'control' => env('SYNCHRONIZER_MD5_CONTROL', true),
-        'field' => env('SYNCHRONIZER_MD5_FIELD', 'checksum'),
+        'control' => env('SYNCHRONIZER_CHECKSUM_CONTROL', true),
+        'field' => env('SYNCHRONIZER_CHECKSUM_FIELD', 'checksum'),
         'timestamps_excluded' => false,
     ],
 
@@ -22,6 +22,14 @@ return [
         'default' => [
             \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
             \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
+            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
+        ],
+        'load-all-and-parse' => [
+            \Grixu\Synchronizer\Jobs\LoadAllAndParseJob::class,
+            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
+        ],
+        'chunk-load-and-parse' => [
+            \Grixu\Synchronizer\Jobs\ChunkLoadAndParseJob::class,
             \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
         ]
     ],

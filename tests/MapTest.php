@@ -30,7 +30,7 @@ class MapTest extends TestCase
             [
                 'name' => 'name',
                 'spam' => 'spam',
-                'updatedAt' => 'updatedAt'
+                'updatedAt' => 'updated_at'
             ],
             Model::class
         );
@@ -86,15 +86,15 @@ class MapTest extends TestCase
         );
         $model = Product::factory()->make(
             [
-                'brandId' => null,
-                'productTypeId' => null,
+                'brand_id' => null,
+                'product_type_id' => null,
             ]
         );
 
         $this->obj = new Map(
             [
                 'name' => 'name',
-                'updatedAt' => 'updatedAt'
+                'updatedAt' => 'updated_at'
             ],
             Product::class
         );
