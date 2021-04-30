@@ -30,7 +30,7 @@ class RelationshipSynchronizerTest extends TestCase
     {
         $this->makeBelongsToCase();
 
-        $this->obj->syncRelationship($this->data->current());
+        $this->obj->syncRelationship($this->data->first());
 
         $this->localModel->load('brand');
         $this->assertNotEmpty($this->localModel->brand_id);
@@ -68,7 +68,7 @@ class RelationshipSynchronizerTest extends TestCase
     {
         $this->makeManyToManyCase();
 
-        $this->obj->syncRelationship($this->data->current());
+        $this->obj->syncRelationship($this->data->first());
 
         $this->localModel->load('branches');
         $this->assertNotEmpty($this->localModel->branches);
@@ -109,7 +109,7 @@ class RelationshipSynchronizerTest extends TestCase
         $this->makeDisruptedCaseOne();
 
         try {
-            $this->obj->syncRelationship($this->data->current());
+            $this->obj->syncRelationship($this->data->first());
             $this->assertTrue(false);
         } catch (WrongLocalModelException $exception) {
             $this->assertTrue(true);
@@ -140,7 +140,7 @@ class RelationshipSynchronizerTest extends TestCase
         $this->makeDisruptedCaseTwo();
 
         try {
-            $this->obj->syncRelationship($this->data->current());
+            $this->obj->syncRelationship($this->data->first());
             $this->assertTrue(false);
         } catch (WrongRelationTypeException $exception) {
             $this->assertTrue(true);
@@ -181,7 +181,7 @@ class RelationshipSynchronizerTest extends TestCase
     {
         $this->makeEmptyForeignKeysCase();
 
-        $this->obj->syncRelationship($this->data->current());
+        $this->obj->syncRelationship($this->data->first());
 
         $this->localModel->load('branches');
         $this->assertEmpty($this->localModel->branches);
@@ -232,7 +232,7 @@ class RelationshipSynchronizerTest extends TestCase
 
         $this->assertEmpty($this->localModel->brand_id);
 
-        $this->obj->syncRelationship($this->data->current());
+        $this->obj->syncRelationship($this->data->first());
 
         $this->localModel->load('brand');
         $this->assertNotEmpty($this->localModel->brand_id);
@@ -248,7 +248,7 @@ class RelationshipSynchronizerTest extends TestCase
 
         $this->assertEmpty($this->localModel->brand_id);
         try {
-            $this->obj->syncRelationship($this->data->current());
+            $this->obj->syncRelationship($this->data->first());
             $this->assertTrue(true);
         } catch (\Illuminate\Database\QueryException) {
             $this->assertTrue(true);
@@ -266,7 +266,7 @@ class RelationshipSynchronizerTest extends TestCase
         $this->obj = new RelationshipSynchronizer($extendedClass);
 
         try {
-            $this->obj->syncRelationship($this->data->current());
+            $this->obj->syncRelationship($this->data->first());
             $this->assertTrue(false);
         } catch (WrongLocalModelException) {
             $this->assertTrue(true);

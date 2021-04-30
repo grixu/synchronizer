@@ -187,18 +187,16 @@ class CollectionSynchronizerTest extends TestCase
             [
                 ProductDataFactory::new()->create(
                     [
-                        'relationships' => RelationshipDataCollection::create(
+                        'relationships' => [
                             [
-                                [
-                                    'localClass' => Product::class,
-                                    'foreignClass' => Brand::class,
-                                    'localRelationshipName' => 'brand',
-                                    'foreignRelatedFieldName' => 'xl_id',
-                                    'type' => BelongsTo::class,
-                                    'foreignKey' => $brand->xlId,
-                                ]
+                                'localClass' => Product::class,
+                                'foreignClass' => Brand::class,
+                                'localRelationshipName' => 'brand',
+                                'foreignRelatedFieldName' => 'xl_id',
+                                'type' => BelongsTo::class,
+                                'foreignKey' => $brand->xlId,
                             ]
-                        ),
+                        ],
                     ]
                 )
             ]
