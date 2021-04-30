@@ -11,7 +11,7 @@ class MapFactory
     {
         $map = [];
 
-        foreach ($dataTransferObject->except('relationship')->toArray() as $key => $value) {
+        foreach ($dataTransferObject->except('relationships')->toArray() as $key => $value) {
             $map[$key] = Str::snake($key);
         }
 
