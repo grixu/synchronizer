@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.3.1 - 2021-04-30
+
+- Updated `socius-models` & `relationship-data-transfer-object`
+
 ## 3.3.0 - 2021-04-28
 
 - Added possibility of use extended models without using Attribute
