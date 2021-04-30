@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.3.2 - 2021-04-30
+
+- Bug fixed in `MapFactory`
+
 ## 3.3.1 - 2021-04-30
 
 - Updated `socius-models` & `relationship-data-transfer-object`
