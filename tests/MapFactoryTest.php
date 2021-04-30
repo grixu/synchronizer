@@ -18,7 +18,7 @@ class MapFactoryTest extends TestCase
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
-        $this->assertCount(count($dto->toArray()), $map->get());
+        $this->assertCount(count($dto->except('relationships')->toArray()), $map->get());
     }
 
     /** @test */
