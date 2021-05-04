@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 3.3.2 - 2021-05-04
+
+- Bug fixed in LoadDataToSyncJob
+
 ## 3.3.3 - 2021-04-30
 
 - Shame on me, typo happen this time...

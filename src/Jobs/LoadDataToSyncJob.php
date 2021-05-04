@@ -8,7 +8,6 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Queue\SerializesModels;
 use Grixu\Synchronizer\Contracts\LoaderInterface;
 use Illuminate\Support\Carbon;
 
@@ -19,7 +18,7 @@ class LoadDataToSyncJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    public $timeout = 60;
+    public $timeout = 180;
     public $tries = 3;
     public $maxExceptions = 3;
 
@@ -29,7 +28,7 @@ class LoadDataToSyncJob implements ShouldQueue
 
     public function backoff(): int
     {
-        return 60 * $this->attempts();
+        return $this->timeout * $this->attempts();
     }
 
     public function retryUntil(): Carbon
