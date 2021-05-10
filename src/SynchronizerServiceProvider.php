@@ -34,6 +34,9 @@ class SynchronizerServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'synchronizer');
 
+        Checksum::setChecksumField(config('synchronizer.checksum.field'));
+        Map::setTimestamps(config('synchronizer.sync.timestamps'));
+
         $this->app->singleton(SyncConfigFactory::class, function () {
             return new SyncConfigFactory();
         });
