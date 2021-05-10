@@ -6,7 +6,9 @@ use Illuminate\Database\Eloquent\Model;
 
 /**
  * @property string model
- * @property int model_id
+ * @property string batch_id
+ * @property int total_changes
+ * @property array log
  * @method static create(array $array)
  */
 class Log extends Model
@@ -16,13 +18,14 @@ class Log extends Model
     public $table = 'synchronizer_logs';
 
     protected $casts = [
-        'model_id' => 'integer',
         'log' => 'array',
+        'total_changes' => 'integer',
     ];
 
     protected $fillable = [
         'model',
-        'model_id',
+        'batch_id',
+        'total_changes',
         'log',
     ];
 }
