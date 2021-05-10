@@ -8,15 +8,13 @@ use Illuminate\Support\Str;
 
 class Map
 {
-    protected Collection $map;
-    protected Collection $mapWithoutTimestamps;
+    protected array $map = [];
+    protected array $mapWithoutTimestamps = [];
     protected array $updatableOnNull = [];
     protected static array $timestamps;
 
     public function __construct(array $fields, protected string $model)
     {
-        $this->map = collect();
-        $this->mapWithoutTimestamps = collect();
         $excludedFields = $this->getExcludedFields($model);
 
         foreach ($fields as $field) {
@@ -32,10 +30,10 @@ class Map
                 continue;
             }
 
-            $this->map->put($field, $modelField);
+            $this->map[$field] = $modelField;
 
             if (!in_array($modelField, static::$timestamps)) {
-                $this->mapWithoutTimestamps->put($field, $modelField);
+                $this->mapWithoutTimestamps[$field] = $modelField;
             }
         }
     }
@@ -47,19 +45,19 @@ class Map
             ->get();
     }
 
-    public function get(): Collection
+    public function get(): array
     {
         return $this->map;
     }
 
-    public function getWithoutTimestamps(): Collection
+    public function getWithoutTimestamps(): array
     {
         return $this->mapWithoutTimestamps;
     }
 
     public function getModelFieldsArray(): array
     {
-        return $this->map->values()->toArray();
+        return array_values($this->map);
     }
 
     public function getUpdatableOnNullFields(): array
