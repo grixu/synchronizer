@@ -28,9 +28,9 @@ class MapTest extends TestCase
     {
         $this->obj = new Map(
             [
-                'name' => 'name',
-                'spam' => 'spam',
-                'updatedAt' => 'updated_at'
+                'name',
+                'spam',
+                'updatedAt'
             ],
             Model::class
         );
@@ -69,10 +69,11 @@ class MapTest extends TestCase
     /** @test */
     public function get_filtered_with_excluded_update_on_null_fields()
     {
-        $model = $this->createObjAndRealModel();
-        $this->assertNotEmpty($this->obj->get($model));
-        $this->assertCount(1, $this->obj->get($model));
-        $this->assertCount(0, $this->obj->getWithoutTimestamps($model));
+        $this->createObjAndRealModel();
+        $this->assertNotEmpty($this->obj->get());
+        $this->assertCount(1, $this->obj->get());
+        $this->assertCount(0, $this->obj->getWithoutTimestamps());
+        $this->assertCount(1, $this->obj->getUpdatableOnNullFields());
     }
 
     protected function createObjAndRealModel(): Model
@@ -93,8 +94,8 @@ class MapTest extends TestCase
 
         $this->obj = new Map(
             [
-                'name' => 'name',
-                'updatedAt' => 'updated_at'
+                'name',
+                'updatedAt'
             ],
             Product::class
         );
@@ -142,26 +143,19 @@ class MapTest extends TestCase
     /** @test */
     public function get_array_with_filtered_models_fields_but_one_excluded_with_null_update_option()
     {
-        $model = $this->createObjAndRealModel();
+        $this->createObjAndRealModel();
 
         $this->assertBasicThingsAboutArray();
-        $this->assertCount(1, $this->obj->getModelFieldsArray($model));
+        $this->assertCount(1, $this->obj->getModelFieldsArray());
     }
 
-    /**
-     * @test
-     * @environment-setup useChecksumTimestampExcluded
-     */
-    public function get_array_with_models_fields_when_timestamps_exclude_is_on()
+    /** @test */
+    public function get_array_with_models_fields_when_timestamps_exclude_is_off()
     {
+        Map::setTimestamps([]);
         $this->createObj();
 
         $this->assertBasicThingsAboutArray();
-        $this->assertCount(2, $this->obj->getModelFieldsArray());
-    }
-
-    protected function useChecksumTimestampExcluded($app)
-    {
-        $app->config->set('synchronizer.checksum.timestamps_excluded', true);
+        $this->assertCount(3, $this->obj->getModelFieldsArray());
     }
 }
