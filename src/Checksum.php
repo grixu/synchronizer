@@ -2,74 +2,54 @@
 
 namespace Grixu\Synchronizer;
 
-use Grixu\Synchronizer\Exceptions\EmptyMd5FieldNameInConfigException;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Checksum
 {
-    protected ?string $checksum = null;
+    public static string $checksumField = 'checksum';
+    protected Collection $diff;
 
-    public function __construct(protected Map $map, protected Model $model)
+    public function __construct(Collection $data, string $key, string $model)
     {
-    }
+        $modelKey = Str::snake($key);
 
-    protected function prepareChecksumData(): string
-    {
-        return json_encode(
-            $this->model->only(
-                $this->map->getModelFieldsArray()
-            )
-        );
-    }
+        $checksums = $data->pluck(static::$checksumField, $key);
+        /** @var Model $model */
+        $storedChecksums = $model::query()
+            ->whereIn($modelKey, $checksums->keys())
+            ->whereNotNull(static::$checksumField)
+            ->pluck(static::$checksumField, $modelKey);
 
-    public function validate(): bool
-    {
-        if (!$this->isChecksumEnabled()) {
-            return false;
+        $diff = collect();
+
+        foreach ($checksums as $id => $checksum) {
+            if (isset($storedChecksums[$id]) && $storedChecksums[$id] !== $checksum) {
+                $diff->push(
+                    $data->where($key, $id)->first()
+                );
+            }
         }
 
-        $checksumFieldName = $this->getChecksumFieldName();
+        $differentialKeyCheck = $checksums->keys()->diff($storedChecksums->keys());
+        $diff->push(...$data->whereIn($key, $differentialKeyCheck));
 
-        if (empty($this->model->$checksumFieldName)) {
-            return false;
-        }
-
-        return Hash::check($this->prepareChecksumData(), $this->model->$checksumFieldName);
+        $this->diff = $diff->filter();
     }
 
-    protected function isChecksumEnabled(): bool
+    public function get(): Collection
     {
-        return config('synchronizer.checksum.control') == true || !empty(config('synchronizer.checksum.control'));
+        return $this->diff;
     }
 
-    protected function getChecksumFieldName(): string
+    public static function generate(array $data): string
     {
-        $md5FieldName = config('synchronizer.checksum.field');
-        if (empty($md5FieldName)) {
-            throw new EmptyMd5FieldNameInConfigException();
-        }
-
-        return $md5FieldName;
+        return hash('crc32c', json_encode($data));
     }
 
-    public function update(): void
+    public static function setChecksumField(string $fieldName)
     {
-        if (!$this->isChecksumEnabled()) {
-            return;
-        }
-
-        $md5FieldName = $this->getChecksumFieldName();
-        $this->model->$md5FieldName = $this->getChecksum();
-        $this->model->save();
-    }
-
-    public function getChecksum(): string
-    {
-        if (empty($this->checksum)) {
-            $this->checksum = Hash::make($this->prepareChecksumData());
-        }
-
-        return $this->checksum;
+        static::$checksumField = $fieldName;
     }
 }
