@@ -3,62 +3,72 @@
 namespace Grixu\Synchronizer;
 
 use Grixu\Synchronizer\Models\ExcludedField;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class Map
 {
     protected Collection $map;
+    protected Collection $mapWithoutTimestamps;
+    protected array $updatableOnNull = [];
+    protected static array $timestamps;
 
-    public function __construct(array $map, string $model)
+    public function __construct(array $fields, protected string $model)
     {
         $this->map = collect();
+        $this->mapWithoutTimestamps = collect();
+        $excludedFields = $this->getExcludedFields($model);
 
-        foreach ($map as $dtoField => $modelField) {
-            $excludedField = $this->getExcludedField($model, $modelField);
+        foreach ($fields as $field) {
+            $modelField = Str::snake($field);
 
-            $this->map->push(
-                new MapEntry($dtoField, $modelField, $excludedField)
-            );
+            $excludedField = $excludedFields->where('field', $modelField)->first();
+
+            if ($excludedField) {
+                if ($excludedField->update_empty) {
+                    $this->updatableOnNull[] = $modelField;
+                }
+
+                continue;
+            }
+
+            $this->map->put($field, $modelField);
+
+            if (!in_array($modelField, static::$timestamps)) {
+                $this->mapWithoutTimestamps->put($field, $modelField);
+            }
         }
     }
 
-    protected function getExcludedField(string $model, string $field): ExcludedField | null
+    protected function getExcludedFields(string $model): Collection
     {
         return ExcludedField::query()
-            ->where(
-                [
-                    ['model', '=', $model],
-                    ['field', '=', $field]
-                ]
-            )
-            ->firstOr(fn() => null);
+            ->where('model', $model)
+            ->get();
     }
 
-    public function get(?Model $model = null): Collection
+    public function get(): Collection
     {
-        return $this->map->filter(function ($item) use ($model) {
-            $field = $item->getModelField();
-            return $item->isSyncable(optional($model)->$field);
-        });
+        return $this->map;
     }
 
-    public function getWithoutTimestamps(?Model $model = null): Collection
+    public function getWithoutTimestamps(): Collection
     {
-        return $this->map->filter(function ($item) use ($model) {
-            $field = $item->getModelField();
-            return $item->isSyncable(optional($model)->$field) && !$item->isTimestamp();
-        });
+        return $this->mapWithoutTimestamps;
     }
 
-    public function getModelFieldsArray(?Model $model=null): array
+    public function getModelFieldsArray(): array
     {
-        if (config('synchronizer.checksum.timestamps_excluded')) {
-            $fields = $this->getWithoutTimestamps($model);
-        } else {
-            $fields = $this->get($model);
-        }
+        return $this->map->values()->toArray();
+    }
 
-        return $fields->map(fn ($item) => $item->getModelField())->toArray();
+    public function getUpdatableOnNullFields(): array
+    {
+        return $this->updatableOnNull;
+    }
+
+    public static function setTimestamps(array $fields): void
+    {
+        static::$timestamps = $fields;
     }
 }
