@@ -3,54 +3,44 @@
 namespace Grixu\Synchronizer;
 
 use Grixu\Synchronizer\Models\Log;
+use Grixu\Synchronizer\Notifications\LoggerNotification;
+use Illuminate\Support\Facades\Notification;
 
 class Logger
 {
-    protected array $changes;
-
-    public function __construct(protected string $model, protected int $id)
+    public function __construct(protected string $batchId, protected string $model)
     {
-        $this->changes = [];
     }
 
-    public function addChanges(string $dtoField, string $modelField, $dtoValue = null, $modelValue = null): void
+    public function log(array $changes): void
     {
-        if ($dtoValue !== $modelValue && !in_array($modelField, config('synchronizer.sync.timestamps'))) {
-            $this->changes[] =
-                [
-                    'dtoField' => $dtoField,
-                    'modelField' => $modelField,
-                    'dtoValue' => $dtoValue,
-                    'modelValue' => $modelValue
-                ];
-        }
-    }
-
-    public function get(): array
-    {
-        return $this->changes;
-    }
-
-    public function save(): void
-    {
-        if (config('synchronizer.sync.logging') == true && count($this->changes) > 0) {
+        if (count($changes) > 0) {
             Log::create(
                 [
                     'model' => $this->model,
-                    'model_id' => $this->id,
-                    'log' => $this->changes,
+                    'batch_id' => $this->batchId,
+                    'total_changes' => count($changes),
+                    'log' => $changes,
                 ]
             );
         }
     }
 
-    public function getModel(): string
+    public function report(): void
     {
-        return $this->model;
-    }
+        $count = Log::query()
+            ->where(
+                [
+                    ['batch_id', '=', $this->batchId],
+                    ['model', '=', $this->model]
+                ]
+            )
+            ->sum('total_changes');
 
-    public function getId(): int
-    {
-        return $this->id;
+        ray($count);
+        if ($count > 0) {
+            Notification::route('slack', config('synchronizer.logger.notifications.slack'))
+                ->notify(new LoggerNotification($this->model, $count));
+        }
     }
 }
