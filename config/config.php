@@ -2,10 +2,8 @@
 
 return [
     'sync' => [
-        'send_notification' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
-        'logging' => env('SYNCHRONIZER_DB_LOGGING', true),
-
         'timestamps' => [
+            'created_at',
             'updated_at'
         ],
 
@@ -16,6 +14,14 @@ return [
         'control' => env('SYNCHRONIZER_CHECKSUM_CONTROL', true),
         'field' => env('SYNCHRONIZER_CHECKSUM_FIELD', 'checksum'),
         'timestamps_excluded' => false,
+    ],
+
+    'logger' => [
+        'db' => env('SYNCHRONIZER_DB_LOGGING', true),
+
+        'notifications' => [
+            'slack' => env('SYNCHRONIZER_SLACK_WEBHOOK', null),
+        ]
     ],
 
     'jobs' => [
