@@ -69,4 +69,9 @@ class Map
     {
         static::$timestamps = $fields;
     }
+
+    public static function getTimestamps(): array
+    {
+        return static::$timestamps;
+    }
 }
