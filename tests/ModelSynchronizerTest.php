@@ -2,189 +2,49 @@
 
 namespace Grixu\Synchronizer\Tests;
 
-use Grixu\SociusModels\Product\DataTransferObjects\ProductData;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Events\ModelCreatedEvent;
-use Grixu\Synchronizer\Events\ModelSynchronizedEvent;
+use Grixu\Synchronizer\Map;
 use Grixu\Synchronizer\MapFactory;
-use Grixu\Synchronizer\Models\Log;
 use Grixu\Synchronizer\ModelSynchronizer;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Str;
 
 class ModelSynchronizerTest extends TestCase
 {
     use MigrateProductsTrait;
 
-    protected ProductData|array $dto;
-    protected Product|Model $model;
+    protected array $input;
+    protected Map $map;
+    protected ModelSynchronizer $obj;
 
     protected function setUp(): void
     {
         parent::setUp();
 
         $this->migrateProducts();
-        $this->dto = ProductDataFactory::new()->create();
-        $this->model = Product::factory()->create(
-            [
-                'brand_id' => null,
-                'product_type_id' => null
-            ]
-        );
+        $this->input = ProductDataFactory::new()->create()->toArray();
+        $this->map = MapFactory::makeFromArray($this->input, Product::class);
     }
 
     /** @test */
-    public function it_creates_itself_with_map()
+    public function it_create_array_to_sync()
     {
-        $map = MapFactory::makeFromDto($this->dto, get_class($this->model));
-        $obj = new ModelSynchronizer($this->dto, $this->model, $map);
+        $obj = new ModelSynchronizer($this->map, null);
+        $returnedData = $obj->sync($this->input);
 
-        $this->assertEquals(ModelSynchronizer::class, get_class($obj));
+        $this->assertNotEmpty($returnedData);
+        $this->assertCount(count($this->map->get()), $returnedData);
     }
 
     /** @test */
-    public function it_creates_itself_without_map_using_dto()
+    public function it_create_array_to_sync_with_checksum()
     {
-        $obj = new ModelSynchronizer($this->dto, $this->model);
-        $this->assertEquals(ModelSynchronizer::class, get_class($obj));
+        $this->input['checksum'] = 'aaaa';
+        $obj = new ModelSynchronizer($this->map, config('synchronizer.checksum.field'));
+        $returnedData = $obj->sync($this->input);
+
+        $this->assertNotEmpty($returnedData);
+        $this->assertCount(count($this->map->get()) + 1, $returnedData);
     }
-
-    /** @test */
-    public function it_creates_itself_without_map_using_array()
-    {
-        $this->dto = ProductDataFactory::new()->create()->toArray();
-        $obj = new ModelSynchronizer($this->dto, $this->model);
-        $this->assertEquals(ModelSynchronizer::class, get_class($obj));
-    }
-
-    /** @test */
-    public function it_creates_itself_without_model()
-    {
-        $obj = new ModelSynchronizer($this->dto, Product::class);
-        $this->assertEquals(ModelSynchronizer::class, get_class($obj));
-    }
-
-    /** @test */
-    public function it_creates_model()
-    {
-        $obj = new ModelSynchronizer($this->dto, Product::class);
-        $model = $obj->sync();
-
-        $this->assertEquals(Product::class, get_class($model));
-        $this->assertTransfer($model);
-    }
-
-    protected function assertTransfer($model)
-    {
-        foreach ($this->dto as $key => $value) {
-            $key = Str::snake($key);
-            if (is_object($value) && get_class($value) === Carbon::class) {
-                $this->assertEquals($value->timestamp, $model->$key->timestamp);
-            } else {
-                $this->assertEquals($value, $model->$key);
-            }
-        }
-
-        $this->assertNotEmpty($model->checksum);
-    }
-
-    /** @test */
-    public function it_updates_model()
-    {
-        $obj = new ModelSynchronizer($this->dto, $this->model);
-        $model = $obj->sync();
-
-        $this->assertTransfer($model);
-    }
-
-    /** @test */
-    public function it_creates_log()
-    {
-        $this->assertDatabaseCount('synchronizer_logs', 0);
-        $obj = new ModelSynchronizer($this->dto, $this->model);
-        $obj->sync();
-        $this->assertDatabaseCount('synchronizer_logs', 1);
-    }
-
-    /** @test */
-    public function it_not_creating_log_from_timestamps()
-    {
-        $this->assertDatabaseCount('synchronizer_logs', 0);
-        $obj = new ModelSynchronizer($this->dto, $this->model);
-        $obj->sync();
-        $this->assertDatabaseCount('synchronizer_logs', 1);
-
-        $model = Log::query()
-            ->where(
-                [
-                    ['model', '=', get_class($this->model)],
-                    ['model_id', '=', $this->model->id]
-                ]
-            )->first();
-
-        foreach ($model->log as $log) {
-            $this->assertEquals(
-                false,
-                in_array($log['modelField'], config('synchronizer.sync.timestamps'))
-            );
-        }
-    }
-
-    /** @test */
-    public function it_firing_event_when_model_is_created()
-    {
-        Event::fake();
-
-        $this->it_creates_model();
-
-        Event::assertDispatched(ModelCreatedEvent::class);
-        Event::assertNotDispatched(ModelSynchronizedEvent::class);
-    }
-
-    /** @test */
-    public function it_firing_event_when_model_is_synced()
-    {
-        Event::fake();
-
-        $this->it_updates_model();
-
-        Event::assertDispatched(ModelSynchronizedEvent::class);
-        Event::assertNotDispatched(ModelCreatedEvent::class);
-    }
-
-    /**
-     * @test
-     * @environment-setup useChecksumTimestampExcluded
-     */
-    public function it_not_syncing_timestamp_when_excluded_option_is_on()
-    {
-        $obj = new ModelSynchronizer($this->dto, $this->model);
-        $model = $obj->sync();
-        $this->model = $model;
-
-        $obj = new ModelSynchronizer($this->dto, $model);
-        $obj->sync();
-
-        $this->assertTrue($model === $this->model);
-    }
-
-    protected function useChecksumTimestampExcluded($app)
-    {
-        $app->config->set('synchronizer.checksum.timestamps_excluded', true);
-    }
-
-    /**
-     * @test
-     * @environment-setup useChecksumTimestampExcluded
-     */
-    public function it_sync_timestamp_when_excluded_option_is_on_but_not_excluded_field_in_dto_changed()
-    {
-        $this->it_updates_model();
-    }
-
 }
