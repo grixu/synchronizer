@@ -3,8 +3,10 @@
 namespace Grixu\Synchronizer\Engine;
 
 use Grixu\Synchronizer\Abstracts\RelationEngine;
+use Grixu\Synchronizer\Transformer;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as BelongsToRelation;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class BelongsTo extends RelationEngine
 {
@@ -17,7 +19,7 @@ class BelongsTo extends RelationEngine
         );
     }
 
-    public function sync()
+    public function sync(Transformer|null $transformer = null)
     {
         if (empty($this->loaded)) {
             return;
@@ -29,13 +31,13 @@ class BelongsTo extends RelationEngine
         $this->input->groupBy('relations.*.relation')
             ->filter()
             ->each(
-                function ($collection, $relation) use ($upsert, $upsertFieldNames) {
+                function ($collection, $relation) use ($upsert, $upsertFieldNames, $transformer) {
                     $fieldName = $this->model->$relation()->getForeignKeyName();
                     $upsertFieldNames->push($fieldName);
 
                     /** @var Collection $collection */
                     $collection->each(
-                        function ($item) use ($fieldName, $relation, $upsert) {
+                        function ($item) use ($fieldName, $relation, $upsert, $transformer) {
                             foreach ($item['relations'] as $rel) {
                                 if (empty($rel['foreignKeys']) || $rel['type'] !== BelongsToRelation::class) {
                                     continue;
@@ -43,17 +45,18 @@ class BelongsTo extends RelationEngine
 
                                 $relatedId = $this->loaded[$relation][$rel['foreignField']][$rel['foreignKeys']];
 
-                                $item[$fieldName] = $relatedId;
-                                unset($item['relations']);
-                                $upsert->push($item);
+                                $transformed = $transformer->sync($item, [$fieldName => $relatedId]);
+                                $upsert->push($transformed);
                             }
                         }
                     );
                 }
             );
 
-        $this->ids->push(...$upsert->pluck('xl_id'));
-        ray($upsert);
-        $this->model::upsert($upsert->toArray(), ['xl_id'], $upsertFieldNames->unique()->toArray());
+        $modelKey = Str::snake($this->key);
+        $fields = array_merge($upsertFieldNames->unique()->toArray(), $transformer->getMap()->getModelFieldsArray());
+        $this->model::upsert($upsert->toArray(), [$modelKey], $fields);
+
+        $this->ids->push(...$upsert->pluck($modelKey));
     }
 }
