@@ -5,6 +5,7 @@ namespace Grixu\Synchronizer;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Console\AddExcludedFieldCommand;
 use Grixu\Synchronizer\Console\ListExcludedFieldsCommand;
+use Grixu\Synchronizer\Providers\EventServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
 class SynchronizerServiceProvider extends ServiceProvider
@@ -36,6 +37,8 @@ class SynchronizerServiceProvider extends ServiceProvider
 
         Checksum::setChecksumField(config('synchronizer.checksum.field'));
         Map::setTimestamps(config('synchronizer.sync.timestamps'));
+
+        $this->app->register(EventServiceProvider::class);
 
         $this->app->singleton(SyncConfigFactory::class, function () {
             return new SyncConfigFactory();
