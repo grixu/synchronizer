@@ -21,7 +21,7 @@ class Map
             $fields[] = Checksum::$checksumField;
         }
 
-        unset($fields['relations']);
+        $fields = array_diff($fields, ['relations']);
 
         foreach ($fields as $field) {
             $modelField = Str::snake($field);
