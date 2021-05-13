@@ -42,7 +42,7 @@ class MapTest extends TestCase
         $this->createObj();
 
         $this->assertNotEmpty($this->obj->get());
-        $this->assertCount(3, $this->obj->get());
+        $this->assertCount(4, $this->obj->get());
     }
 
     /** @test */
@@ -52,7 +52,7 @@ class MapTest extends TestCase
         $this->createObj();
 
         $this->assertNotEmpty($this->obj->get());
-        $this->assertCount(2, $this->obj->get());
+        $this->assertCount(3, $this->obj->get());
     }
 
     protected function createSimpleExclude(): void
@@ -71,8 +71,8 @@ class MapTest extends TestCase
     {
         $this->createObjAndRealModel();
         $this->assertNotEmpty($this->obj->get());
-        $this->assertCount(1, $this->obj->get());
-        $this->assertCount(0, $this->obj->getWithoutTimestamps());
+        $this->assertCount(2, $this->obj->get());
+        $this->assertCount(1, $this->obj->getWithoutTimestamps());
         $this->assertCount(1, $this->obj->getUpdatableOnNullFields());
     }
 
@@ -112,7 +112,7 @@ class MapTest extends TestCase
         $this->createObj();
 
         $this->assertNotEmpty($this->obj->getWithoutTimestamps());
-        $this->assertCount(2, $this->obj->getWithoutTimestamps());
+        $this->assertCount(3, $this->obj->getWithoutTimestamps());
     }
 
     /** @test */
@@ -121,7 +121,7 @@ class MapTest extends TestCase
         $this->createObj();
 
         $this->assertBasicThingsAboutArray();
-        $this->assertCount(3, $this->obj->getModelFieldsArray());
+        $this->assertCount(4, $this->obj->getModelFieldsArray());
     }
 
     protected function assertBasicThingsAboutArray()
@@ -137,7 +137,7 @@ class MapTest extends TestCase
         $this->createObj();
 
         $this->assertBasicThingsAboutArray();
-        $this->assertCount(2, $this->obj->getModelFieldsArray());
+        $this->assertCount(3, $this->obj->getModelFieldsArray());
     }
 
     /** @test */
@@ -146,7 +146,7 @@ class MapTest extends TestCase
         $this->createObjAndRealModel();
 
         $this->assertBasicThingsAboutArray();
-        $this->assertCount(1, $this->obj->getModelFieldsArray());
+        $this->assertCount(2, $this->obj->getModelFieldsArray());
     }
 
     /** @test */
@@ -156,6 +156,6 @@ class MapTest extends TestCase
         $this->createObj();
 
         $this->assertBasicThingsAboutArray();
-        $this->assertCount(3, $this->obj->getModelFieldsArray());
+        $this->assertCount(4, $this->obj->getModelFieldsArray());
     }
 }
