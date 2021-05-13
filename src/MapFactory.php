@@ -8,7 +8,7 @@ class MapFactory
 {
     public static function makeFromDto(DataTransferObject $dataTransferObject, string $model): Map
     {
-        return new Map(array_keys($dataTransferObject->except('relationships')->toArray()), $model);
+        return new Map(array_keys($dataTransferObject->toArray()), $model);
     }
 
     public static function makeFromArray(array $dataArray, string $model): Map
