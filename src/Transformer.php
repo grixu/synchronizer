@@ -26,7 +26,6 @@ class Transformer
                 $synced[$outputField] = $data[$inputField];
             }
         }
-
         return array_merge($synced, $additional);
     }
 
