@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Abstracts;
 
+use Exception;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Category;
@@ -40,10 +41,9 @@ class RelationEngineTest extends TestCase
         $this->makeBrokenRelationCase();
 
         try {
-            $this->obj = new BelongsToEngine(Product::class, $this->data);
+            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
             $this->assertTrue(false);
-        } catch (\Exception $e) {
-            ray($e);
+        } catch (Exception) {
             $this->assertTrue(true);
         }
     }
@@ -74,10 +74,9 @@ class RelationEngineTest extends TestCase
         $this->makeNotRelationCase();
 
         try {
-            $this->obj = new BelongsToEngine(Product::class, $this->data);
+            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
             $this->assertTrue(false);
-        } catch (\Exception $e) {
-            ray($e);
+        } catch (Exception) {
             $this->assertTrue(true);
         }
     }
@@ -108,10 +107,9 @@ class RelationEngineTest extends TestCase
         $this->makeNotThisModelCase();
 
         try {
-            $this->obj = new BelongsToEngine(Product::class, $this->data);
+            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
             $this->assertTrue(false);
-        } catch (\Exception $e) {
-            ray($e);
+        } catch (Exception) {
             $this->assertTrue(true);
         }
     }
