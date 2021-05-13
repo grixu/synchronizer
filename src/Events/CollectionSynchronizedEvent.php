@@ -2,8 +2,15 @@
 
 namespace Grixu\Synchronizer\Events;
 
-use Grixu\Synchronizer\Abstracts\AbstractSynchronizerEvent;
+use Illuminate\Broadcasting\InteractsWithSockets;
+use Illuminate\Foundation\Events\Dispatchable;
 
-class CollectionSynchronizedEvent extends AbstractSynchronizerEvent
+class CollectionSynchronizedEvent
 {
+    use Dispatchable;
+    use InteractsWithSockets;
+
+    public function __construct(public string $model, public string $batchId)
+    {
+    }
 }
