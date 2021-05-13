@@ -3,21 +3,18 @@
 namespace Grixu\Synchronizer\Abstracts;
 
 use Exception;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 
 abstract class RelationEngine extends BaseEngine
 {
-    public Collection $loaded;
-    public Model $model;
+    protected Collection $loaded;
 
     public function __construct(protected Collection $input, protected string $key, string $model)
     {
-        parent::__construct($input, $key);
+        parent::__construct($input, $key, $model);
         $this->loaded = collect();
-        $this->model = new $model;
 
         $this->checkRelations();
 
