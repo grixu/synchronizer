@@ -8,18 +8,23 @@ use Illuminate\Support\Facades\Notification;
 
 class Logger
 {
+    public const BELONGS_TO = 1;
+    public const MODEL = 2;
+    public const BELONGS_TO_MANY = 3;
+
     public function __construct(protected string $batchId, protected string $model)
     {
     }
 
-    public function log(array $changes): void
+    public function log(array $changes, int $type): void
     {
         if (count($changes) > 0) {
             Log::create(
                 [
                     'model' => $this->model,
                     'batch_id' => $this->batchId,
-                    'total_changes' => count($changes),
+                    'changed' => count($changes),
+                    'type' => $type,
                     'log' => $changes,
                 ]
             );
@@ -35,9 +40,8 @@ class Logger
                     ['model', '=', $this->model]
                 ]
             )
-            ->sum('total_changes');
+            ->sum('changed');
 
-        ray($count);
         if ($count > 0) {
             Notification::route('slack', config('synchronizer.logger.notifications.slack'))
                 ->notify(new LoggerNotification($this->model, $count));
