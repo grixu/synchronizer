@@ -24,7 +24,8 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
                 $item = $item->except(...$timestamps);
             }
 
-            $item->checksum = Checksum::generate($item->toArray());
+            $item = $item->toArray();
+            $item['checksum'] = Checksum::generate($item);
             return $item;
         });
     }
