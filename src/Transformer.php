@@ -4,12 +4,14 @@ namespace Grixu\Synchronizer;
 
 use JetBrains\PhpStorm\Pure;
 
-class ModelSynchronizer
+class Transformer
 {
+    protected string|null $checksumField;
+
     public function __construct(
         protected Map $map,
-        protected string|null $checksumField = null
     ) {
+        $this->checksumField = Checksum::$checksumField;
     }
 
     #[Pure]
