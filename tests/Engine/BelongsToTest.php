@@ -8,7 +8,9 @@ use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Contracts\Engine;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
+use Grixu\Synchronizer\MapFactory;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Grixu\Synchronizer\Transformer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -20,6 +22,7 @@ class BelongsToTest extends TestCase
     protected Model $relatedModel;
     protected Engine $obj;
     protected Collection $data;
+    protected Transformer $transformer;
 
     /** @test */
     public function it_creates_obj_properly()
@@ -27,7 +30,7 @@ class BelongsToTest extends TestCase
         $this->makeBelongsToCase();
 
         try {
-            $this->obj = new BelongsToEngine(Product::class, $this->data);
+            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
             $this->assertTrue(true);
         } catch (Exception $e) {
             ray($e);
@@ -62,6 +65,9 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
+        $map = MapFactory::makeFromArray($this->data->first(), Product::class);
+        $this->transformer = new Transformer($map);
+
         $this->assertEmpty($this->localModel->brand_id);
     }
 
@@ -69,8 +75,8 @@ class BelongsToTest extends TestCase
     public function it_sync_belongs_to_properly()
     {
         $this->makeBelongsToCase();
-        $this->obj = new BelongsToEngine(Product::class, $this->data);
-        $this->obj->sync();
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
 
@@ -92,8 +98,8 @@ class BelongsToTest extends TestCase
         $this->makeBelongsToCase();
         $this->makeExtraRelationsData();
 
-        $this->obj = new BelongsToEngine(Product::class, $this->data);
-        $this->obj->sync();
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
 
