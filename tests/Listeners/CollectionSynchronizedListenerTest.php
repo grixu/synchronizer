@@ -18,6 +18,16 @@ class CollectionSynchronizedListenerTest extends TestCase
     {
         Notification::fake();
 
+        $this->createLog();
+
+        $obj = new CollectionSynchronizedListener();
+        $obj->handle(new CollectionSynchronizedEvent(Product::class, 'none'));
+
+        Notification::assertTimesSent(1, LoggerNotification::class);
+    }
+
+    protected function createLog(): void
+    {
         Log::create(
             [
                 'batch_id' => 'none',
@@ -27,9 +37,15 @@ class CollectionSynchronizedListenerTest extends TestCase
                 'type' => Logger::MODEL
             ]
         );
+    }
 
-        $obj = new CollectionSynchronizedListener();
-        $obj->handle(new CollectionSynchronizedEvent(Product::class, 'none'));
+    /** @test */
+    public function it_triggers_through_event_provider()
+    {
+        Notification::fake();
+
+        $this->createLog();
+        event(new CollectionSynchronizedEvent(Product::class, 'none'));
 
         Notification::assertTimesSent(1, LoggerNotification::class);
     }
