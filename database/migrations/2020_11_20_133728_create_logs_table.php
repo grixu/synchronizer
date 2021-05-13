@@ -12,7 +12,8 @@ class CreateLogsTable extends Migration
             $table->id();
             $table->string('model');
             $table->string('batch_id');
-            $table->string('total_changes');
+            $table->string('changed');
+            $table->string('type');
             $table->json('log');
             $table->timestamps();
         });
