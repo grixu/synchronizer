@@ -26,7 +26,7 @@ class BelongsToManyTest extends TestCase
         $this->makeBelongsToManyCase();
 
         try {
-            $this->obj = new BelongsToManyEngine(Operator::class, $this->data);
+            $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
             $this->assertTrue(true);
         } catch (Exception $e) {
             ray($e);
@@ -70,7 +70,7 @@ class BelongsToManyTest extends TestCase
     public function it_sync_belongs_to_many_properly()
     {
         $this->makeBelongsToManyCase();
-        $this->obj = new BelongsToManyEngine(Operator::class, $this->data);
+        $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
         $this->obj->sync();
 
         $this->localModel->refresh();
@@ -92,7 +92,7 @@ class BelongsToManyTest extends TestCase
         $this->makeBelongsToManyCase();
         $this->makeExtraRelationsData();
 
-        $this->obj = new BelongsToManyEngine(Operator::class, $this->data);
+        $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
         $this->obj->sync();
 
         $this->localModel->refresh();
