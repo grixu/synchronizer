@@ -17,6 +17,12 @@ class Map
     {
         $excludedFields = $this->getExcludedFields($model);
 
+        if (!empty(Checksum::$checksumField)) {
+            $fields[] = Checksum::$checksumField;
+        }
+
+        unset($fields['relations']);
+
         foreach ($fields as $field) {
             $modelField = Str::snake($field);
 
