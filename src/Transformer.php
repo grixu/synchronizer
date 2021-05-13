@@ -15,16 +15,23 @@ class Transformer
     }
 
     #[Pure]
-    public function sync(array $data): array
-    {
+    public function sync(
+        array $data,
+        array $additional = []
+    ): array {
         $synced = [];
 
         foreach ($this->map->get() as $inputField => $outputField) {
-            $synced[$outputField] = $data[$inputField];
+            if (isset($data[$inputField])) {
+                $synced[$outputField] = $data[$inputField];
+            }
         }
 
-        if ($this->checksumField) $synced[$this->checksumField] = $data[$this->checksumField];
+        return array_merge($synced, $additional);
+    }
 
-        return $synced;
+    public function getMap(): Map
+    {
+        return $this->map;
     }
 }
