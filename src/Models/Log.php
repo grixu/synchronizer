@@ -19,13 +19,15 @@ class Log extends Model
 
     protected $casts = [
         'log' => 'array',
-        'total_changes' => 'integer',
+        'type' => 'integer',
+        'changed' => 'integer',
     ];
 
     protected $fillable = [
         'model',
         'batch_id',
-        'total_changes',
+        'changed',
+        'type',
         'log',
     ];
 }
