@@ -148,4 +148,48 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
     }
+
+    /** @test */
+    public function it_exit_gently_when_is_nothing_to_sync()
+    {
+        $this->makeBelongsToCase();
+        $this->data = collect();
+        $this->data->push(
+            ProductDataFactory::new()->create()->toArray()
+        );
+
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj->sync($this->transformer);
+
+        $this->localModel->refresh();
+        $this->assertEmpty($this->localModel->brand_id);
+    }
+
+    /** @test */
+    public function it_exit_gently_when_related_obj_not_exists()
+    {
+        $this->makeBelongsToCase();
+        $this->data = collect();
+        $this->data->push(
+            ProductDataFactory::new()->create(
+                [
+                    'relations' => [
+                        [
+                            'foreignClass' => Brand::class,
+                            'relation' => 'brand',
+                            'foreignField' => 'xl_id',
+                            'type' => BelongsTo::class,
+                            'foreignKeys' => (int)$this->relatedModel->xl_id+1,
+                        ]
+                    ]
+                ]
+            )->toArray()
+        );
+
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj->sync($this->transformer);
+
+        $this->localModel->refresh();
+        $this->assertEmpty($this->localModel->brand_id);
+    }
 }
