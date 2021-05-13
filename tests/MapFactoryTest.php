@@ -33,7 +33,7 @@ class MapFactoryTest extends TestCase
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
-        $this->assertCount(1, $map->get());
+        $this->assertCount(2, $map->get());
     }
 
     /** @test */
