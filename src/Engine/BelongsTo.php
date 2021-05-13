@@ -14,6 +14,10 @@ class BelongsTo extends RelationEngine
     {
         return $dataSet->filter(
             function ($item) {
+                if (!isset($item['relations']) || empty($item['relations'])) {
+                    return false;
+                }
+
                 return array_filter($item['relations'], fn($item) => $item['type'] === BelongsToRelation::class);
             }
         );
@@ -21,7 +25,7 @@ class BelongsTo extends RelationEngine
 
     public function sync(Transformer|null $transformer = null)
     {
-        if (empty($this->loaded)) {
+        if ($this->loaded->flatten()->count() <= 0) {
             return;
         }
 
