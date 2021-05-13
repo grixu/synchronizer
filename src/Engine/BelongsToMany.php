@@ -3,6 +3,7 @@
 namespace Grixu\Synchronizer\Engine;
 
 use Grixu\Synchronizer\Abstracts\RelationEngine;
+use Grixu\Synchronizer\Transformer;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany as BelongsToManyRelation;
 use Illuminate\Support\Collection;
 
@@ -17,7 +18,7 @@ class BelongsToMany extends RelationEngine
         );
     }
 
-    public function sync()
+    public function sync(Transformer|null $transformer = null)
     {
         $collectionToSync = collect();
         $this->input->groupBy('relations.*.relation')
@@ -28,7 +29,6 @@ class BelongsToMany extends RelationEngine
                         function ($item) use ($relation, $collectionToSync) {
 
                             foreach ($item['relations'] as $rel) {
-                                ray($rel);
                                 if (empty($rel['foreignKeys']) || !is_array($rel['foreignKeys']) || $rel['type'] !== BelongsToManyRelation::class) {
                                     continue;
                                 }
