@@ -12,17 +12,17 @@ use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Http\Client\Request;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+use stdClass;
 
 class SyncParsedDataJobTest extends SyncTestCase
 {
     use DatabaseMigrations;
 
     protected SyncConfig $config;
-    protected Collection $dtoCollection;
+    protected array $data;
 
     protected function setUp(): void
     {
@@ -37,13 +37,13 @@ class SyncParsedDataJobTest extends SyncTestCase
         $dataCollection = $loader->get()->first();
 
         $parser = new FakeParser();
-        $this->dtoCollection = $parser->parse($dataCollection);
+        $this->data = $parser->parse($dataCollection)->toArray();
     }
 
     /** @test */
     public function it_constructs()
     {
-        $obj = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $obj = new SyncParsedDataJob($this->data, $this->config);
 
         $this->assertEquals(SyncParsedDataJob::class, $obj::class);
     }
@@ -53,7 +53,7 @@ class SyncParsedDataJobTest extends SyncTestCase
     {
         Queue::fake();
 
-        dispatch(new SyncParsedDataJob($this->dtoCollection, $this->config));
+        dispatch(new SyncParsedDataJob($this->data, $this->config));
 
         Queue::assertPushed(SyncParsedDataJob::class, 1);
     }
@@ -64,7 +64,7 @@ class SyncParsedDataJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $job = new SyncParsedDataJob($this->data, $this->config);
         $batch = $bus->batch(
             [
                 $job
@@ -83,7 +83,7 @@ class SyncParsedDataJobTest extends SyncTestCase
     /** @test */
     public function it_syncs_data()
     {
-        $obj = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $obj = new SyncParsedDataJob($this->data, $this->config);
 
         $this->assertDatabaseCount('customers', 0);
 
@@ -95,23 +95,23 @@ class SyncParsedDataJobTest extends SyncTestCase
     /** @test */
     public function it_skips_damaged_data()
     {
-        $workingDto = new \stdClass();
+        $workingDto = new stdClass();
         $workingDto->name = 'Customer';
         $workingDto->xlId = 1;
         $workingDto->updatedAt = now();
 
-        $brokenDto = new \stdClass();
+        $brokenDto = new stdClass();
         $brokenDto->name = 'Some other language';
 
-        $this->dtoCollection = collect(
+        $this->data = collect(
             [
                 $workingDto,
                 $brokenDto
             ]
-        );
+        )->toArray();
         $this->assertDatabaseCount('customers', 0);
 
-        $obj = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $obj = new SyncParsedDataJob($this->data, $this->config);
         $obj->handle();
 
         $this->assertTrue(Customer::count() == 0);
@@ -122,18 +122,18 @@ class SyncParsedDataJobTest extends SyncTestCase
     {
         Http::fake();
 
-        $this->config->setErrorHandler(function ($e) {
+        $this->config->setErrorHandler(function () {
             Http::get('http://testable.dev');
         });
 
-        $brokenDto = new \stdClass();
+        $brokenDto = new stdClass();
         $brokenDto->name = null;
         $brokenDto->xlId = 1;
         $brokenDto->updatedAt = now();
 
-        $this->dtoCollection->push($brokenDto);
+        $this->data[] = $brokenDto;
 
-        $obj = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $obj = new SyncParsedDataJob($this->data, $this->config);
 
         $this->assertDatabaseCount('customers', 0);
 
@@ -149,7 +149,7 @@ class SyncParsedDataJobTest extends SyncTestCase
     /** @test */
     public function it_reacts_to_cancellation()
     {
-        $job = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $job = new SyncParsedDataJob($this->data, $this->config);
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
@@ -167,11 +167,11 @@ class SyncParsedDataJobTest extends SyncTestCase
     {
         Http::fake();
 
-        $this->config->setSyncClosure(function ($e) {
+        $this->config->setSyncClosure(function () {
             Http::get('http://testable.dev');
         });
 
-        $obj = new SyncParsedDataJob($this->dtoCollection, $this->config);
+        $obj = new SyncParsedDataJob($this->data, $this->config);
 
         $obj->handle();
 
