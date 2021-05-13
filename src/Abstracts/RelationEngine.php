@@ -3,40 +3,37 @@
 namespace Grixu\Synchronizer\Abstracts;
 
 use Exception;
-use Grixu\Synchronizer\Contracts\Engine as EngineInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use ReflectionClass;
 
-abstract class RelationEngine implements EngineInterface
+abstract class RelationEngine extends BaseEngine
 {
-    public Collection $input;
     public Collection $loaded;
-    public Collection $ids;
     public Model $model;
 
-    public function __construct(string $model, Collection $dataSet)
+    public function __construct(protected Collection $input, protected string $key, string $model)
     {
-        $this->ids = collect();
+        parent::__construct($input, $key);
         $this->loaded = collect();
         $this->model = new $model;
 
-        $this->check($dataSet);
+        $this->checkRelations();
 
-        $this->input = $this->filter($dataSet);
+        $this->input = $this->filter($this->input);
 
         if ($this->input->count() > 0) {
             $this->load();
         }
     }
 
-    protected function check(Collection $input)
+    protected function checkRelations()
     {
         $test = $this->model;
         $reflection = new ReflectionClass($test);
 
-        $input->pluck('relations')
+        $this->input->pluck('relations')
             ->flatten(1)
             ->filter()
             ->pluck('relation', 'foreignClass')
@@ -73,7 +70,6 @@ abstract class RelationEngine implements EngineInterface
             ->filter()
             ->each(
                 function ($collection, $relation) {
-
                     $data = collect();
                     $model = $this->model->$relation()->getRelated();
 
@@ -95,10 +91,5 @@ abstract class RelationEngine implements EngineInterface
                     $this->loaded->put($relation, $data);
                 }
             );
-    }
-
-    public function getIds(): Collection
-    {
-        return $this->ids;
     }
 }
