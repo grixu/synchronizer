@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 
 class Checksum
 {
-    public static string $checksumField = 'checksum';
+    public static string|null $checksumField = 'checksum';
     protected Collection $diff;
 
     public function __construct(Collection $data, string $key, string $model)
@@ -48,7 +48,7 @@ class Checksum
         return hash('crc32c', json_encode($data));
     }
 
-    public static function setChecksumField(string $fieldName)
+    public static function setChecksumField(string|null $fieldName)
     {
         static::$checksumField = $fieldName;
     }
