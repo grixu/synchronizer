@@ -31,14 +31,12 @@ class ParseLoadedDataJob implements ShouldQueue
 
     public function backoff(): int
     {
-        return 30 * $this->attempts();
+        return 60 * $this->attempts();
     }
 
     public function retryUntil(): Carbon
     {
-        return now()->addSeconds(
-            $this->timeout * $this->maxExceptions + $this->backoff()
-        );
+        return now()->addHour();
     }
 
     public function handle()
@@ -51,14 +49,14 @@ class ParseLoadedDataJob implements ShouldQueue
         /** @var ParserInterface $parser */
         $parser = app($parserClass);
 
-        $dtoCollection = $parser->parse($this->dataToParse);
+        $data = $parser->parse($this->dataToParse)->toArray();
 
         if ($this->batch()) {
             $jobClass = $this->config->getNextJob();
 
             $this->batch()->add(
                 [
-                    new $jobClass($dtoCollection, $this->config)
+                    new $jobClass($data, $this->config)
                 ]
             );
         }

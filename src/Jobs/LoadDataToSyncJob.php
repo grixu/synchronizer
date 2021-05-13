@@ -18,9 +18,9 @@ class LoadDataToSyncJob implements ShouldQueue
     use InteractsWithQueue;
     use Queueable;
 
-    public $timeout = 180;
-    public $tries = 3;
-    public $maxExceptions = 3;
+    public $timeout = 600;
+    public $tries = 0;
+    public $maxExceptions = 2;
 
     public function __construct(public SyncConfig $config)
     {
@@ -28,15 +28,12 @@ class LoadDataToSyncJob implements ShouldQueue
 
     public function backoff(): int
     {
-        return $this->timeout * $this->attempts();
+        return 60 * $this->attempts();
     }
 
     public function retryUntil(): Carbon
     {
-        return now()
-            ->addSeconds(
-                $this->timeout * $this->tries * $this->maxExceptions
-            );
+        return now()->addHour();
     }
 
     public function handle()
