@@ -38,7 +38,7 @@ class LoggerTest extends TestCase
     {
         $this->assertDatabaseCount('synchronizer_logs', 0);
 
-        $this->obj->log($this->changes);
+        $this->obj->log($this->changes, Logger::BELONGS_TO);
 
         $this->assertDatabaseCount('synchronizer_logs', 1);
     }
@@ -46,10 +46,10 @@ class LoggerTest extends TestCase
     /** @test */
     public function it_calculates_changes_on_save()
     {
-        $this->obj->log($this->changes);
+        $this->obj->log($this->changes, Logger::MODEL);
 
         $log = Log::first();
-        $this->assertEquals(2, $log->total_changes);
+        $this->assertEquals(2, $log->changed);
     }
 
     /** @test */
@@ -59,7 +59,7 @@ class LoggerTest extends TestCase
 
         $this->assertDatabaseCount('synchronizer_logs', 0);
 
-        $this->obj->log($this->changes);
+        $this->obj->log($this->changes, Logger::BELONGS_TO_MANY);
 
         $this->assertDatabaseCount('synchronizer_logs', 0);
     }
@@ -69,9 +69,20 @@ class LoggerTest extends TestCase
     {
         Notification::fake();
 
-        $this->obj->log($this->changes);
+        $this->obj->log($this->changes, Logger::BELONGS_TO_MANY);
         $this->obj->report();
 
         Notification::assertTimesSent(1, LoggerNotification::class);
+    }
+
+    /** @test */
+    public function it_not_sending_notification_if_nothing_changed()
+    {
+        Notification::fake();
+
+        $this->obj->log([], Logger::BELONGS_TO_MANY);
+        $this->obj->report();
+
+        Notification::assertTimesSent(0, LoggerNotification::class);
     }
 }
