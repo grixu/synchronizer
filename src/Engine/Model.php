@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer\Engine;
 
 use Grixu\Synchronizer\Abstracts\BaseEngine;
 use Grixu\Synchronizer\Transformer;
-use Illuminate\Support\Str;
 
 class Model extends BaseEngine
 {
@@ -18,12 +17,11 @@ class Model extends BaseEngine
             return $transformer->sync($item);
         });
 
-        $modelKey = Str::snake($this->key);
-        $fields = array_diff($transformer->getMap()->getModelFieldsArray(), [$modelKey]);
+        $fields = array_diff($transformer->getMap()->getModelFieldsArray(), [$this->modelKey]);
 
         $this->model::upsert(
             $transformed->toArray(),
-            [$modelKey],
+            [$this->modelKey],
             $fields
         );
 

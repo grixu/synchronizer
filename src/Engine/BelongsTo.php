@@ -6,7 +6,6 @@ use Grixu\Synchronizer\Abstracts\RelationEngine;
 use Grixu\Synchronizer\Transformer;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as BelongsToRelation;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 class BelongsTo extends RelationEngine
 {
@@ -57,10 +56,9 @@ class BelongsTo extends RelationEngine
                 }
             );
 
-        $modelKey = Str::snake($this->key);
         $fields = array_merge($upsertFieldNames->unique()->toArray(), $transformer->getMap()->getModelFieldsArray());
-        $this->model::upsert($upsert->toArray(), [$modelKey], $fields);
+        $this->model::upsert($upsert->toArray(), [$this->modelKey], $fields);
 
-        $this->ids->push(...$upsert->pluck($modelKey));
+        $this->ids->push(...$upsert->pluck($this->modelKey));
     }
 }
