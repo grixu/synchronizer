@@ -13,6 +13,10 @@ class BelongsToMany extends RelationEngine
     {
         return $dataSet->filter(
             function ($item) {
+                if (empty($item['relations'])) {
+                    return false;
+                }
+
                 return array_filter($item['relations'], fn($item) => $item['type'] === BelongsToManyRelation::class);
             }
         );
