@@ -6,6 +6,7 @@ use Exception;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsTo;
 use Grixu\Synchronizer\Engine\BelongsToMany;
+use Grixu\Synchronizer\Engine\ExcludedField;
 use Grixu\Synchronizer\Engine\Model;
 use Grixu\Synchronizer\Events\SynchronizerEvent;
 use Illuminate\Support\Collection;
@@ -51,6 +52,11 @@ class Synchronizer
 
         $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model);
         $belongsToMany->sync();
+
+        if (!empty($this->map->getUpdatableOnNullFields())) {
+            $excludedField = new ExcludedField($this->input, $this->key, $this->model);
+            $excludedField->sync($this->transformer);
+        }
 
         $this->logger->log($belongsTo->getIds()->toArray(), Logger::BELONGS_TO);
         $this->logger->log($model->getIds()->toArray(), Logger::MODEL);
