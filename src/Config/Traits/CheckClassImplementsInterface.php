@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer\Traits;
+namespace Grixu\Synchronizer\Config\Traits;
 
 use Grixu\Synchronizer\Exceptions\InterfaceNotImplemented;
 use ReflectionClass;

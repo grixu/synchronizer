@@ -5,7 +5,7 @@ namespace Grixu\Synchronizer\Config;
 use Exception;
 use Grixu\Synchronizer\Contracts\ErrorHandlerInterface;
 use Grixu\Synchronizer\Contracts\SyncHandlerInterface;
-use Grixu\Synchronizer\Traits\CheckClassImplementsInterface;
+use Grixu\Synchronizer\Config\Traits\CheckClassImplementsInterface;
 use Illuminate\Queue\SerializableClosure;
 
 class SyncConfigFactory
