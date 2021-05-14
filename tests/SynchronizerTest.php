@@ -6,6 +6,9 @@ use Grixu\SociusModels\Operator\Factories\OperatorDataFactory;
 use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
+use Grixu\SociusModels\Product\Factories\ProductDataFactory;
+use Grixu\SociusModels\Product\Models\Product;
+use Grixu\Synchronizer\Models\ExcludedField;
 use Grixu\Synchronizer\Synchronizer;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Events\SynchronizerEvent;
@@ -164,5 +167,42 @@ class SynchronizerTest extends TestCase
         } catch (\Exception) {
             $this->assertTrue(true);
         }
+    }
+
+    /** @test */
+    public function it_synchronize_excluded_fields()
+    {
+        require_once __DIR__ . '/../vendor/grixu/socius-models/migrations/create_products_table.stub';
+        (new \CreateProductsTable())->up();
+
+        $this->excludedField = ExcludedField::create(
+            [
+                'model' => Product::class,
+                'update_empty' => true,
+                'field' => 'index'
+            ]
+        );
+
+        $this->data = [];
+        $this->data[] = ProductDataFactory::new()->create()->toArray();
+        $this->config = new SyncConfig(
+            FakeLoader::class,
+            FakeParser::class,
+            Product::class,
+            'xlId',
+            config('synchronizer.jobs.default')
+        );
+
+        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+
+        $this->assertDatabaseCount('products', 0);
+
+        $this->obj->sync();
+
+        $this->assertDatabaseCount('products', 1);
+        $product = Product::query()->where('xl_id', $this->data[0]['xlId'])->first();
+
+        $this->assertNotEmpty($product);
+        $this->assertNotEmpty($product->index);
     }
 }
