@@ -28,6 +28,10 @@ class BelongsToMany extends RelationEngine
         $this->input->groupBy('relations.*.relation')
             ->each(
                 function ($collection, $relation) use ($collectionToSync) {
+                    if (!$this->model->$relation() instanceof BelongsToManyRelation) {
+                        return;
+                    }
+
                     /** @var Collection $collection */
                     $collection->each(
                         function ($item) use ($relation, $collectionToSync) {
@@ -40,7 +44,9 @@ class BelongsToMany extends RelationEngine
                                 $relatedIds = [];
 
                                 foreach ($rel['foreignKeys'] as $key) {
-                                    $relatedIds[] = $this->loaded[$relation][$rel['foreignField']][$key];
+                                    if (isset($this->loaded[$relation][$rel['foreignField']][$key])) {
+                                        $relatedIds[] = $this->loaded[$relation][$rel['foreignField']][$key];
+                                    }
                                 }
 
                                 $collectionToSync->put($item['xlId'], [$relation => $relatedIds]);
