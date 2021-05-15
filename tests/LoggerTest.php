@@ -7,6 +7,7 @@ use Grixu\Synchronizer\Logger;
 use Grixu\Synchronizer\Notifications\LoggerNotification;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Notification;
 
 class LoggerTest extends TestCase
@@ -81,6 +82,18 @@ class LoggerTest extends TestCase
         Notification::fake();
 
         $this->obj->log([], Logger::BELONGS_TO_MANY);
+        $this->obj->report();
+
+        Notification::assertTimesSent(0, LoggerNotification::class);
+    }
+
+    /** @test */
+    public function it_not_sending_notification_if_webhook_is_not_configured()
+    {
+        Notification::fake();
+        Config::set('synchronizer.logger.notifications.slack', null);
+
+        $this->obj->log(['some'], Logger::BELONGS_TO_MANY);
         $this->obj->report();
 
         Notification::assertTimesSent(0, LoggerNotification::class);
