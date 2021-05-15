@@ -33,6 +33,10 @@ class Logger
 
     public function report(): void
     {
+        if (empty(config('synchronizer.logger.notifications.slack'))) {
+            return;
+        }
+
         $count = Log::query()
             ->where(
                 [
