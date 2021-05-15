@@ -6,6 +6,7 @@ use Exception;
 use Grixu\SociusModels\Operator\Factories\OperatorDataFactory;
 use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
+use Grixu\SociusModels\Operator\Models\OperatorRole;
 use Grixu\Synchronizer\Engine\BelongsToMany as BelongsToManyEngine;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -17,6 +18,7 @@ class BelongsToManyTest extends TestCase
 {
     protected Model $localModel;
     protected Model $relatedModel;
+    protected Model $secondRelatedModel;
     protected BelongsToManyEngine $obj;
     protected Collection $data;
 
@@ -38,13 +40,16 @@ class BelongsToManyTest extends TestCase
     {
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_branches_table.stub';
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_operators_table.stub';
+        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_operator_roles_table.stub';
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.stub';
         (new \CreateBranchesTable())->up();
         (new \CreateOperatorsTable())->up();
+        (new \CreateOperatorRolesTable())->up();
         (new \CreateOperatorBranchPivotTable())->up();
 
         $this->localModel = Operator::factory()->create();
         $this->relatedModel = Branch::factory()->create();
+        $this->secondRelatedModel = OperatorRole::factory()->create();
         $this->data = collect();
         $this->data->push(
             OperatorDataFactory::new()->create(
@@ -57,6 +62,13 @@ class BelongsToManyTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsToMany::class,
                             'foreignKeys' => [(int)$this->relatedModel->xl_id],
+                        ],
+                        [
+                            'foreignClass' => OperatorRole::class,
+                            'relation' => 'role',
+                            'foreignField' => 'xl_id',
+                            'type' => BelongsTo::class,
+                            'foreignKeys' => [(int)$this->secondRelatedModel->xl_id],
                         ]
                     ]
                 ]
