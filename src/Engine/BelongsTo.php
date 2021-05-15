@@ -28,36 +28,45 @@ class BelongsTo extends RelationEngine
             return;
         }
 
-        $upsert = collect();
-        $upsertFieldNames = collect();
-
-        $this->input->groupBy('relations.*.relation')
-            ->filter()
-            ->each(
-                function ($collection, $relation) use ($upsert, $upsertFieldNames, $transformer) {
-                    $fieldName = $this->model->$relation()->getForeignKeyName();
-                    $upsertFieldNames->push($fieldName);
-
-                    /** @var Collection $collection */
-                    $collection->each(
-                        function ($item) use ($fieldName, $relation, $upsert, $transformer) {
-                            foreach ($item['relations'] as $rel) {
-                                if (empty($rel['foreignKeys']) || $rel['type'] !== BelongsToRelation::class) {
-                                    continue;
-                                }
-
-                                $relatedId = $this->loaded[$relation][$rel['foreignField']][$rel['foreignKeys']];
-
-                                $transformed = $transformer->sync($item, [$fieldName => $relatedId]);
-                                $upsert->push($transformed);
-                            }
-                        }
-                    );
+        $allRelations = [];
+        $this->input->pluck('relations.*.relation')
+            ->flatten()
+            ->filter(function ($relation) {
+                if ($this->model->$relation() instanceof BelongsToRelation) {
+                    return true;
                 }
-            );
 
-        $fields = array_merge($upsertFieldNames->unique()->toArray(), $transformer->getMap()->getModelFieldsArray());
-        $this->model::upsert($upsert->toArray(), [$this->modelKey], $fields);
+                return false;
+            })
+            ->each(function ($relation) use ($transformer, &$allRelations) {
+                $fieldName = $this->model->$relation()->getForeignKeyName();
+                $transformer->getMap()->add($fieldName);
+                $allRelations[$relation] = $fieldName;
+            })
+            ->toArray();
+
+        $upsert = $this->input->map(
+            function ($item) use ($transformer, $allRelations) {
+                $relatedFields = [];
+
+                foreach($item['relations'] as $rel) {
+                    if (empty($allRelations[$rel['relation']]) || empty($rel['foreignKeys'])) {
+                        continue;
+                    }
+
+                    if (!isset($this->loaded[$rel['relation']][$rel['foreignField']][$rel['foreignKeys']])) {
+                        continue;
+                    }
+
+                    $fieldName = $allRelations[$rel['relation']];
+                    $relatedFields[$fieldName] = $this->loaded[$rel['relation']][$rel['foreignField']][$rel['foreignKeys']];
+                }
+
+                return $transformer->sync($item, $relatedFields);
+            }
+        );
+
+        $this->model::upsert($upsert->toArray(), [$this->modelKey], $transformer->getMap()->getModelFieldsArray());
 
         $this->ids->push(...$upsert->pluck($this->modelKey));
     }
