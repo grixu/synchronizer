@@ -62,7 +62,7 @@ class Synchronizer
         $this->logger->log($model->getIds()->toArray(), Logger::MODEL);
         $this->logger->log($model->getIds()->toArray(), Logger::BELONGS_TO_MANY);
 
-        event(new SynchronizerEvent($this->input->toArray()));
+        event(new SynchronizerEvent($this->model, $this->input->toArray()));
     }
 
     protected function diffCompleted(array $ids): Collection
