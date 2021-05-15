@@ -11,11 +11,12 @@ class Map
     protected array $map = [];
     protected array $mapWithoutTimestamps = [];
     protected array $updatableOnNull = [];
+    protected Collection $excludedFields;
     protected static array $timestamps;
 
     public function __construct(array $fields, protected string $model)
     {
-        $excludedFields = $this->getExcludedFields($model);
+        $this->excludedFields = $this->getExcludedFields($model);
 
         if (!empty(Checksum::$checksumField)) {
             $fields[] = Checksum::$checksumField;
@@ -24,23 +25,7 @@ class Map
         $fields = array_diff($fields, ['relations']);
 
         foreach ($fields as $field) {
-            $modelField = Str::snake($field);
-
-            $excludedField = $excludedFields->where('field', $modelField)->first();
-
-            if ($excludedField) {
-                if ($excludedField->update_empty) {
-                    $this->updatableOnNull[] = $modelField;
-                }
-
-                continue;
-            }
-
-            $this->map[$field] = $modelField;
-
-            if (!in_array($modelField, static::$timestamps)) {
-                $this->mapWithoutTimestamps[$field] = $modelField;
-            }
+            $this->add($field);
         }
     }
 
@@ -49,6 +34,30 @@ class Map
         return ExcludedField::query()
             ->where('model', $model)
             ->get();
+    }
+
+    public function add(string $field, string|null $modelField = null): void
+    {
+        $modelField = (empty($modelField)) ? Str::snake($field) : $modelField;
+        if (in_array($modelField, $this->map)) {
+            return;
+        }
+
+        $excludedField = $this->excludedFields->where('field', $modelField)->first();
+
+        if ($excludedField) {
+            if ($excludedField->update_empty) {
+                $this->updatableOnNull[] = $modelField;
+            }
+
+            return;
+        }
+
+        $this->map[$field] = $modelField;
+
+        if (!in_array($modelField, static::$timestamps)) {
+            $this->mapWithoutTimestamps[$field] = $modelField;
+        }
     }
 
     public function get(): array
