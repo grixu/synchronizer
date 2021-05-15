@@ -24,6 +24,8 @@ class Transformer
         foreach ($this->map->get() as $inputField => $outputField) {
             if (isset($data[$inputField])) {
                 $synced[$outputField] = $data[$inputField];
+            } else {
+                $synced[$outputField] = null;
             }
         }
         return array_merge($synced, $additional);
