@@ -24,11 +24,7 @@ class TransformerTest extends TestCase
         parent::setUp();
 
         $this->migrateProducts();
-        $this->input = ProductDataFactory::new()->create(
-            [
-                'flags' => 1
-            ]
-        )->toArray();
+        $this->input = ProductDataFactory::new()->create()->toArray();
         $this->map = MapFactory::makeFromArray($this->input, Product::class);
     }
 
