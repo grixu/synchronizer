@@ -1,14 +1,14 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Abstracts;
+namespace Grixu\Synchronizer\Tests\Engine\Abstracts;
 
 use Exception;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Category;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Contracts\Engine;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
+use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -25,8 +25,8 @@ class RelationEngineTest extends TestCase
     {
         parent::setUp();
 
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_brands_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
+        require_once __DIR__ . '/../../../vendor/grixu/socius-models/migrations/create_brands_table.stub';
+        require_once __DIR__ . '/../../../vendor/grixu/socius-models/migrations/create_products_table.stub';
         (new \CreateBrandsTable())->up();
         (new \CreateProductsTable())->up();
 

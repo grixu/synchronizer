@@ -5,7 +5,7 @@ namespace Grixu\Synchronizer\Abstracts;
 use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Contracts\ParserInterface;
 use Grixu\Synchronizer\Contracts\SingleElementParserInterface;
-use Grixu\Synchronizer\Map;
+use Grixu\Synchronizer\Engine\Map\Map;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 

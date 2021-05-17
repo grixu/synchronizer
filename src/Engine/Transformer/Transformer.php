@@ -1,10 +1,12 @@
 <?php
 
-namespace Grixu\Synchronizer;
+namespace Grixu\Synchronizer\Engine\Transformer;
 
-use JetBrains\PhpStorm\Pure;
+use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Engine\Contracts\Map;
+use Grixu\Synchronizer\Engine\Contracts\Transformer as TransformerInterface;
 
-class Transformer
+class Transformer implements TransformerInterface
 {
     protected string|null $checksumField;
 
@@ -14,7 +16,6 @@ class Transformer
         $this->checksumField = Checksum::$checksumField;
     }
 
-    #[Pure]
     public function sync(
         array $data,
         array $additional = []

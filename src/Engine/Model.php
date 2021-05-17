@@ -2,12 +2,12 @@
 
 namespace Grixu\Synchronizer\Engine;
 
-use Grixu\Synchronizer\Abstracts\BaseEngine;
-use Grixu\Synchronizer\Transformer;
+use Grixu\Synchronizer\Engine\Abstracts\BaseEngine;
+use Grixu\Synchronizer\Engine\Contracts\Transformer;
 
 class Model extends BaseEngine
 {
-    public function sync(?Transformer $transformer = null)
+    public function sync(Transformer $transformer)
     {
         if ($this->input->count() <= 0) {
             return;

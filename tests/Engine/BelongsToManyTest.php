@@ -8,6 +8,7 @@ use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
 use Grixu\Synchronizer\Engine\BelongsToMany as BelongsToManyEngine;
+use Grixu\Synchronizer\Engine\Transformer\NullTransformer;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -83,7 +84,7 @@ class BelongsToManyTest extends TestCase
     {
         $this->makeBelongsToManyCase();
         $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
-        $this->obj->sync();
+        $this->obj->sync(NullTransformer::make());
 
         $this->localModel->refresh();
         $this->assertNotEmpty($this->localModel->branches);
@@ -105,7 +106,7 @@ class BelongsToManyTest extends TestCase
         $this->makeExtraRelationsData();
 
         $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
-        $this->obj->sync();
+        $this->obj->sync(NullTransformer::make());
 
         $this->localModel->refresh();
 

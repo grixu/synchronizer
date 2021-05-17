@@ -4,11 +4,11 @@ namespace Grixu\Synchronizer\Tests\Engine;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Contracts\Engine;
+use Grixu\Synchronizer\Engine\Contracts\Engine;
+use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Model as ModelEngine;
-use Grixu\Synchronizer\MapFactory;
+use Grixu\Synchronizer\Engine\Transformer\Transformer;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
-use Grixu\Synchronizer\Transformer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 

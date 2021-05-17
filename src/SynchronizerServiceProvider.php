@@ -5,6 +5,7 @@ namespace Grixu\Synchronizer;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Console\AddExcludedFieldCommand;
 use Grixu\Synchronizer\Console\ListExcludedFieldsCommand;
+use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Providers\EventServiceProvider;
 use Illuminate\Support\ServiceProvider;
 

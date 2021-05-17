@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer;
+namespace Grixu\Synchronizer\Engine\Map;
 
 use Spatie\DataTransferObject\DataTransferObject;
 

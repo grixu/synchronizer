@@ -2,13 +2,13 @@
 
 namespace Grixu\Synchronizer\Engine;
 
-use Grixu\Synchronizer\Abstracts\BaseEngine;
-use Grixu\Synchronizer\Transformer;
+use Grixu\Synchronizer\Engine\Abstracts\BaseEngine;
+use Grixu\Synchronizer\Engine\Contracts\Transformer;
 use Illuminate\Support\Str;
 
 class ExcludedField extends BaseEngine
 {
-    public function sync(?Transformer $transformer = null)
+    public function sync(Transformer $transformer)
     {
         $allIds = $this->input->pluck($this->key);
         $updatable = $transformer->getMap()->getUpdatableOnNullFields();

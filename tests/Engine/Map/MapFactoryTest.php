@@ -1,11 +1,11 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests;
+namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Map;
-use Grixu\Synchronizer\MapFactory;
+use Grixu\Synchronizer\Engine\Map\Map;
+use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class MapFactoryTest extends TestCase

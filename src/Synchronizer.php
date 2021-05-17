@@ -7,7 +7,10 @@ use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsTo;
 use Grixu\Synchronizer\Engine\BelongsToMany;
 use Grixu\Synchronizer\Engine\ExcludedField;
+use Grixu\Synchronizer\Engine\Map\Map;
+use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Model;
+use Grixu\Synchronizer\Engine\Transformer\Transformer;
 use Grixu\Synchronizer\Events\SynchronizerEvent;
 use Illuminate\Support\Collection;
 
@@ -59,7 +62,7 @@ class Synchronizer
             $model->sync($this->transformer);
 
             $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model);
-            $belongsToMany->sync();
+            $belongsToMany->sync($this->transformer);
 
             if (!empty($this->map->getUpdatableOnNullFields())) {
                 $excludedField = new ExcludedField($this->input, $this->key, $this->model);

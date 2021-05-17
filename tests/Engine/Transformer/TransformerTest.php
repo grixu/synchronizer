@@ -1,13 +1,13 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests;
+namespace Grixu\Synchronizer\Tests\Engine\Transformer;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Checksum;
-use Grixu\Synchronizer\Transformer;
-use Grixu\Synchronizer\Map;
-use Grixu\Synchronizer\MapFactory;
+use Grixu\Synchronizer\Engine\Map\Map;
+use Grixu\Synchronizer\Engine\Map\MapFactory;
+use Grixu\Synchronizer\Engine\Transformer\Transformer;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 

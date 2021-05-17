@@ -1,8 +1,8 @@
 <?php
 
-namespace Grixu\Synchronizer\Abstracts;
+namespace Grixu\Synchronizer\Engine\Abstracts;
 
-use Grixu\Synchronizer\Contracts\Engine;
+use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;

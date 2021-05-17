@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer\Abstracts;
+namespace Grixu\Synchronizer\Engine\Abstracts;
 
 use Exception;
 use Illuminate\Database\Eloquent\Relations\Relation;

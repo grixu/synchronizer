@@ -2,8 +2,8 @@
 
 namespace Grixu\Synchronizer\Engine;
 
-use Grixu\Synchronizer\Abstracts\RelationEngine;
-use Grixu\Synchronizer\Transformer;
+use Grixu\Synchronizer\Engine\Abstracts\RelationEngine;
+use Grixu\Synchronizer\Engine\Contracts\Transformer;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany as BelongsToManyRelation;
 use Illuminate\Support\Collection;
 
@@ -22,7 +22,7 @@ class BelongsToMany extends RelationEngine
         );
     }
 
-    public function sync(Transformer|null $transformer = null)
+    public function sync(Transformer $transformer)
     {
         $collectionToSync = collect();
         $this->input->groupBy('relations.*.relation')

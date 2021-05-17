@@ -1,12 +1,14 @@
 <?php
 
-namespace Grixu\Synchronizer;
+namespace Grixu\Synchronizer\Engine\Map;
 
+use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
 use Grixu\Synchronizer\Models\ExcludedField;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
-class Map
+class Map implements MapInterface
 {
     protected array $map = [];
     protected array $mapWithoutTimestamps = [];
