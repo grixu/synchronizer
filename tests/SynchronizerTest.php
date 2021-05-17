@@ -18,6 +18,7 @@ use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 
 class SynchronizerTest extends TestCase
@@ -204,5 +205,32 @@ class SynchronizerTest extends TestCase
 
         $this->assertNotEmpty($product);
         $this->assertNotEmpty($product->index);
+    }
+
+    /** @test */
+    public function it_not_even_start_sync_when_nothing_changed()
+    {
+        Config::set('synchronizer.checksum.timestamps_excluded', true);
+        Config::set('synchronizer.sync.timestamps', ['updated_at']);
+
+        $this->data = [
+            $this->makeBelongsToCase(),
+        ];
+        $this->data[0]['checksum'] = 'aaa';
+
+        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        $this->obj->sync();
+
+        $takeOne = Operator::where('xl_id', $this->data[0]['xlId'])->first();
+        $this->assertNotEmpty($takeOne);
+
+        $this->data[0]['updatedAt'] = now()->addSeconds(10);
+        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        $this->obj->sync();
+
+        $takeTwo = Operator::where('xl_id', $this->data[0]['xlId'])->first();
+        $this->assertNotEmpty($takeTwo);
+
+        $this->assertEquals($takeOne->checksum, $takeTwo->checksum);
     }
 }
