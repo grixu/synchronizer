@@ -7,6 +7,7 @@ use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Config;
 
 class AbstractParserTest extends SyncTestCase
 {
@@ -30,5 +31,24 @@ class AbstractParserTest extends SyncTestCase
         $this->assertCount(10, $result);
         $checksumField = Checksum::$checksumField;
         $result->each(fn ($item) => $this->assertNotEmpty($item[$checksumField]));
+    }
+
+    /** @test */
+    public function it_can_excluding_timestamps()
+    {
+        Config::set('synchronizer.checksum.timestamps_excluded', true);
+        Config::set('synchronizer.sync.timestamps', ['Knt_SyncTimeStamp']);
+
+        $takeOne = $this->obj->parse($this->data);
+
+        $this->data = $this->data->map(function ($item) {
+            $item->Knt_SyncTimeStamp = now();
+            return $item;
+        });
+
+        $takeTwo = $this->obj->parse($this->data);
+
+        $this->assertEquals($takeOne, $takeTwo);
+
     }
 }
