@@ -19,13 +19,14 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 
         return $collection->map(function ($item) use ($timestampExcluded, $timestamps) {
             $item = $this->parseElement($item);
+            $checksumBase = clone $item;
 
-            if (!$timestampExcluded) {
-                $item = $item->except(...$timestamps);
+            if ($timestampExcluded) {
+                $checksumBase = $checksumBase->except(...$timestamps);
             }
 
             $item = $item->toArray();
-            $item['checksum'] = Checksum::generate($item);
+            $item['checksum'] = Checksum::generate($checksumBase->toArray());
             return $item;
         });
     }
