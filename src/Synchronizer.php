@@ -43,24 +43,32 @@ class Synchronizer
 
     public function sync()
     {
+        if ($this->input->count() <= 0) {
+            return;
+        }
+
         $belongsTo = new BelongsTo($this->input, $this->key, $this->model);
         $belongsTo->sync($this->transformer);
 
-        $rest = $this->diffCompleted($belongsTo->getIds()->toArray());
-        $model = new Model($rest, $this->key, $this->model);
-        $model->sync($this->transformer);
-
-        $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model);
-        $belongsToMany->sync();
-
-        if (!empty($this->map->getUpdatableOnNullFields())) {
-            $excludedField = new ExcludedField($this->input, $this->key, $this->model);
-            $excludedField->sync($this->transformer);
-        }
-
         $this->logger->log($belongsTo->getIds()->toArray(), Logger::BELONGS_TO);
-        $this->logger->log($model->getIds()->toArray(), Logger::MODEL);
-        $this->logger->log($model->getIds()->toArray(), Logger::BELONGS_TO_MANY);
+
+        $rest = $this->diffCompleted($belongsTo->getIds()->toArray());
+
+        if ($rest->count() > 0) {
+            $model = new Model($rest, $this->key, $this->model);
+            $model->sync($this->transformer);
+
+            $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model);
+            $belongsToMany->sync();
+
+            if (!empty($this->map->getUpdatableOnNullFields())) {
+                $excludedField = new ExcludedField($this->input, $this->key, $this->model);
+                $excludedField->sync($this->transformer);
+            }
+
+            $this->logger->log($model->getIds()->toArray(), Logger::MODEL);
+            $this->logger->log($model->getIds()->toArray(), Logger::BELONGS_TO_MANY);
+        }
 
         event(new SynchronizerEvent($this->model, $this->input->toArray()));
     }
