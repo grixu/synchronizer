@@ -25,6 +25,6 @@ class Model extends BaseEngine
             $fields
         );
 
-        $this->ids->push(...$this->input->pluck($this->key));
+        $this->ids->push(...$this->input->pluck($this->key)->unique());
     }
 }

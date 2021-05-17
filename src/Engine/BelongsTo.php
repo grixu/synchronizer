@@ -68,6 +68,6 @@ class BelongsTo extends RelationEngine
 
         $this->model::upsert($upsert->toArray(), [$this->modelKey], $transformer->getMap()->getModelFieldsArray());
 
-        $this->ids->push(...$upsert->pluck($this->modelKey));
+        $this->ids->push(...$upsert->pluck($this->modelKey)->unique());
     }
 }
