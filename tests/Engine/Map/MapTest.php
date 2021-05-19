@@ -4,7 +4,7 @@ namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Engine\Map\Map;
-use Grixu\Synchronizer\Models\ExcludedField;
+use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 

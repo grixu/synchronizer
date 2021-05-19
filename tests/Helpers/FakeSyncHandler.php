@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
-use Grixu\Synchronizer\Contracts\SyncHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\SyncHandlerInterface;
 use Illuminate\Queue\SerializableClosure;
 use JetBrains\PhpStorm\Pure;
 

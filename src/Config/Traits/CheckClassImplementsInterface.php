@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Config\Traits;
 
-use Grixu\Synchronizer\Exceptions\InterfaceNotImplemented;
+use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
 use ReflectionClass;
 
 trait CheckClassImplementsInterface

@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
-use Grixu\Synchronizer\Abstracts\AbstractLoader;
+use Grixu\Synchronizer\Process\Abstracts\AbstractLoader;
 
 class FakeLoader extends AbstractLoader
 {

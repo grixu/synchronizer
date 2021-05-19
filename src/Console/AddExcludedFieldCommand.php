@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Console;
 
-use Grixu\Synchronizer\Models\ExcludedField;
+use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Illuminate\Console\Command;
 
 class AddExcludedFieldCommand extends Command

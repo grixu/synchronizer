@@ -8,7 +8,7 @@ use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Engine\ExcludedField;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
-use Grixu\Synchronizer\Models\ExcludedField as ExcludedFieldModel;
+use Grixu\Synchronizer\Engine\Models\ExcludedField as ExcludedFieldModel;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Support\Collection;
 

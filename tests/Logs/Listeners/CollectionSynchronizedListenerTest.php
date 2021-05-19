@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Tests\Logs\Listeners;
 
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
+use Grixu\Synchronizer\Process\Events\CollectionSynchronizedEvent;
 use Grixu\Synchronizer\Logs\Listeners\CollectionSynchronizedListener;
 use Grixu\Synchronizer\Logs\Logger;
 use Grixu\Synchronizer\Logs\Models\Log;

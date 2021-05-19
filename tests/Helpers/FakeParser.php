@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Tests\Helpers;
 
 use Grixu\SociusModels\Customer\DataTransferObjects\CustomerData;
-use Grixu\Synchronizer\Abstracts\AbstractParser;
+use Grixu\Synchronizer\Process\Abstracts\AbstractParser;
 use Illuminate\Database\Eloquent\Model;
 
 class FakeParser extends AbstractParser

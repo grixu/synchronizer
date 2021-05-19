@@ -11,7 +11,7 @@ use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Model;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
-use Grixu\Synchronizer\Events\SynchronizerEvent;
+use Grixu\Synchronizer\Engine\Events\SynchronizerEvent;
 use Grixu\Synchronizer\Logs\Logger;
 use Illuminate\Support\Collection;
 

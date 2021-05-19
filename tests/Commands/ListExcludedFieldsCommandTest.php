@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Commands;
 
-use Grixu\Synchronizer\Models\ExcludedField;
+use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class ListExcludedFieldsCommandTest extends TestCase

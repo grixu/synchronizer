@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
-use Grixu\Synchronizer\Contracts\ErrorHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\ErrorHandlerInterface;
 use Illuminate\Queue\SerializableClosure;
 use JetBrains\PhpStorm\Pure;
 

@@ -4,7 +4,7 @@ namespace Grixu\Synchronizer\Engine\Map;
 
 use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
-use Grixu\Synchronizer\Models\ExcludedField;
+use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 

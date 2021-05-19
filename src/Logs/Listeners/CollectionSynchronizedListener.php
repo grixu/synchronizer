@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Logs\Listeners;
 
-use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
+use Grixu\Synchronizer\Process\Events\CollectionSynchronizedEvent;
 use Grixu\Synchronizer\Logs\Logger;
 
 class CollectionSynchronizedListener

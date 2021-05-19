@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Providers;
 
-use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
+use Grixu\Synchronizer\Process\Events\CollectionSynchronizedEvent;
 use Grixu\Synchronizer\Logs\Listeners\CollectionSynchronizedListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
