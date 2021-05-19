@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer\Models;
+namespace Grixu\Synchronizer\Logs\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

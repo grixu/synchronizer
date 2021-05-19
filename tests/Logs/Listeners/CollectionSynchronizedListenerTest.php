@@ -1,13 +1,13 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Listeners;
+namespace Grixu\Synchronizer\Tests\Logs\Listeners;
 
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Listeners\CollectionSynchronizedListener;
-use Grixu\Synchronizer\Logger;
-use Grixu\Synchronizer\Models\Log;
-use Grixu\Synchronizer\Notifications\LoggerNotification;
+use Grixu\Synchronizer\Logs\Listeners\CollectionSynchronizedListener;
+use Grixu\Synchronizer\Logs\Logger;
+use Grixu\Synchronizer\Logs\Models\Log;
+use Grixu\Synchronizer\Logs\Notifications\LoggerNotification;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Support\Facades\Notification;
 

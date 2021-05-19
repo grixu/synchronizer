@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Providers;
 
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Listeners\CollectionSynchronizedListener;
+use Grixu\Synchronizer\Logs\Listeners\CollectionSynchronizedListener;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider

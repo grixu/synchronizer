@@ -1,9 +1,9 @@
 <?php
 
-namespace Grixu\Synchronizer;
+namespace Grixu\Synchronizer\Logs;
 
-use Grixu\Synchronizer\Models\Log;
-use Grixu\Synchronizer\Notifications\LoggerNotification;
+use Grixu\Synchronizer\Logs\Models\Log;
+use Grixu\Synchronizer\Logs\Notifications\LoggerNotification;
 use Illuminate\Support\Facades\Notification;
 
 class Logger

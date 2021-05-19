@@ -1,9 +1,9 @@
 <?php
 
-namespace Grixu\Synchronizer\Listeners;
+namespace Grixu\Synchronizer\Logs\Listeners;
 
 use Grixu\Synchronizer\Events\CollectionSynchronizedEvent;
-use Grixu\Synchronizer\Logger;
+use Grixu\Synchronizer\Logs\Logger;
 
 class CollectionSynchronizedListener
 {

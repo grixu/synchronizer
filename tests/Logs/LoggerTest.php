@@ -1,10 +1,10 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests;
+namespace Grixu\Synchronizer\Tests\Logs;
 
-use Grixu\Synchronizer\Models\Log;
-use Grixu\Synchronizer\Logger;
-use Grixu\Synchronizer\Notifications\LoggerNotification;
+use Grixu\Synchronizer\Logs\Models\Log;
+use Grixu\Synchronizer\Logs\Logger;
+use Grixu\Synchronizer\Logs\Notifications\LoggerNotification;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Config;
