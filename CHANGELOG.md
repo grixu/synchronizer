@@ -2,6 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 4.0.0 - 2021-05-21
+
+- Huge rebuilt of core classes for performance optimization
+- Rebuilt structure & synchronization process
+- Changed: Files & Classes structure
+
 ## 3.3.2 - 2021-05-04
 
 - Bug fixed in LoadDataToSyncJob
