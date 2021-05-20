@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Engine;
 
+use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Abstracts\RelationEngine;
 use Grixu\Synchronizer\Engine\Contracts\Transformer;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as BelongsToRelation;
@@ -28,33 +29,20 @@ class BelongsTo extends RelationEngine
             return;
         }
 
-        $allRelations = [];
-        $this->input->pluck('relations.*.relation')
-            ->flatten()
-            ->filter(function ($relation) {
-                if ($this->model->$relation() instanceof BelongsToRelation) {
-                    return true;
-                }
-
-                return false;
-            })
-            ->each(function ($relation) use ($transformer, &$allRelations) {
-                $fieldName = $this->model->$relation()->getForeignKeyName();
-                $transformer->getMap()->add($fieldName);
-                $allRelations[$relation] = $fieldName;
-            })
-            ->toArray();
+        $allRelations = $this->getAllRelations($transformer);
 
         $upsert = $this->input->map(
             function ($item) use ($transformer, $allRelations) {
                 $relatedFields = [];
 
                 foreach($item['relations'] as $rel) {
-                    if (empty($allRelations[$rel['relation']]) || empty($rel['foreignKeys'])) {
+                    if (empty($allRelations[$rel['relation']]) || (empty($rel['foreignKeys']) && $rel['foreignKeys'] !== 0)) {
+                        $relatedFields[Checksum::$checksumField] = null;
                         continue;
                     }
 
                     if (!isset($this->loaded[$rel['relation']][$rel['foreignField']][$rel['foreignKeys']])) {
+                        $relatedFields[Checksum::$checksumField] = null;
                         continue;
                     }
 
