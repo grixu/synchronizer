@@ -11,6 +11,7 @@ use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\SociusModels\Product\Models\ProductType;
+use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
@@ -267,5 +268,6 @@ class BelongsToTest extends TestCase
         $secondModel = Product::query()->where('xl_id', $this->data[1]['xlId'])->first();
         $this->assertNotEmpty($secondModel);
         $this->assertEmpty($secondModel->brand_id);
+        $this->assertEmpty($secondModel->{Checksum::$checksumField});
     }
 }
