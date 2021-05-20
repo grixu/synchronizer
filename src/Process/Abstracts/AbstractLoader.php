@@ -31,6 +31,15 @@ abstract class AbstractLoader implements LoaderInterface
         }
     }
 
+    public function chunk(\Closure $loop): void
+    {
+        if (empty($this->query)) {
+            $this->buildQuery();
+        }
+
+        $this->query->chunk(config('synchronizer.sync.default_chunk_size'), $loop);
+    }
+
     public function get(): Collection
     {
         $this->checkIsDataLoaded();
