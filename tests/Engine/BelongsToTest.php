@@ -196,7 +196,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $map = MapFactory::makeFromArray($this->data->first(), Product::class);
+        $map = MapFactory::makeFromArray($this->data->first(), Operator::class);
         $this->transformer = new Transformer($map);
 
         $this->assertEmpty($this->localModel->branches);

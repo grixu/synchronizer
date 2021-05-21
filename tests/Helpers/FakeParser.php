@@ -4,11 +4,10 @@ namespace Grixu\Synchronizer\Tests\Helpers;
 
 use Grixu\SociusModels\Customer\DataTransferObjects\CustomerData;
 use Grixu\Synchronizer\Process\Abstracts\AbstractParser;
-use Illuminate\Database\Eloquent\Model;
 
 class FakeParser extends AbstractParser
 {
-    public function parseElement(Model $model): CustomerData
+    public function parseElement($model): CustomerData
     {
         return new CustomerData(
             [
