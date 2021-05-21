@@ -18,47 +18,24 @@ composer require grixu/synchronizer
 ### Simple synchronization
 
 ```php
-use Grixu\Synchronizer\CollectionSynchronizer;
-use Grixu\Synchronizer\RelationshipSynchronizer;
+use Grixu\Synchronizer\Synchronizer;
 
 /** 
- * @param $dtoCollection \Spatie\DataTransferObject\DataTransferObjectCollection
- * @param string $model Model class name
- * @param string $fk Foreign key in DTO used to find your local models 
+ * @param array $inputData 
+ * @param \Grixu\Synchronizer\Config\SyncConfig $config 
+ * @param string|null $batchId Optional BatchID
  */
-$synchronizer = new CollectionSynchronizer($dtoCollection, Model::class, 'fk');
+$synchronizer = new Synchronizer($inputData, $config, 'batch-id');
 
-/**
-* @param array|null $map Assoc array with dtoFieldName => modelFieldName
- */
-$synchronizer->sync($map);
-
-
-// In case you have separated DTO with relationships based on
-// RelationshipDataTransferObject you can sync them using
-// RelationshipSynchronizer, like below:
-$relationshipSynchronizer = new RelationshipSynchronizer($modelInstance);
-$relationshipSynchronizer->sync($dtoCollectionWithRelationships);
+$synchronizer->sync();
 ```
-
-#### Custom model classes
-
-You can use extended models from Synchronizer v3.3.0!
-
-If you want to use different model than your source returns in `localClass` field in `relationships` block - you can
-easily achieve this with using PHP 8 attributes. Just add `SynchronizeWith` attribute do your model with FQCN (Fully
-Qualified Class Name) of original class name (that used in `localClass` field)
-
-#### Use Array instead of DTO classes
-
-If you want just to synchronize data without relationships, you can use Collection of arrays instead of DTOs. It's
-possible from version 3.3.0
 
 ### Advanced use with jobs & dividing to smaller pieces of data (built-in jobs)
 
 ```php
-use Grixu\Synchronizer\Actions\StartSyncAction;
+use Grixu\Synchronizer\Process\Actions\StartSyncAction;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
+use Illuminate\Queue\SerializableClosure;
 
 $obj = new StartSyncAction();
 $configFactory = new SyncConfigFactory();
@@ -70,8 +47,8 @@ $config = $configFactory->make(
     foreignKey: 'fkId',
     jobsConfig: 'default',
     idsToSync: null,
-    syncClosure: new \Illuminate\Queue\SerializableClosure(function ($collection, $config) {}),
-    errorHandler: new \Illuminate\Queue\SerializableClosure(function ($exception) {})
+    syncClosure: new SerializableClosure(function ($collection, $config) {}),
+    errorHandler: new SerializableClosure(function ($exception) {})
 );
 
 $obj->execute($config, 'sync_queue');
@@ -124,7 +101,7 @@ SerializableClosure containing code which will be used to handle synchronization
 and `StartSyncAction`. Such Closure should take 2 arguments:
 
 - DtoCollection (`Illuminate\Support\Collection`)
-- Config (`Grixu\Config\SyncConfig`)
+- Config (`Grixu\Synchronizer\Config\SyncConfig`)
 
 #### Default error handler
 
@@ -148,11 +125,9 @@ There are 5 options available in config file to adjust how `synchronizer` should
 ```php
 return [
     'sync' => [
-        'send_notification' => env('SYNCHRONIZER_SLACK_SUM_UP', false),
-        'logging' => env('SYNCHRONIZER_DB_LOGGING',true),
-
         'timestamps' => [
-            'updatedAt'
+            'created_at',
+            'updated_at'
         ],
 
         'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
@@ -163,12 +138,28 @@ return [
         'field' => env('SYNCHRONIZER_CHECKSUM_FIELD', 'checksum'),
         'timestamps_excluded' => false,
     ],
-    
+
+    'logger' => [
+        'db' => env('SYNCHRONIZER_DB_LOGGING', true),
+
+        'notifications' => [
+            'slack' => env('SYNCHRONIZER_SLACK_WEBHOOK', null),
+        ]
+    ],
+
     'jobs' => [
         'default' => [
-            \Grixu\Synchronizer\Jobs\LoadDataToSyncJob::class,
-            \Grixu\Synchronizer\Jobs\ParseLoadedDataJob::class,
-            \Grixu\Synchronizer\Jobs\SyncParsedDataJob::class
+            \Grixu\Synchronizer\Process\Jobs\LoadDataToSyncJob::class,
+            \Grixu\Synchronizer\Process\Jobs\ParseLoadedDataJob::class,
+            \Grixu\Synchronizer\Process\Jobs\SyncParsedDataJob::class
+        ],
+        'load-all-and-parse' => [
+            \Grixu\Synchronizer\Process\Jobs\LoadAllAndParseJob::class,
+            \Grixu\Synchronizer\Process\Jobs\SyncParsedDataJob::class
+        ],
+        'chunk-load-and-parse' => [
+            \Grixu\Synchronizer\Process\Jobs\ChunkLoadAndParseJob::class,
+            \Grixu\Synchronizer\Process\Jobs\SyncParsedDataJob::class
         ]
     ],
 
@@ -177,27 +168,31 @@ return [
 //        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class
 //    ],
 ];
+
 ```
 
 ### Sync block
 
-When option `send_notification` is equals true, `CollectionSynchronizer` after sync send information to Slack channel
-about all creation/update changes.
-
-`logging` flag is designed to switch on/off logging changes in a database.
-
 In `timestamps` array you could define names of fields used as timestamp in all your models - those fields would not be
-logged as change by logger.
+taken into consideration on checksum generation.
 
 ### Checksum block
 
-For checking changes between local model and foreign DTO, Synchronizer use comparing checksum from last sync with new
+For checking changes between local & input data, Synchronizer use comparing checksum from last sync with new
 one. Checksum is generated one from fields which are used in sync and are not timestamps. To use it properly you should
-an extra field in your local models which are not in DTO. Pass this field name to `checksum_field` in config file.
+an extra field in your local models which are not in DTO. Pass this field name to `field` in config file.
 
 To turn off this feature just set up `control` as false.
 
 Option `timestamp_excluded` when enabled do not use timestamp fields to generate a checksum.
+
+### Logger block
+
+`SYNCHRONIZER_DB_LOGGING` flag is designed to switch on/off logging changes in a database.
+
+When environment variable `SYNCHRONIZER_SLACK_WEBHOOK` is not empty, batch started in `StartSyncAction` on finish
+trigger `CollectionSynchronizedEvent` event. Then attached listener `CollectionSynchronizedListener` will send report
+about sync to Slack webhook about changes.
 
 ### Jobs block
 

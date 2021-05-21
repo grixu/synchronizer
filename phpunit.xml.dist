@@ -28,6 +28,6 @@
         <server name="CACHE_DRIVER" value="array"/>
         <server name="DB_CONNECTION" value="testing"/>
         <server name="QUEUE_DRIVER" value="sync"/>
-        <server name="SLACK_NOTIFICATION_WEBHOOK" value="put-your-slack-webhook-url-here"/>
+        <server name="SYNCHRONIZER_SLACK_WEBHOOK" value="put-your-slack-webhook-url-here"/>
     </php>
 </phpunit>

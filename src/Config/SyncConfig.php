@@ -4,9 +4,9 @@ namespace Grixu\Synchronizer\Config;
 
 use Closure;
 use Exception;
-use Grixu\Synchronizer\Contracts\LoaderInterface;
-use Grixu\Synchronizer\Contracts\ParserInterface;
-use Grixu\Synchronizer\Traits\CheckClassImplementsInterface;
+use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
+use Grixu\Synchronizer\Process\Contracts\ParserInterface;
+use Grixu\Synchronizer\Config\Traits\CheckClassImplementsInterface;
 use Illuminate\Queue\SerializableClosure;
 
 class SyncConfig

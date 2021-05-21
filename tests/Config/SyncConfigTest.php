@@ -5,7 +5,7 @@ namespace Grixu\Synchronizer\Tests\Config;
 use Exception;
 use Grixu\SociusModels\Description\Models\Language;
 use Grixu\Synchronizer\Config\SyncConfig;
-use Grixu\Synchronizer\Exceptions\InterfaceNotImplemented;
+use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
