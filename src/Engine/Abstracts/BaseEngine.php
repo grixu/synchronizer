@@ -27,7 +27,7 @@ abstract class BaseEngine implements Engine
     protected function filterByKeyExistence()
     {
         $key = $this->key;
-        $this->input = $this->input->filter(fn ($item) => !empty($item[$key]));
+        $this->input = $this->input->filter(fn ($item) => isset($item[$key]));
     }
 
     public function getIds(): Collection
@@ -42,10 +42,6 @@ abstract class BaseEngine implements Engine
             ->flatten()
             ->filter()
             ->filter(function ($relation) {
-                if (!is_string($relation)) {
-                    return false;
-                }
-
                 if ($this->model->$relation() instanceof BelongsToRelation) {
                     return true;
                 }
