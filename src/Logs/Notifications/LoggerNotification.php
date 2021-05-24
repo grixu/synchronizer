@@ -11,8 +11,13 @@ class LoggerNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
+    public $tries = 2;
+    public $timeout = 30;
+    public $backoff = [5, 20];
+
     public function __construct(public string $model, public int $totalChanges)
     {
+        $this->onQueue(config('synchronizer.queues.notifications'));
     }
 
     public function via(): array

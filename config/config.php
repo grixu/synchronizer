@@ -40,6 +40,10 @@ return [
         ]
     ],
 
+    'queues' => [
+        'notifications' => env('SYNCHRONIZER_NOTIFICATION_QUEUE', 'notifications'),
+    ]
+
 //    'handlers' => [
 //        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,
 //        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class

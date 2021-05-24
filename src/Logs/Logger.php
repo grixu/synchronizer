@@ -37,18 +37,22 @@ class Logger
             return;
         }
 
-        $count = Log::query()
+        $query = Log::query()
             ->where(
                 [
                     ['batch_id', '=', $this->batchId],
-                    ['model', '=', $this->model]
+                    ['model', '=', $this->model],
+                    ['reported', '=', false]
                 ]
-            )
-            ->sum('changed');
+            );
+
+        $count = $query->sum('changed');
 
         if ($count > 0) {
             Notification::route('slack', config('synchronizer.logger.notifications.slack'))
                 ->notify(new LoggerNotification($this->model, $count));
+
+            $query->update(['reported' => true]);
         }
     }
 }

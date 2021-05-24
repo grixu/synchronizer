@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 4.1.0 - 2021-05-24
+
+- Modified `CollectionSynchronizedListener` to be idempotent and queueable
+
 ## 4.0.0 - 2021-05-21
 
 - Huge rebuilt of core classes for performance optimization

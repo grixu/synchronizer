@@ -15,6 +15,7 @@ class CreateLogsTable extends Migration
             $table->string('changed');
             $table->string('type');
             $table->json('log');
+            $table->boolean('reported')->default(false);
             $table->timestamps();
         });
     }
