@@ -50,6 +50,17 @@ class AbstractLoaderTest extends SyncTestCase
     }
 
     /** @test */
+    public function it_returns_piece()
+    {
+        $returnedData = $this->obj->getPiece(2);
+
+        $this->assertNotEmpty($returnedData);
+        $this->assertTrue($returnedData instanceof Collection);
+        $this->assertCount(config('synchronizer.sync.default_chunk_size'), $returnedData);
+    }
+
+
+    /** @test */
     public function it_returns_builder_obj()
     {
         $returnedData = $this->obj->getBuilder();

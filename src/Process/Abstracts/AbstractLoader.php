@@ -22,12 +22,17 @@ abstract class AbstractLoader implements LoaderInterface
     protected function checkIsDataLoaded(): void
     {
         if ($this->count <= 0) {
-            if (empty($this->query)) {
-                $this->buildQuery();
-            }
+            $this->checkBuildQuery();
 
             $this->data = $this->query->get();
             $this->count = $this->data->count();
+        }
+    }
+
+    protected function checkBuildQuery(): void
+    {
+        if (empty($this->query)) {
+            $this->buildQuery();
         }
     }
 
@@ -52,6 +57,20 @@ abstract class AbstractLoader implements LoaderInterface
         $this->checkIsDataLoaded();
 
         return $this->data;
+    }
+
+    public function getPiece(int $piece): Collection
+    {
+        $this->checkBuildQuery();
+        $pieceSize = config('synchronizer.sync.default_chunk_size');
+
+        $query = $this->query->limit($pieceSize);
+
+        if ($piece > 1) {
+            $query = $query->offset(($piece - 1) * $pieceSize);
+        }
+
+        return $query->get();
     }
 
     public function getBuilder(): Builder

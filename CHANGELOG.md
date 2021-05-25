@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 4.2.0 - 2021-05-25
+
+- Added `ChunkRestParseJob` for cases with more precise control on process of loading data.
+
 ## 4.1.0 - 2021-05-24
 
 - Modified `CollectionSynchronizedListener` to be idempotent and queueable

@@ -37,12 +37,17 @@ return [
         'chunk-load-and-parse' => [
             \Grixu\Synchronizer\Process\Jobs\ChunkLoadAndParseJob::class,
             \Grixu\Synchronizer\Process\Jobs\SyncParsedDataJob::class
+        ],
+        'chunk-rest-parse' => [
+            \Grixu\Synchronizer\Process\Jobs\ChunkRestParseJob::class,
+            \Grixu\Synchronizer\Process\Jobs\SyncParsedDataJob::class
         ]
     ],
 
     'queues' => [
         'notifications' => env('SYNCHRONIZER_NOTIFICATION_QUEUE', 'notifications'),
-    ]
+        'release' => env('SYNCHRONIZER_QUEUE_RELEASE', 1),
+    ],
 
 //    'handlers' => [
 //        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,

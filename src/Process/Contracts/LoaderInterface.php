@@ -10,6 +10,7 @@ interface LoaderInterface
     public function get(): Collection;
     public function getRaw(): Collection;
     public function chunk(\Closure $loop): void;
+    public function getPiece(int $piece): Collection;
     public function getCount(): int;
     public function getBuilder();
 }
