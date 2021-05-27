@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 4.2.1 - 2021-05-27
+
+- Small optimization in `LoadAllAndParseJob`
+
 ## 4.2.0 - 2021-05-25
 
 - Added `ChunkRestParseJob` for cases with more precise control on process of loading data.

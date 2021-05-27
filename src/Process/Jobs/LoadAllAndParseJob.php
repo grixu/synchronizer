@@ -51,8 +51,6 @@ class LoadAllAndParseJob implements ShouldQueue
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
         $loader->buildQuery($this->config->getIdsToSync());
-        /** @var Builder $query */
-        $query = $loader->getBuilder();
 
         $parserClass = $this->config->getParserClass();
         /** @var ParserInterface $parser */
@@ -60,8 +58,7 @@ class LoadAllAndParseJob implements ShouldQueue
 
         $jobClass = $this->config->getNextJob();
 
-        $query->get()
-            ->chunk(config('synchronizer.sync.default_chunk_size'))
+        $loader->get()
             ->each(
                 function ($data) use ($jobClass, $parser) {
                     $parsedData = $parser->parse($data)->toArray();
