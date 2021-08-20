@@ -14,7 +14,7 @@ class MapFactoryTest extends TestCase
     public function making_map_based_on_dto()
     {
         $dto = ProductDataFactory::new()->create();
-        $map = MapFactory::makeFromDto($dto, Product::class);
+        $map = MapFactory::makeFromDto($dto, Product::class, config('synchronizer.checksum.field'));
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
@@ -28,7 +28,8 @@ class MapFactoryTest extends TestCase
             [
                 'name' => 'name'
             ],
-            Product::class
+            Product::class,
+            config('synchronizer.checksum.field')
         );
 
         $this->assertEquals(Map::class, get_class($map));
@@ -40,7 +41,7 @@ class MapFactoryTest extends TestCase
     public function making_map_based_on_array()
     {
         $dto = ProductDataFactory::new()->create()->toArray();
-        $map = MapFactory::makeFromArray($dto, Product::class);
+        $map = MapFactory::makeFromArray($dto, Product::class, config('synchronizer.checksum.field'));
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
