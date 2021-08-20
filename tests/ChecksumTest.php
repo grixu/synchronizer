@@ -5,7 +5,7 @@ namespace Grixu\Synchronizer\Tests;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Checksum;
-use Grixu\Synchronizer\Map;
+use Grixu\Synchronizer\Engine\Contracts\Map;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
@@ -32,7 +32,7 @@ class ChecksumTest extends TestCase
             $row->checksum = hash('crc32c', json_encode($row));
         }
 
-        $obj = new Checksum($data, 'xlId', Product::class);
+        $obj = new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
 
         $this->assertNotEmpty($obj->get());
         $this->assertCount(10, $obj->get());
@@ -47,7 +47,7 @@ class ChecksumTest extends TestCase
             Product::factory()->create(['xl_id' => $row->xlId, 'checksum' => $row->checksum]);
         }
 
-        $obj = new Checksum($data, 'xlId', Product::class);
+        $obj = new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
 
         $this->assertEmpty($obj->get());
     }
@@ -61,7 +61,7 @@ class ChecksumTest extends TestCase
             Product::factory()->create(['xl_id' => $row->xlId, 'checksum' => $row->checksum . '_a']);
         }
 
-        $obj = new Checksum($data, 'xlId', Product::class);
+        $obj = new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
 
         $this->assertNotEmpty($obj->get());
         $this->assertCount(10, $obj->get());
@@ -77,5 +77,30 @@ class ChecksumTest extends TestCase
 
         $this->assertNotEmpty($checksumGenerated);
         $this->assertEquals(hash('crc32c', json_encode($data)), $checksumGenerated);
+    }
+
+    /**
+     * @test
+     * @environment-setup useDisabledChecksum
+     */
+    public function it_throws_exception_if_checksum_control_is_disabled()
+    {
+        $data = ProductDataFactory::new()->times(10)->create();
+        foreach ($data as $row) {
+            Product::factory()->create(['xl_id' => $row->xlId]);
+            $row->checksum = hash('crc32c', json_encode($row));
+        }
+
+        try {
+            new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
+            $this->fail();
+        } catch (\Exception) {
+            $this->assertTrue(true);
+        }
+    }
+
+    protected function useDisabledChecksum($app)
+    {
+        $app->config->set('synchronizer.checksum.control', false);
     }
 }
