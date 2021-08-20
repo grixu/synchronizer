@@ -46,7 +46,7 @@ class ModelTest extends TestCase
         $map = MapFactory::makeFromArray($this->data->first(), Product::class);
         $this->transformer = new Transformer($map);
 
-        $this->obj = new ModelEngine($this->data, 'xlId', Product::class);
+        $this->obj = new ModelEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
     }
 
     /** @test */
@@ -63,7 +63,7 @@ class ModelTest extends TestCase
     public function it_exit_gently_when_it_nothing_to_sync()
     {
         $this->data = collect();
-        $this->obj = new ModelEngine($this->data, 'xlId', Product::class);
+        $this->obj = new ModelEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
         $this->assertDatabaseCount('products', 1);
 
         $this->obj->sync($this->transformer);
@@ -75,7 +75,7 @@ class ModelTest extends TestCase
     public function it_reset_checksum_when_relations_found_in_dataset()
     {
         $this->makeComplicatedCase();
-        $this->obj = new ModelEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new ModelEngine($this->data, 'xlId', Operator::class, config('synchronizer.checksum.field'));
         $this->assertDatabaseCount('operators', 1);
 
         $this->obj->sync($this->transformer);
@@ -124,7 +124,7 @@ class ModelTest extends TestCase
             )->toArray()
         );
 
-        $map = MapFactory::makeFromArray($this->data->first(), Operator::class);
+        $map = MapFactory::makeFromArray($this->data->first(), Operator::class, config('synchronizer.checksum.field'));
         $this->transformer = new Transformer($map);
     }
 

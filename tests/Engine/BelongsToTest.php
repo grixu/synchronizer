@@ -11,7 +11,6 @@ use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\SociusModels\Product\Models\ProductType;
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
@@ -37,7 +36,7 @@ class BelongsToTest extends TestCase
         $this->makeBelongsToCase();
 
         try {
-            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
             $this->assertTrue(true);
         } catch (Exception $e) {
             ray($e);
@@ -83,7 +82,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $map = MapFactory::makeFromArray($this->data->first(), Product::class);
+        $map = MapFactory::makeFromArray($this->data->first(), Product::class, config('synchronizer.checksum.field'));
         $this->transformer = new Transformer($map);
 
         $this->assertEmpty($this->localModel->brand_id);
@@ -94,7 +93,7 @@ class BelongsToTest extends TestCase
     public function it_sync_belongs_to_properly()
     {
         $this->makeBelongsToCase();
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -125,7 +124,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
         $this->obj->sync($this->transformer);
 
         $tempModel->refresh();
@@ -147,7 +146,7 @@ class BelongsToTest extends TestCase
     {
         $this->makeComplicatedCase();
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Operator::class, config('synchronizer.checksum.field'));
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -196,7 +195,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $map = MapFactory::makeFromArray($this->data->first(), Operator::class);
+        $map = MapFactory::makeFromArray($this->data->first(), Operator::class, config('synchronizer.checksum.field'));
         $this->transformer = new Transformer($map);
 
         $this->assertEmpty($this->localModel->branches);
@@ -210,7 +209,7 @@ class BelongsToTest extends TestCase
 
         $this->data->push(OperatorDataFactory::new()->create()->toArray());
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Operator::class, config('synchronizer.checksum.field'));
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -228,7 +227,7 @@ class BelongsToTest extends TestCase
             ProductDataFactory::new()->create()->toArray()
         );
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -255,7 +254,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
         $this->obj->sync($this->transformer);
 
         $this->assertCount($this->data->count(), $this->obj->getIds());
@@ -268,6 +267,6 @@ class BelongsToTest extends TestCase
         $secondModel = Product::query()->where('xl_id', $this->data[1]['xlId'])->first();
         $this->assertNotEmpty($secondModel);
         $this->assertEmpty($secondModel->brand_id);
-        $this->assertEmpty($secondModel->{Checksum::$checksumField});
+        $this->assertEmpty($secondModel->{config('synchronizer.checksum.field')});
     }
 }

@@ -55,7 +55,7 @@ class ExcludedFieldTest extends TestCase
 
         $this->assertCount(1, $map->getUpdatableOnNullFields());
 
-        $this->obj = new ExcludedField($this->data, 'xlId', Product::class);
+        $this->obj = new ExcludedField($this->data, 'xlId', Product::class, config('synchronizer.checksum.field'));
     }
 
     /** @test */
