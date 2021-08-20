@@ -29,8 +29,7 @@ class AbstractParserTest extends SyncTestCase
 
         $this->assertNotEmpty($result);
         $this->assertCount(10, $result);
-        $checksumField = Checksum::$checksumField;
-        $result->each(fn ($item) => $this->assertNotEmpty($item[$checksumField]));
+        $result->each(fn ($item) => $this->assertNotEmpty($item[config('synchronizer.checksum.field')]));
     }
 
     /** @test */
