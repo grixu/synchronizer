@@ -2,7 +2,6 @@
 
 namespace Grixu\Synchronizer\Engine\Map;
 
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
 use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Illuminate\Support\Collection;
@@ -16,12 +15,12 @@ class Map implements MapInterface
     protected Collection $excludedFields;
     protected static array $timestamps;
 
-    public function __construct(array $fields, protected string $model)
+    public function __construct(array $fields, protected string $model, string|null $checksumField = null)
     {
         $this->excludedFields = $this->getExcludedFields($model);
 
-        if (!empty(Checksum::$checksumField)) {
-            $fields[] = Checksum::$checksumField;
+        if (!empty($checksumField)) {
+            $fields[] = $checksumField;
         }
 
         $fields = array_diff($fields, ['relations']);
