@@ -14,8 +14,7 @@ class FakeSyncConfig
             FakeParser::class,
             Customer::class,
             'xlId',
-            config('synchronizer.jobs.default')
-
+            config('synchronizer.jobs.default'),
         );
     }
 
@@ -27,7 +26,6 @@ class FakeSyncConfig
             Customer::class,
             'xlId',
             config('synchronizer.jobs.load-all-and-parse')
-
         );
     }
 
@@ -39,7 +37,6 @@ class FakeSyncConfig
             Customer::class,
             'xlId',
             config('synchronizer.jobs.chunk-load-and-parse')
-
         );
     }
 
