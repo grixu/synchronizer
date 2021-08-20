@@ -165,14 +165,14 @@ class SyncConfigFactoryTest extends TestCase
         $this->assertNotEmpty($config->getChecksumField());
     }
 
-    protected function makeObjWithChecksum(): SyncConfig
+    protected function makeObjWithChecksum(string|bool $checksum = 'checksum'): SyncConfig
     {
         return $this->obj->make(
             loaderClass: FakeLoader::class,
             parserClass: FakeParser::class,
             localModel: FakeForeignSqlSourceModel::class,
             foreignKey: 'xlId',
-            checksumField: 'checksum',
+            checksumField: $checksum,
             idsToSync: null,
             syncClosure: new SerializableClosure(function ($collection, $config) {}),
             errorHandler: new SerializableClosure(function ($e) {})
@@ -194,5 +194,13 @@ class SyncConfigFactoryTest extends TestCase
     protected function useDisabledChecksum($app)
     {
         $app->config->set('synchronizer.checksum.control', false);
+    }
+
+    /** @test */
+    public function it_allows_to_disable_checksum()
+    {
+        $config = $this->makeObjWithChecksum(false);
+
+        $this->assertEmpty($config->getChecksumField());
     }
 }
