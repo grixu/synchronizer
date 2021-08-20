@@ -21,6 +21,7 @@ class Synchronizer
     protected Transformer $transformer;
     protected Logger $logger;
     protected Collection $input;
+    protected string|null $checksum;
     protected string $key;
     protected string $model;
 
@@ -41,8 +42,13 @@ class Synchronizer
         $batchId = (empty($batchId)) ? 'none' : $batchId;
         $this->logger = new Logger($batchId, $this->model);
 
-        $checksum = new Checksum($input, $this->key, $syncConfig->getLocalModel());
-        $this->input = $checksum->get();
+        $this->checksum = $syncConfig->getChecksumField();
+        if ($this->checksum && config('synchronizer.checksum.control')) {
+            $checksum = new Checksum($input, $this->key, $syncConfig->getLocalModel(), $this->checksum);
+            $this->input = $checksum->get();
+        } else {
+            $this->input = $input;
+        }
     }
 
     public function sync()
@@ -51,7 +57,7 @@ class Synchronizer
             return;
         }
 
-        $belongsTo = new BelongsTo($this->input, $this->key, $this->model);
+        $belongsTo = new BelongsTo($this->input, $this->key, $this->model, $this->checksum);
         $belongsTo->sync($this->transformer);
 
         $this->logger->log($belongsTo->getIds()->toArray(), Logger::BELONGS_TO);
@@ -59,14 +65,14 @@ class Synchronizer
         $rest = $this->diffCompleted($belongsTo->getIds()->toArray());
 
         if ($rest->count() > 0) {
-            $model = new Model($rest, $this->key, $this->model);
+            $model = new Model($rest, $this->key, $this->model, $this->checksum);
             $model->sync($this->transformer);
 
-            $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model);
+            $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model, $this->checksum);
             $belongsToMany->sync($this->transformer);
 
             if (!empty($this->map->getUpdatableOnNullFields())) {
-                $excludedField = new ExcludedField($this->input, $this->key, $this->model);
+                $excludedField = new ExcludedField($this->input, $this->key, $this->model, $this->checksum);
                 $excludedField->sync($this->transformer);
             }
 
