@@ -43,7 +43,7 @@ class Synchronizer
         $this->logger = new Logger($batchId, $this->model);
 
         $this->checksum = $syncConfig->getChecksumField();
-        if ($this->checksum && config('synchronizer.checksum.control')) {
+        if (!empty($this->checksum) && config('synchronizer.checksum.control')) {
             $checksum = new Checksum($input, $this->key, $syncConfig->getLocalModel(), $this->checksum);
             $this->input = $checksum->get();
         } else {
@@ -67,17 +67,17 @@ class Synchronizer
         if ($rest->count() > 0) {
             $model = new Model($rest, $this->key, $this->model, $this->checksum);
             $model->sync($this->transformer);
+            $this->logger->log($model->getIds()->toArray(), Logger::MODEL);
 
             $belongsToMany = new BelongsToMany($this->input, $this->key, $this->model, $this->checksum);
             $belongsToMany->sync($this->transformer);
+            $this->logger->log($belongsToMany->getIds()->toArray(), Logger::BELONGS_TO_MANY);
 
             if (!empty($this->map->getUpdatableOnNullFields())) {
                 $excludedField = new ExcludedField($this->input, $this->key, $this->model, $this->checksum);
                 $excludedField->sync($this->transformer);
+                $this->logger->log($excludedField->getIds()->toArray(), Logger::EXCLUDED_FIELDS);
             }
-
-            $this->logger->log($model->getIds()->toArray(), Logger::MODEL);
-            $this->logger->log($model->getIds()->toArray(), Logger::BELONGS_TO_MANY);
         }
 
         event(new SynchronizerEvent($this->model, $this->input->toArray()));
