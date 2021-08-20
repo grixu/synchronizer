@@ -18,7 +18,7 @@ class SyncConfigFactory
         string $localModel,
         string $foreignKey,
         array|string|null $jobsConfig = null,
-        string|null $checksumField = null,
+        string|bool|null $checksumField = null,
         ?array $idsToSync = [],
         SerializableClosure|null $syncClosure = null,
         SerializableClosure|null $errorHandler = null
@@ -37,8 +37,12 @@ class SyncConfigFactory
             );
         }
 
-        if (empty($checksumField) && config('synchronizer.checksum.control')) {
+        if (empty($checksumField) && $checksumField !== false && config('synchronizer.checksum.control')) {
             $checksumField = config('synchronizer.checksum.field');
+        }
+
+        if ($checksumField === false) {
+            $checksumField = null;
         }
 
         if (!empty($jobsConfig) && is_string($jobsConfig)) {
