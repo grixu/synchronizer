@@ -155,4 +155,44 @@ class SyncConfigFactoryTest extends TestCase
             'default' => [],
         ]);
     }
+
+    /** @test */
+    public function it_returns_object_when_checksum_defined()
+    {
+        $config = $this->makeObjWithChecksum();
+
+        $this->basicAssertions($config);
+        $this->assertNotEmpty($config->getChecksumField());
+    }
+
+    protected function makeObjWithChecksum(): SyncConfig
+    {
+        return $this->obj->make(
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
+            checksumField: 'checksum',
+            idsToSync: null,
+            syncClosure: new SerializableClosure(function ($collection, $config) {}),
+            errorHandler: new SerializableClosure(function ($e) {})
+        );
+    }
+
+    /**
+     * @test
+     * @environment-setup useDisabledChecksum
+     */
+    public function it_allows_to_empty_checksum()
+    {
+        $config = $this->makeObj();
+
+        $this->basicAssertions($config);
+        $this->assertEmpty($config->getChecksumField());
+    }
+
+    protected function useDisabledChecksum($app)
+    {
+        $app->config->set('synchronizer.checksum.control', false);
+    }
 }
