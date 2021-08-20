@@ -11,6 +11,7 @@ class Logger
     public const BELONGS_TO = 1;
     public const MODEL = 2;
     public const BELONGS_TO_MANY = 3;
+    public const EXCLUDED_FIELDS = 4;
 
     public function __construct(protected string $batchId, protected string $model)
     {
