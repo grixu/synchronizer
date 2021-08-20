@@ -11,9 +11,9 @@ abstract class RelationEngine extends BaseEngine
 {
     protected Collection $loaded;
 
-    public function __construct(protected Collection $input, protected string $key, string $model)
+    public function __construct(protected Collection $input, protected string $key, string $model, protected string|null $checksum = null)
     {
-        parent::__construct($input, $key, $model);
+        parent::__construct($input, $key, $model, $checksum);
         $this->loaded = collect();
 
         $this->checkRelations();

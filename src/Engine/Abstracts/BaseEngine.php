@@ -15,7 +15,7 @@ abstract class BaseEngine implements Engine
     protected Model $model;
     protected string $modelKey;
 
-    public function __construct(protected Collection $input, protected string $key, string $model)
+    public function __construct(protected Collection $input, protected string $key, string $model, protected string|null $checksum = null)
     {
         $this->ids = collect();
         $this->model = new $model;
