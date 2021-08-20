@@ -27,17 +27,18 @@ class SyncConfigTest extends TestCase
     protected function createObj(): SyncConfig
     {
         return new SyncConfig(
-            loaderClass: FakeLoader::class,
-            parserClass: FakeParser::class,
-            localModel: Language::class,
-            foreignKey: 'xlId',
-            jobsConfig: config('synchronizer.jobs.default'),
-            idsToSync: null,
-            syncClosure: new SerializableClosure(
+            loaderClass:   FakeLoader::class,
+            parserClass:   FakeParser::class,
+            localModel:    Language::class,
+            foreignKey:    'xlId',
+            jobsConfig:    config('synchronizer.jobs.default'),
+            checksumField: null,
+            idsToSync:     null,
+            syncClosure:   new SerializableClosure(
                              function (Collection $dtoCollection, SyncConfig $config) {
                              }
                          ),
-            errorHandler: new SerializableClosure(
+            errorHandler:  new SerializableClosure(
                              function (Throwable $e) {
                              }
                          )
@@ -49,17 +50,18 @@ class SyncConfigTest extends TestCase
     {
         try {
             new SyncConfig(
-                loaderClass: Collection::class,
-                parserClass: FakeParser::class,
-                localModel: Language::class,
-                foreignKey: 'xlId',
-                jobsConfig: config('synchronizer.jobs.default'),
-                idsToSync: null,
-                syncClosure: new SerializableClosure(
+                loaderClass:   Collection::class,
+                parserClass:   FakeParser::class,
+                localModel:    Language::class,
+                foreignKey:    'xlId',
+                jobsConfig:    config('synchronizer.jobs.default'),
+                checksumField: null,
+                idsToSync:     null,
+                syncClosure:   new SerializableClosure(
                                  function (Collection $dtoCollection, SyncConfig $config) {
                                  }
                              ),
-                errorHandler: new SerializableClosure(
+                errorHandler:  new SerializableClosure(
                                  function (Throwable $e) {
                                  }
                              )
@@ -117,5 +119,50 @@ class SyncConfigTest extends TestCase
 
         $this->assertNotEmpty($config->getErrorHandler());
         $this->assertEquals(SerializableClosure::class, $config->getErrorHandler()::class);
+    }
+
+    /** @test */
+    public function it_provide_access_to_checksum_field_name()
+    {
+        $obj = $this->makeObjWithChecksum();
+        $returnedValue = $obj->getChecksumField();
+
+        $this->assertEquals('checksum', $returnedValue);
+    }
+
+    protected function makeObjWithChecksum(): SyncConfig
+    {
+        return new SyncConfig(
+            loaderClass:   FakeLoader::class,
+            parserClass:   FakeParser::class,
+            localModel:    Language::class,
+            foreignKey:    'xlId',
+            jobsConfig:    config('synchronizer.jobs.default'),
+            checksumField: 'checksum',
+            idsToSync:     null,
+            syncClosure:   new SerializableClosure(
+                               function (Collection $dtoCollection, SyncConfig $config) {
+                               }
+                           ),
+            errorHandler:  new SerializableClosure(
+                               function (Throwable $e) {
+                               }
+                           )
+        );
+    }
+
+    /**
+     * @test
+     * @environment-setup useDisabledChecksum
+     */
+    public function it_not_allows_checksum_field_if_checking_system_is_off()
+    {
+        $obj = $this->makeObjWithChecksum();
+        $this->assertEmpty($obj->getChecksumField());
+    }
+
+    protected function useDisabledChecksum($app)
+    {
+        $app->config->set('synchronizer.checksum.control', false);
     }
 }
