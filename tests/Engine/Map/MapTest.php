@@ -32,7 +32,8 @@ class MapTest extends TestCase
                 'spam',
                 'updatedAt'
             ],
-            Model::class
+            Model::class,
+            'checksum'
         );
     }
 
@@ -97,7 +98,8 @@ class MapTest extends TestCase
                 'name',
                 'updatedAt'
             ],
-            Product::class
+            Product::class,
+            'checksum'
         );
 
         return $model;
