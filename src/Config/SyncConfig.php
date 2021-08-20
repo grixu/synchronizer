@@ -21,12 +21,21 @@ class SyncConfig
         protected string $localModel,
         protected string $foreignKey,
         protected array $jobsConfig,
-        protected ?array $idsToSync = [],
+        protected string|null $checksumField = null,
+        protected array|null $idsToSync = [],
         protected Closure|SerializableClosure|null $syncClosure = null,
         protected Closure|SerializableClosure|null $errorHandler = null
     ) {
+        $this->validateChecksum();
         $this->checkClassIsImplementingInterface($loaderClass, LoaderInterface::class);
         $this->checkClassIsImplementingInterface($parserClass, ParserInterface::class);
+    }
+
+    protected function validateChecksum(): void
+    {
+        if (!config('synchronizer.checksum.control')) {
+            $this->checksumField = null;
+        }
     }
 
     public function getLoaderClass(): string
@@ -112,5 +121,10 @@ class SyncConfig
         }
 
         $this->errorHandler = $errorHandler;
+    }
+
+    public function getChecksumField(): string | null
+    {
+        return $this->checksumField;
     }
 }
