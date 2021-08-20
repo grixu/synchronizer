@@ -54,7 +54,8 @@ class SynchronizerTest extends TestCase
             FakeParser::class,
             Operator::class,
             'xlId',
-            config('synchronizer.jobs.default')
+            config('synchronizer.jobs.default'),
+            config('synchronizer.checksum.field')
         );
         $this->batchId = '11-111-111-11';
 
