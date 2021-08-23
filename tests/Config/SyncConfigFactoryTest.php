@@ -28,13 +28,16 @@ class SyncConfigFactoryTest extends TestCase
     public function it_returns_sync_config_object()
     {
         $config = $this->obj->make(
-            loaderClass: FakeLoader::class,
-            parserClass: FakeParser::class,
-            localModel: FakeForeignSqlSourceModel::class,
-            foreignKey: 'xlId',
-            idsToSync: null,
-            syncClosure: new SerializableClosure(function ($collection, $config) {}),
-            errorHandler: new SerializableClosure(function ($e) {})
+            loaderClass:  FakeLoader::class,
+            parserClass:  FakeParser::class,
+            localModel:   FakeForeignSqlSourceModel::class,
+            foreignKey:   'xlId',
+            timestamps:   [],
+            ids:          [],
+            syncClosure:  new SerializableClosure(function ($collection, $config) {
+                          }),
+            errorHandler: new SerializableClosure(function ($e) {
+                          })
         );
 
         $this->basicAssertions($config);
@@ -54,12 +57,12 @@ class SyncConfigFactoryTest extends TestCase
     public function it_returns_sync_config_object_with_default_handlers()
     {
         $config = $this->obj->make(
-            loaderClass: FakeLoader::class,
-            parserClass: FakeParser::class,
-            localModel: FakeForeignSqlSourceModel::class,
-            foreignKey: 'xlId',
-            idsToSync: null,
-            syncClosure: null,
+            loaderClass:  FakeLoader::class,
+            parserClass:  FakeParser::class,
+            localModel:   FakeForeignSqlSourceModel::class,
+            foreignKey:   'xlId',
+            timestamps:   [],
+            syncClosure:  null,
             errorHandler: null
         );
 
@@ -84,38 +87,33 @@ class SyncConfigFactoryTest extends TestCase
 
     protected function makeObj(): SyncConfig
     {
-         return $this->obj->make(
-            loaderClass: FakeLoader::class,
-            parserClass: FakeParser::class,
-            localModel: FakeForeignSqlSourceModel::class,
-            foreignKey: 'xlId',
-            idsToSync: null,
-            syncClosure: new SerializableClosure(function ($collection, $config) {}),
-            errorHandler: new SerializableClosure(function ($e) {})
+        return $this->obj->make(
+            loaderClass:  FakeLoader::class,
+            parserClass:  FakeParser::class,
+            localModel:   FakeForeignSqlSourceModel::class,
+            foreignKey:   'xlId',
+            timestamps:   [],
+            syncClosure:  new SerializableClosure(function ($collection, $config) {
+                          }),
+            errorHandler: new SerializableClosure(function ($e) {
+                          })
         );
-    }
-
-    /** @test */
-    public function it_could_set_ids_to_sync()
-    {
-        $obj = $this->makeObj();
-        $obj->setIdsToSync([1, 2, 3]);
-
-        $this->assertNotEmpty($obj->getIdsToSync());
     }
 
     /** @test */
     public function it_could_take_config_string()
     {
         $config = $this->obj->make(
-            loaderClass: FakeLoader::class,
-            parserClass: FakeParser::class,
-            localModel: FakeForeignSqlSourceModel::class,
-            foreignKey: 'xlId',
-            jobsConfig: 'default',
-            idsToSync: null,
-            syncClosure: new SerializableClosure(function ($collection, $config) {}),
-            errorHandler: new SerializableClosure(function ($e) {})
+            loaderClass:  FakeLoader::class,
+            parserClass:  FakeParser::class,
+            localModel:   FakeForeignSqlSourceModel::class,
+            foreignKey:   'xlId',
+            jobsConfig:   'default',
+            timestamps:   [],
+            syncClosure:  new SerializableClosure(function ($collection, $config) {
+                          }),
+            errorHandler: new SerializableClosure(function ($e) {
+                          })
         );
 
         $this->assertJobs($config);
@@ -168,14 +166,16 @@ class SyncConfigFactoryTest extends TestCase
     protected function makeObjWithChecksum(string|bool $checksum = 'checksum'): SyncConfig
     {
         return $this->obj->make(
-            loaderClass: FakeLoader::class,
-            parserClass: FakeParser::class,
-            localModel: FakeForeignSqlSourceModel::class,
-            foreignKey: 'xlId',
+            loaderClass:   FakeLoader::class,
+            parserClass:   FakeParser::class,
+            localModel:    FakeForeignSqlSourceModel::class,
+            foreignKey:    'xlId',
             checksumField: $checksum,
-            idsToSync: null,
-            syncClosure: new SerializableClosure(function ($collection, $config) {}),
-            errorHandler: new SerializableClosure(function ($e) {})
+            timestamps:    [],
+            syncClosure:   new SerializableClosure(function ($collection, $config) {
+                           }),
+            errorHandler:  new SerializableClosure(function ($e) {
+                           })
         );
     }
 
@@ -202,5 +202,48 @@ class SyncConfigFactoryTest extends TestCase
         $config = $this->makeObjWithChecksum(false);
 
         $this->assertEmpty($config->getChecksumField());
+    }
+
+    /** @test */
+    public function it_returns_object_when_timestamps_defined()
+    {
+        $timestamps = ['one'];
+        $config = $this->makeObjWithTimestamps($timestamps);
+
+        $this->assertNotEmpty($config->getTimestamps());
+        $this->assertEquals($timestamps, $config->getTimestamps());
+    }
+
+    protected function makeObjWithTimestamps(array|bool $timestamps = []): SyncConfig
+    {
+        return $this->obj->make(
+            loaderClass:   FakeLoader::class,
+            parserClass:   FakeParser::class,
+            localModel:    FakeForeignSqlSourceModel::class,
+            foreignKey:    'xlId',
+            checksumField: 'checksum',
+            timestamps:    $timestamps,
+            syncClosure:   new SerializableClosure(function ($collection, $config) {
+                           }),
+            errorHandler:  new SerializableClosure(function ($e) {
+                           })
+        );
+    }
+
+    /** @test */
+    public function it_returns_object_when_timestamps_disabled()
+    {
+        $config = $this->makeObjWithTimestamps(false);
+
+        $this->assertEmpty($config->getTimestamps());
+    }
+
+    /** @test */
+    public function it_returns_object_when_default_timestamps_if_not_defined()
+    {
+        $config = $this->makeObjWithTimestamps();
+
+        $this->assertNotEmpty($config->getTimestamps());
+        $this->assertEquals(config('synchronizer.checksum.timestamps'), $config->getTimestamps());
     }
 }
