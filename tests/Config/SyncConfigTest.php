@@ -4,6 +4,8 @@ namespace Grixu\Synchronizer\Tests\Config;
 
 use Exception;
 use Grixu\SociusModels\Description\Models\Language;
+use Grixu\Synchronizer\Config\Contracts\SyncConfig as SyncConfigInterface;
+use Grixu\Synchronizer\Config\NullSyncConfig;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
@@ -33,15 +35,15 @@ class SyncConfigTest extends TestCase
             foreignKey:    'xlId',
             jobsConfig:    config('synchronizer.jobs.default'),
             checksumField: null,
-            idsToSync:     null,
+            timestamps:    [],
             syncClosure:   new SerializableClosure(
-                             function (Collection $dtoCollection, SyncConfig $config) {
-                             }
-                         ),
+                               function (Collection $dtoCollection, SyncConfig $config) {
+                               }
+                           ),
             errorHandler:  new SerializableClosure(
-                             function (Throwable $e) {
-                             }
-                         )
+                               function (Throwable $e) {
+                               }
+                           )
         );
     }
 
@@ -56,15 +58,15 @@ class SyncConfigTest extends TestCase
                 foreignKey:    'xlId',
                 jobsConfig:    config('synchronizer.jobs.default'),
                 checksumField: null,
-                idsToSync:     null,
+                timestamps:    [],
                 syncClosure:   new SerializableClosure(
-                                 function (Collection $dtoCollection, SyncConfig $config) {
-                                 }
-                             ),
+                                   function (Collection $dtoCollection, SyncConfig $config) {
+                                   }
+                               ),
                 errorHandler:  new SerializableClosure(
-                                 function (Throwable $e) {
-                                 }
-                             )
+                                   function (Throwable $e) {
+                                   }
+                               )
             );
 
             $this->assertTrue(false);
@@ -104,7 +106,8 @@ class SyncConfigTest extends TestCase
     {
         $config = $this->createObj();
 
-        $config->setSyncClosure(function () {});
+        $config->setSyncClosure(function () {
+        });
 
         $this->assertNotEmpty($config->getSyncClosure());
         $this->assertEquals(SerializableClosure::class, $config->getSyncClosure()::class);
@@ -115,7 +118,8 @@ class SyncConfigTest extends TestCase
     {
         $config = $this->createObj();
 
-        $config->setErrorHandler(function () {});
+        $config->setErrorHandler(function () {
+        });
 
         $this->assertNotEmpty($config->getErrorHandler());
         $this->assertEquals(SerializableClosure::class, $config->getErrorHandler()::class);
@@ -130,7 +134,7 @@ class SyncConfigTest extends TestCase
         $this->assertEquals('checksum', $returnedValue);
     }
 
-    protected function makeObjWithChecksum(): SyncConfig
+    protected function makeObjWithChecksum($timestamps = []): SyncConfig
     {
         return new SyncConfig(
             loaderClass:   FakeLoader::class,
@@ -139,7 +143,7 @@ class SyncConfigTest extends TestCase
             foreignKey:    'xlId',
             jobsConfig:    config('synchronizer.jobs.default'),
             checksumField: 'checksum',
-            idsToSync:     null,
+            timestamps:    $timestamps,
             syncClosure:   new SerializableClosure(
                                function (Collection $dtoCollection, SyncConfig $config) {
                                }
@@ -164,5 +168,78 @@ class SyncConfigTest extends TestCase
     protected function useDisabledChecksum($app)
     {
         $app->config->set('synchronizer.checksum.control', false);
+    }
+
+    /** @test */
+    public function it_provide_access_to_timestamp_fields()
+    {
+        $timestamps = ['one'];
+        $obj = $this->makeObjWithChecksum($timestamps);
+
+        $this->assertNotEmpty($obj->getTimestamps());
+        $this->assertEquals($timestamps, $obj->getTimestamps());
+    }
+
+    /**
+     * @test
+     * @environment-setup useDisabledChecksum
+     */
+    public function it_block_access_to_timestamps_when_checksum_checking_is_disabled()
+    {
+        $timestamps = ['one'];
+        $obj = $this->makeObjWithChecksum($timestamps);
+
+        $this->assertEmpty($obj->getTimestamps());
+    }
+
+    /** @test */
+    public function it_provide_access_to_ids_array()
+    {
+        $ids = [1,2,3];
+        $obj = $this->makeObjWithIds($ids);
+        $returnedValue = $obj->getIds();
+
+        $this->assertEquals($ids, $returnedValue);
+    }
+
+    protected function makeObjWithIds($ids = []): SyncConfig
+    {
+        return new SyncConfig(
+            loaderClass:   FakeLoader::class,
+            parserClass:   FakeParser::class,
+            localModel:    Language::class,
+            foreignKey:    'xlId',
+            jobsConfig:    config('synchronizer.jobs.default'),
+            checksumField: 'checksum',
+            timestamps:    [],
+            ids:           $ids,
+            syncClosure:   new SerializableClosure(
+                               function (Collection $dtoCollection, SyncConfig $config) {
+                               }
+                           ),
+            errorHandler:  new SerializableClosure(
+                               function (Throwable $e) {
+                               }
+                           )
+        );
+    }
+
+    /** @test */
+    public function it_is_singleton()
+    {
+        $obj = SyncConfig::getInstance();
+
+        $this->assertTrue($obj instanceof SyncConfigInterface);
+    }
+
+    /** @test */
+    public function it_is_singleton_and_could_set_instance()
+    {
+        $instanceBefore = SyncConfig::getInstance();
+        $obj = $this->makeObjWithIds();
+        SyncConfig::setInstance($obj);
+
+        $this->assertNotEquals($instanceBefore, SyncConfig::getInstance());
+        $this->assertEquals($obj, app(SyncConfigInterface::class));
     }
 }
