@@ -19,7 +19,8 @@ class SyncConfigFactory
         string $foreignKey,
         array|string|null $jobsConfig = null,
         string|bool|null $checksumField = null,
-        ?array $idsToSync = [],
+        array|bool $timestamps = [],
+        array $ids = [],
         SerializableClosure|null $syncClosure = null,
         SerializableClosure|null $errorHandler = null
     ): SyncConfig {
@@ -37,12 +38,22 @@ class SyncConfigFactory
             );
         }
 
-        if (empty($checksumField) && $checksumField !== false && config('synchronizer.checksum.control')) {
-            $checksumField = config('synchronizer.checksum.field');
-        }
+        if (config('synchronizer.checksum.control')) {
+            if (empty($checksumField) && $checksumField !== false) {
+                $checksumField = config('synchronizer.checksum.field');
+            }
 
-        if ($checksumField === false) {
-            $checksumField = null;
+            if ($checksumField === false) {
+                $checksumField = null;
+            }
+
+            if (empty($timestamps) && $timestamps !== false) {
+                $timestamps = config('synchronizer.checksum.timestamps');
+            }
+
+            if ($timestamps === false) {
+                $timestamps = [];
+            }
         }
 
         if (!empty($jobsConfig) && is_string($jobsConfig)) {
@@ -64,7 +75,8 @@ class SyncConfigFactory
             foreignKey: $foreignKey,
             jobsConfig: $jobsConfig,
             checksumField: $checksumField,
-            idsToSync: $idsToSync,
+            timestamps: $timestamps,
+            ids: $ids,
             syncClosure: $syncClosure,
             errorHandler: $errorHandler
         );
