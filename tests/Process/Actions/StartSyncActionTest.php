@@ -70,7 +70,8 @@ class StartSyncActionTest extends SyncTestCase
                 'xlId',
                 null,
                 null,
-                null,
+                [],
+                [],
                 new SerializableClosure(function() {
                     Http::get('http://testable.dev');
                 })
