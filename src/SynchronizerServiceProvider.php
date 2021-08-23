@@ -2,6 +2,9 @@
 
 namespace Grixu\Synchronizer;
 
+use Grixu\Synchronizer\Config\Contracts\SyncConfig as SyncConfigInterface;
+use Grixu\Synchronizer\Config\NullSyncConfig;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Console\AddExcludedFieldCommand;
 use Grixu\Synchronizer\Console\ListExcludedFieldsCommand;
@@ -36,7 +39,9 @@ class SynchronizerServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'synchronizer');
 
-        Map::setTimestamps(config('synchronizer.sync.timestamps'));
+        $this->app->bind(SyncConfigInterface::class, function () {
+            return SyncConfig::getInstance();
+        });
 
         $this->app->register(EventServiceProvider::class);
 
