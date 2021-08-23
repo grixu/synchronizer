@@ -7,7 +7,7 @@ use Grixu\Synchronizer\Config\SyncConfig;
 
 class FakeSyncConfig
 {
-    public static function make(): SyncConfig
+    public static function make(string $checksum = 'checksum', array $timestamps = []): SyncConfig
     {
         return new SyncConfig(
             FakeLoader::class,
@@ -15,6 +15,8 @@ class FakeSyncConfig
             Customer::class,
             'xlId',
             config('synchronizer.jobs.default'),
+            $checksum,
+            $timestamps
         );
     }
 
@@ -25,7 +27,8 @@ class FakeSyncConfig
             FakeParser::class,
             Customer::class,
             'xlId',
-            config('synchronizer.jobs.load-all-and-parse')
+            config('synchronizer.jobs.load-all-and-parse'),
+            config('synchronizer.checksum.field')
         );
     }
 
@@ -36,7 +39,8 @@ class FakeSyncConfig
             FakeParser::class,
             Customer::class,
             'xlId',
-            config('synchronizer.jobs.chunk-load-and-parse')
+            config('synchronizer.jobs.chunk-load-and-parse'),
+            config('synchronizer.checksum.field')
         );
     }
 
@@ -47,7 +51,21 @@ class FakeSyncConfig
             FakeParser::class,
             Customer::class,
             'xlId',
-            config('synchronizer.jobs.default')
+            config('synchronizer.jobs.default'),
+            config('synchronizer.checksum.field')
         ];
+    }
+
+    public static function makeWithCustomModel(string $model, string $checksum = 'checksum', array $timestamps = []): SyncConfig
+    {
+        return new SyncConfig(
+            FakeLoader::class,
+            FakeParser::class,
+            $model,
+            'xlId',
+            config('synchronizer.jobs.default'),
+            $checksum,
+            $timestamps
+        );
     }
 }
