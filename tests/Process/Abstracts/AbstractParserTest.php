@@ -2,9 +2,10 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Abstracts;
 
-use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -36,7 +37,7 @@ class AbstractParserTest extends SyncTestCase
     public function it_can_excluding_timestamps()
     {
         Config::set('synchronizer.checksum.timestamps_excluded', true);
-        Config::set('synchronizer.sync.timestamps', ['Knt_SyncTimeStamp']);
+        SyncConfig::setInstance(FakeSyncConfig::make('checksum', ['Knt_SyncTimeStamp']));
 
         $takeOne = $this->obj->parse($this->data);
 
