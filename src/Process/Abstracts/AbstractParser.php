@@ -3,9 +3,9 @@
 namespace Grixu\Synchronizer\Process\Abstracts;
 
 use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Config\Contracts\SyncConfig;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Process\Contracts\SingleElementParserInterface;
-use Grixu\Synchronizer\Engine\Map\Map;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -13,8 +13,9 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 {
     public function parse(Collection $collection): Collection
     {
+        $config = app(SyncConfig::class);
         $timestampExcluded = config('synchronizer.checksum.timestamps_excluded');
-        $timestamps = Map::getTimestamps();
+        $timestamps = $config->getTimestamps();
         $timestamps = array_map(fn ($item) => Str::camel($item), $timestamps);
 
         return $collection->map(function ($item) use ($timestampExcluded, $timestamps) {
