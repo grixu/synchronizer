@@ -5,7 +5,9 @@ namespace Grixu\Synchronizer\Tests;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\Contracts\Map;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
@@ -21,6 +23,7 @@ class ChecksumTest extends TestCase
     {
         parent::setUp();
         $this->migrateProducts();
+        SyncConfig::setInstance(FakeSyncConfig::makeWithCustomModel(Product::class));
     }
 
     /** @test */
@@ -32,7 +35,7 @@ class ChecksumTest extends TestCase
             $row->checksum = hash('crc32c', json_encode($row));
         }
 
-        $obj = new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
+        $obj = new Checksum($data, SyncConfig::getInstance());
 
         $this->assertNotEmpty($obj->get());
         $this->assertCount(10, $obj->get());
@@ -47,7 +50,7 @@ class ChecksumTest extends TestCase
             Product::factory()->create(['xl_id' => $row->xlId, 'checksum' => $row->checksum]);
         }
 
-        $obj = new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
+        $obj = new Checksum($data, SyncConfig::getInstance());
 
         $this->assertEmpty($obj->get());
     }
@@ -61,7 +64,7 @@ class ChecksumTest extends TestCase
             Product::factory()->create(['xl_id' => $row->xlId, 'checksum' => $row->checksum . '_a']);
         }
 
-        $obj = new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
+        $obj = new Checksum($data, SyncConfig::getInstance());
 
         $this->assertNotEmpty($obj->get());
         $this->assertCount(10, $obj->get());
@@ -92,7 +95,7 @@ class ChecksumTest extends TestCase
         }
 
         try {
-            new Checksum($data, 'xlId', Product::class, config('synchronizer.checksum.field'));
+            new Checksum($data, SyncConfig::getInstance());
             $this->fail();
         } catch (\Exception) {
             $this->assertTrue(true);
