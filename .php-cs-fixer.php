@@ -23,6 +23,7 @@ return $config->setRules([
                              'operator_linebreak' => [
                                  'position' => 'beginning',
                              ],
+                             'no_extra_blank_lines' => true,
                              'standardize_not_equals' => true,
                          ])->
     setFinder($finder);
