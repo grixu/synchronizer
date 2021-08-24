@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer\Tests\Engine\Transformer;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
@@ -25,14 +24,12 @@ class TransformerTest extends TestCase
 
         $this->migrateProducts();
         $this->input = ProductDataFactory::new()->create()->toArray();
-        $this->map = MapFactory::makeFromArray($this->input, Product::class);
     }
 
     /** @test */
     public function it_create_array_to_sync()
     {
-        Checksum::setChecksumField(null);
-        $this->map = MapFactory::makeFromArray($this->input, Product::class);
+        $this->map = MapFactory::makeFromArray($this->input, Product::class, null);
         $obj = new Transformer($this->map);
         $returnedData = $obj->sync($this->input);
 
@@ -43,8 +40,7 @@ class TransformerTest extends TestCase
     /** @test */
     public function it_create_array_to_sync_with_checksum()
     {
-        Checksum::setChecksumField(config('synchronizer.checksum.field'));
-        $this->input['checksum'] = 'aaaa';
+        $this->map = MapFactory::makeFromArray($this->input, Product::class, 'aaaa');
         $obj = new Transformer($this->map);
         $returnedData = $obj->sync($this->input);
 

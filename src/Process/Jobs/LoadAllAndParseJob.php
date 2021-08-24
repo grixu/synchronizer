@@ -47,10 +47,12 @@ class LoadAllAndParseJob implements ShouldQueue
             return;
         }
 
+        SyncConfig::setInstance($this->config);
+
         $loaderClass = $this->config->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
-        $loader->buildQuery($this->config->getIdsToSync());
+        $loader->buildQuery($this->config->getIds());
 
         $parserClass = $this->config->getParserClass();
         /** @var ParserInterface $parser */

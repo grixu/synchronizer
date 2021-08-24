@@ -11,11 +11,12 @@ use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\SociusModels\Product\Models\ProductType;
-use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -30,6 +31,14 @@ class BelongsToTest extends TestCase
     protected Engine $obj;
     protected Collection $data;
     protected Transformer $transformer;
+    protected SyncConfig $config;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->config = FakeSyncConfig::makeWithCustomModel(Product::class);
+        SyncConfig::setInstance($this->config);
+    }
 
     /** @test */
     public function it_creates_obj_properly()
@@ -37,7 +46,7 @@ class BelongsToTest extends TestCase
         $this->makeBelongsToCase();
 
         try {
-            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+            $this->obj = new BelongsToEngine($this->config, $this->data);
             $this->assertTrue(true);
         } catch (Exception $e) {
             ray($e);
@@ -83,7 +92,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $map = MapFactory::makeFromArray($this->data->first(), Product::class);
+        $map = MapFactory::makeFromArray($this->data->first());
         $this->transformer = new Transformer($map);
 
         $this->assertEmpty($this->localModel->brand_id);
@@ -94,7 +103,7 @@ class BelongsToTest extends TestCase
     public function it_sync_belongs_to_properly()
     {
         $this->makeBelongsToCase();
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->config, $this->data);
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -125,7 +134,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->config, $this->data);
         $this->obj->sync($this->transformer);
 
         $tempModel->refresh();
@@ -145,9 +154,10 @@ class BelongsToTest extends TestCase
     /** @test */
     public function it_handles_even_when_two_different_type_relations()
     {
+        SyncConfig::setInstance(FakeSyncConfig::makeWithCustomModel(Operator::class));
         $this->makeComplicatedCase();
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new BelongsToEngine(SyncConfig::getInstance(), $this->data);
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -196,7 +206,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $map = MapFactory::makeFromArray($this->data->first(), Operator::class);
+        $map = MapFactory::makeFromArray($this->data->first());
         $this->transformer = new Transformer($map);
 
         $this->assertEmpty($this->localModel->branches);
@@ -206,11 +216,12 @@ class BelongsToTest extends TestCase
     /** @test */
     public function it_handles_no_rel_entries()
     {
+        SyncConfig::setInstance(FakeSyncConfig::makeWithCustomModel(Operator::class));
         $this->makeComplicatedCase();
 
         $this->data->push(OperatorDataFactory::new()->create()->toArray());
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new BelongsToEngine(SyncConfig::getInstance(), $this->data);
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -228,7 +239,7 @@ class BelongsToTest extends TestCase
             ProductDataFactory::new()->create()->toArray()
         );
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->config, $this->data);
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -255,7 +266,7 @@ class BelongsToTest extends TestCase
             )->toArray()
         );
 
-        $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+        $this->obj = new BelongsToEngine($this->config, $this->data);
         $this->obj->sync($this->transformer);
 
         $this->assertCount($this->data->count(), $this->obj->getIds());
@@ -268,6 +279,6 @@ class BelongsToTest extends TestCase
         $secondModel = Product::query()->where('xl_id', $this->data[1]['xlId'])->first();
         $this->assertNotEmpty($secondModel);
         $this->assertEmpty($secondModel->brand_id);
-        $this->assertEmpty($secondModel->{Checksum::$checksumField});
+        $this->assertEmpty($secondModel->{config('synchronizer.checksum.field')});
     }
 }

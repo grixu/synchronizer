@@ -2,10 +2,7 @@
 
 return [
     'sync' => [
-        'timestamps' => [
-            'created_at',
-            'updated_at'
-        ],
+
 
         'default_chunk_size' => env('SYNCHRONIZER_CHUNK_SIZE', 250),
     ],
@@ -13,6 +10,10 @@ return [
     'checksum' => [
         'control' => env('SYNCHRONIZER_CHECKSUM_CONTROL', true),
         'field' => env('SYNCHRONIZER_CHECKSUM_FIELD', 'checksum'),
+        'timestamps' => [
+            'created_at',
+            'updated_at'
+        ],
         'timestamps_excluded' => false,
     ],
 

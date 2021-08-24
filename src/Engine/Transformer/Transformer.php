@@ -2,19 +2,14 @@
 
 namespace Grixu\Synchronizer\Engine\Transformer;
 
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Contracts\Map;
 use Grixu\Synchronizer\Engine\Contracts\Transformer as TransformerInterface;
 
 class Transformer implements TransformerInterface
 {
-    protected string|null $checksumField;
-
     public function __construct(
         protected Map $map,
-    ) {
-        $this->checksumField = Checksum::$checksumField;
-    }
+    ) {}
 
     public function sync(
         array $data,
