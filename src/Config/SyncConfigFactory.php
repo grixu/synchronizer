@@ -18,7 +18,9 @@ class SyncConfigFactory
         string $localModel,
         string $foreignKey,
         array|string|null $jobsConfig = null,
-        ?array $idsToSync = [],
+        string|bool|null $checksumField = null,
+        array|bool $timestamps = [],
+        array $ids = [],
         SerializableClosure|null $syncClosure = null,
         SerializableClosure|null $errorHandler = null
     ): SyncConfig {
@@ -34,6 +36,24 @@ class SyncConfigFactory
                 'synchronizer.handlers.error',
                 ErrorHandlerInterface::class
             );
+        }
+
+        if (config('synchronizer.checksum.control')) {
+            if (empty($checksumField) && $checksumField !== false) {
+                $checksumField = config('synchronizer.checksum.field');
+            }
+
+            if ($checksumField === false) {
+                $checksumField = null;
+            }
+
+            if (empty($timestamps) && $timestamps !== false) {
+                $timestamps = config('synchronizer.checksum.timestamps');
+            }
+
+            if ($timestamps === false) {
+                $timestamps = [];
+            }
         }
 
         if (!empty($jobsConfig) && is_string($jobsConfig)) {
@@ -54,7 +74,9 @@ class SyncConfigFactory
             localModel: $localModel,
             foreignKey: $foreignKey,
             jobsConfig: $jobsConfig,
-            idsToSync: $idsToSync,
+            checksumField: $checksumField,
+            timestamps: $timestamps,
+            ids: $ids,
             syncClosure: $syncClosure,
             errorHandler: $errorHandler
         );

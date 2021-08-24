@@ -43,6 +43,8 @@ class ParseLoadedDataJob implements ShouldQueue
             return;
         }
 
+        SyncConfig::setInstance($this->config);
+
         $parserClass = $this->config->getParserClass();
         /** @var ParserInterface $parser */
         $parser = app($parserClass);

@@ -2,7 +2,6 @@
 
 namespace Grixu\Synchronizer\Engine;
 
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Abstracts\RelationEngine;
 use Grixu\Synchronizer\Engine\Contracts\Transformer;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as BelongsToRelation;
@@ -18,7 +17,7 @@ class BelongsTo extends RelationEngine
                     return false;
                 }
 
-                return array_filter($item['relations'], fn ($item) => $item['type'] === BelongsToRelation::class);
+                return array_filter($item['relations'], fn($item) => $item['type'] === BelongsToRelation::class);
             }
         );
     }
@@ -35,15 +34,17 @@ class BelongsTo extends RelationEngine
             function ($item) use ($transformer, $allRelations) {
                 $relatedFields = [];
 
-                foreach ($item['relations'] as $rel) {
-                    if (empty($allRelations[$rel['relation']]) || (empty($rel['foreignKeys']) && $rel['foreignKeys'] !== 0)) {
-                        $relatedFields[Checksum::$checksumField] = null;
-                        continue;
-                    }
+                foreach($item['relations'] as $rel) {
+                    if (!empty($this->checksum)) {
+                        if (empty($allRelations[$rel['relation']]) || (empty($rel['foreignKeys']) && $rel['foreignKeys'] !== 0)) {
+                            $relatedFields[$this->checksum] = null;
+                            continue;
+                        }
 
-                    if (!isset($this->loaded[$rel['relation']][$rel['foreignField']][$rel['foreignKeys']])) {
-                        $relatedFields[Checksum::$checksumField] = null;
-                        continue;
+                        if (!isset($this->loaded[$rel['relation']][$rel['foreignField']][$rel['foreignKeys']])) {
+                            $relatedFields[$this->checksum] = null;
+                            continue;
+                        }
                     }
 
                     $fieldName = $allRelations[$rel['relation']];

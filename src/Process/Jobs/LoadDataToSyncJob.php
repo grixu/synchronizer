@@ -42,11 +42,13 @@ class LoadDataToSyncJob implements ShouldQueue
             return;
         }
 
+        SyncConfig::setInstance($this->config);
+
         $loaderClass = $this->config->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
 
-        $loader->buildQuery($this->config->getIdsToSync());
+        $loader->buildQuery($this->config->getIds());
         $dataCollection = $loader->get();
 
         if ($this->batch()) {

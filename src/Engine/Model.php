@@ -2,7 +2,6 @@
 
 namespace Grixu\Synchronizer\Engine;
 
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Abstracts\BaseEngine;
 use Grixu\Synchronizer\Engine\Contracts\Transformer;
 
@@ -14,14 +13,15 @@ class Model extends BaseEngine
             return;
         }
 
+
         $checkRelations = $this->getAllRelations($transformer);
 
-        $resetChecksum = count($checkRelations) > 0;
+        $resetChecksum = count($checkRelations) > 0 && !empty($this->checksum);
 
         $transformed = $this->input->map(
             function ($item) use ($resetChecksum, $transformer) {
                 if ($resetChecksum) {
-                    $item[Checksum::$checksumField] = null;
+                    $item[$this->checksum] = null;
                 }
 
                 return $transformer->sync($item);
