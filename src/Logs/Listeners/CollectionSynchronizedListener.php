@@ -32,12 +32,16 @@ class CollectionSynchronizedListener implements ShouldQueue
     {
         $batch = Bus::findBatch($event->batchId);
 
-        if (!$batch->finished()) {
-            $this->release(60);
-        }
+        if ($batch) {
+            if (!$batch->finished()) {
+                $this->release(60);
+                return;
+            }
 
-        if (!now()->isAfter($batch->finishedAt->addMinute())) {
-            $this->release(60);
+            if (!now()->isAfter($batch->finishedAt->addMinute())) {
+                $this->release(60);
+                return;
+            }
         }
 
         $logger = new Logger($event->batchId, $event->model);

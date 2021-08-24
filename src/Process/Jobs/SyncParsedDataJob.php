@@ -64,7 +64,6 @@ class SyncParsedDataJob implements ShouldQueue
 
             $synchronizer->sync();
         } catch (Throwable $e) {
-            ray($e);
             if ($this->config->getErrorHandler() !== null) {
                 $this->config->getErrorHandler()($e);
             }
