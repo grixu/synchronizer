@@ -42,7 +42,7 @@ class Logger
                 [
                     ['batch_id', '=', $this->batchId],
                     ['model', '=', $this->model],
-                    ['reported', '=', false]
+                    ['reported', '=', false],
                 ]
             );
 

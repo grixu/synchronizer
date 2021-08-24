@@ -11,5 +11,6 @@ class SynchronizerEvent
     use InteractsWithSockets;
 
     public function __construct(public string $model, public array $changed)
-    {}
+    {
+    }
 }

@@ -20,7 +20,7 @@ class StartSyncAction
         return Bus::batch($jobs)
             ->allowFailures()
             // @codeCoverageIgnoreStart
-            ->then(function (Batch $batch) use($configCollection) {
+            ->then(function (Batch $batch) use ($configCollection) {
                 foreach ($configCollection as $config) {
                     /** @var SyncConfig $config */
                     event(new CollectionSynchronizedEvent($config->getLocalModel(), $batch->id));
@@ -28,8 +28,9 @@ class StartSyncAction
             })
             ->catch(function (Batch $batch, Throwable $exception) use ($configCollection) {
                 $configCollection->each(function ($config) use ($exception) {
-                    if ($config->getErrorHandler() != null)
+                    if ($config->getErrorHandler() != null) {
                         $config->getErrorHandler()($exception);
+                    }
                 });
             })
             // @codeCoverageIgnoreEnd

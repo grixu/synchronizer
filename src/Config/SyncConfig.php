@@ -79,7 +79,7 @@ class SyncConfig
             throw new Exception('Value is too low');
         }
 
-        if($currentJob > count($this->jobsConfig)-1) {
+        if ($currentJob > count($this->jobsConfig)-1) {
             throw new Exception('Value is too high');
         }
 

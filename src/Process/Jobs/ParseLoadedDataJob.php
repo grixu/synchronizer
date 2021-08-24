@@ -54,7 +54,7 @@ class ParseLoadedDataJob implements ShouldQueue
 
             $this->batch()->add(
                 [
-                    new $jobClass($data, $this->config)
+                    new $jobClass($data, $this->config),
                 ]
             );
         }

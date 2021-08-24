@@ -27,7 +27,7 @@ class LoggerNotification extends Notification implements ShouldQueue
 
     public function toSlack($notifiable): SlackMessage
     {
-        return (new SlackMessage)
+        return (new SlackMessage())
             ->content(
                 'Synchronizacja modelu ' . $this->model . ' zakończona. Wprowadzonych zmian: ' . $this->totalChanges
             );

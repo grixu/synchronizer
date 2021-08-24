@@ -18,7 +18,7 @@ abstract class BaseEngine implements Engine
     public function __construct(protected Collection $input, protected string $key, string $model)
     {
         $this->ids = collect();
-        $this->model = new $model;
+        $this->model = new $model();
         $this->modelKey = Str::snake($key);
 
         $this->filterByKeyExistence();
@@ -42,14 +42,14 @@ abstract class BaseEngine implements Engine
             ->flatten()
             ->filter()
             ->filter(function ($relation) {
-                if ($this->model->$relation() instanceof BelongsToRelation) {
-                    return true;
-                }
+                return (bool) ($this->model->{$relation}() instanceof BelongsToRelation)
 
-                return false;
+
+
+                 ;
             })
             ->each(function ($relation) use ($transformer, &$allRelations) {
-                $fieldName = $this->model->$relation()->getForeignKeyName();
+                $fieldName = $this->model->{$relation}()->getForeignKeyName();
                 $transformer->getMap()->add($fieldName);
                 $allRelations[$relation] = $fieldName;
             })

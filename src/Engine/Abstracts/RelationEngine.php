@@ -41,11 +41,11 @@ abstract class RelationEngine extends BaseEngine
                         throw new Exception('Relation ' . $relation . ' do not exist!');
                     }
 
-                    if (!$test->$relation() instanceof Relation) {
+                    if (!$test->{$relation}() instanceof Relation) {
                         throw new Exception($relation . ' in ' . $this->model::class . ' is not relation');
                     }
 
-                    if (!$test->$relation()->getRelated() instanceof $class) {
+                    if (!$test->{$relation}()->getRelated() instanceof $class) {
                         throw new Exception(
                             $relation . ' in ' . $this->model::class . ' is not related with ' . $class
                         );
@@ -68,7 +68,7 @@ abstract class RelationEngine extends BaseEngine
             ->each(
                 function ($collection, $relation) {
                     $data = collect();
-                    $model = $this->model->$relation()->getRelated();
+                    $model = $this->model->{$relation}()->getRelated();
 
                     $collection->groupBy('foreignField')
                         ->filter()
