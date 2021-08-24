@@ -34,7 +34,7 @@ class MapFactoryTest extends TestCase
     {
         $map = MapFactory::make(
             [
-                'name' => 'name'
+                'name' => 'name',
             ]
         );
 

@@ -11,7 +11,6 @@ use Grixu\Synchronizer\Logs\Notifications\LoggerNotification;
 use Grixu\Synchronizer\Process\Jobs\LoadDataToSyncJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
-use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
@@ -41,7 +40,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
                 'model' => Product::class,
                 'changed' => 1,
                 'log' => [],
-                'type' => Logger::MODEL
+                'type' => Logger::MODEL,
             ]
         );
     }

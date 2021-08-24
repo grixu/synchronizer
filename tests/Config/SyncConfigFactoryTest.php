@@ -28,16 +28,16 @@ class SyncConfigFactoryTest extends TestCase
     public function it_returns_sync_config_object()
     {
         $config = $this->obj->make(
-            loaderClass:  FakeLoader::class,
-            parserClass:  FakeParser::class,
-            localModel:   FakeForeignSqlSourceModel::class,
-            foreignKey:   'xlId',
-            timestamps:   [],
-            ids:          [],
-            syncClosure:  new SerializableClosure(function ($collection, $config) {
-                          }),
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
+            timestamps: [],
+            ids: [],
+            syncClosure: new SerializableClosure(function ($collection, $config) {
+            }),
             errorHandler: new SerializableClosure(function ($e) {
-                          })
+            })
         );
 
         $this->basicAssertions($config);
@@ -57,12 +57,12 @@ class SyncConfigFactoryTest extends TestCase
     public function it_returns_sync_config_object_with_default_handlers()
     {
         $config = $this->obj->make(
-            loaderClass:  FakeLoader::class,
-            parserClass:  FakeParser::class,
-            localModel:   FakeForeignSqlSourceModel::class,
-            foreignKey:   'xlId',
-            timestamps:   [],
-            syncClosure:  null,
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
+            timestamps: [],
+            syncClosure: null,
             errorHandler: null
         );
 
@@ -88,15 +88,15 @@ class SyncConfigFactoryTest extends TestCase
     protected function makeObj(): SyncConfig
     {
         return $this->obj->make(
-            loaderClass:  FakeLoader::class,
-            parserClass:  FakeParser::class,
-            localModel:   FakeForeignSqlSourceModel::class,
-            foreignKey:   'xlId',
-            timestamps:   [],
-            syncClosure:  new SerializableClosure(function ($collection, $config) {
-                          }),
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
+            timestamps: [],
+            syncClosure: new SerializableClosure(function ($collection, $config) {
+            }),
             errorHandler: new SerializableClosure(function ($e) {
-                          })
+            })
         );
     }
 
@@ -104,16 +104,16 @@ class SyncConfigFactoryTest extends TestCase
     public function it_could_take_config_string()
     {
         $config = $this->obj->make(
-            loaderClass:  FakeLoader::class,
-            parserClass:  FakeParser::class,
-            localModel:   FakeForeignSqlSourceModel::class,
-            foreignKey:   'xlId',
-            jobsConfig:   'default',
-            timestamps:   [],
-            syncClosure:  new SerializableClosure(function ($collection, $config) {
-                          }),
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
+            jobsConfig: 'default',
+            timestamps: [],
+            syncClosure: new SerializableClosure(function ($collection, $config) {
+            }),
             errorHandler: new SerializableClosure(function ($e) {
-                          })
+            })
         );
 
         $this->assertJobs($config);
@@ -124,7 +124,6 @@ class SyncConfigFactoryTest extends TestCase
         $this->assertNotEmpty($config->getCurrentJob());
         $this->assertNotEmpty($config->getNextJob());
     }
-
 
     /** @test */
     public function it_set_default_job_config()
@@ -166,16 +165,16 @@ class SyncConfigFactoryTest extends TestCase
     protected function makeObjWithChecksum(string|bool $checksum = 'checksum'): SyncConfig
     {
         return $this->obj->make(
-            loaderClass:   FakeLoader::class,
-            parserClass:   FakeParser::class,
-            localModel:    FakeForeignSqlSourceModel::class,
-            foreignKey:    'xlId',
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
             checksumField: $checksum,
-            timestamps:    [],
-            syncClosure:   new SerializableClosure(function ($collection, $config) {
-                           }),
-            errorHandler:  new SerializableClosure(function ($e) {
-                           })
+            timestamps: [],
+            syncClosure: new SerializableClosure(function ($collection, $config) {
+            }),
+            errorHandler: new SerializableClosure(function ($e) {
+            })
         );
     }
 
@@ -217,16 +216,16 @@ class SyncConfigFactoryTest extends TestCase
     protected function makeObjWithTimestamps(array|bool $timestamps = []): SyncConfig
     {
         return $this->obj->make(
-            loaderClass:   FakeLoader::class,
-            parserClass:   FakeParser::class,
-            localModel:    FakeForeignSqlSourceModel::class,
-            foreignKey:    'xlId',
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: FakeForeignSqlSourceModel::class,
+            foreignKey: 'xlId',
             checksumField: 'checksum',
-            timestamps:    $timestamps,
-            syncClosure:   new SerializableClosure(function ($collection, $config) {
-                           }),
-            errorHandler:  new SerializableClosure(function ($e) {
-                           })
+            timestamps: $timestamps,
+            syncClosure: new SerializableClosure(function ($collection, $config) {
+            }),
+            errorHandler: new SerializableClosure(function ($e) {
+            })
         );
     }
 

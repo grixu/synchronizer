@@ -51,7 +51,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         $job = new LoadDataToSyncJob($this->config);
         $batch = $bus->batch(
             [
-                $job
+                $job,
             ]
         );
 
@@ -70,7 +70,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         $obj = new LoadDataToSyncJob($this->config);
         $batch = Bus::batch(
             [
-                $obj
+                $obj,
             ]
         )
             ->allowFailures()
@@ -88,7 +88,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         $job = new LoadDataToSyncJob($this->config);
         $batch = $bus->batch(
             [
-                $job
+                $job,
             ]
         );
 
@@ -108,7 +108,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
-                $job->delay(1000)
+                $job->delay(1000),
             ]
         );
 

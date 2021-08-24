@@ -64,7 +64,7 @@ class SyncParsedDataJobTest extends SyncTestCase
         $job = new SyncParsedDataJob($this->data, $this->config);
         $batch = $bus->batch(
             [
-                $job
+                $job,
             ]
         );
 
@@ -103,7 +103,7 @@ class SyncParsedDataJobTest extends SyncTestCase
         $this->data = collect(
             [
                 $workingDto,
-                $brokenDto
+                $brokenDto,
             ]
         )->toArray();
         $this->assertDatabaseCount('customers', 0);
@@ -150,7 +150,7 @@ class SyncParsedDataJobTest extends SyncTestCase
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
-                $job->delay(1000)
+                $job->delay(1000),
             ]
         );
 

@@ -23,7 +23,7 @@ class FakeForeignSqlSourceFactory extends Factory
             'Knt_Telefon1' => $this->faker->phoneNumber,
             'Knt_Telefon2' => $this->faker->phoneNumber,
             'Knt_EMail' => $this->faker->email,
-            'Knt_LimitOkres' => $this->faker->numberBetween(600,900),
+            'Knt_LimitOkres' => $this->faker->numberBetween(600, 900),
             'Knt_AtrWlascicielFrsID' => $this->faker->numberBetween(100000000, 999999999),
             'Knt_OpeNumer' => $this->faker->numberBetween(100000000, 999999999),
             'Knt_GIDNumer' => $this->faker->numberBetween(100000000, 999999999),

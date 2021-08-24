@@ -54,7 +54,8 @@ class NullSyncConfig implements SyncConfigInterface
 
     public function getSyncClosure(): Closure|SerializableClosure|null
     {
-        return function() {};
+        return function () {
+        };
     }
 
     public function setSyncClosure(SerializableClosure|Closure|null $syncClosure): void
@@ -63,7 +64,8 @@ class NullSyncConfig implements SyncConfigInterface
 
     public function getErrorHandler(): Closure|SerializableClosure|null
     {
-        return function() {};
+        return function () {
+        };
     }
 
     public function setErrorHandler(SerializableClosure|Closure|null $errorHandler): void

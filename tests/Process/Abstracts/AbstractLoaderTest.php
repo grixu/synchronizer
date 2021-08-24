@@ -59,7 +59,6 @@ class AbstractLoaderTest extends SyncTestCase
         $this->assertCount(config('synchronizer.sync.default_chunk_size'), $returnedData);
     }
 
-
     /** @test */
     public function it_returns_builder_obj()
     {

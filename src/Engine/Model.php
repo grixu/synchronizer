@@ -13,7 +13,6 @@ class Model extends BaseEngine
             return;
         }
 
-
         $checkRelations = $this->getAllRelations($transformer);
 
         $resetChecksum = count($checkRelations) > 0 && !empty($this->checksum);

@@ -26,11 +26,11 @@ class LoggerTest extends TestCase
         $this->obj = new Logger('batch', Model::class);
         $this->changes = [
             [
-                'name' => 'One'
+                'name' => 'One',
             ],
             [
-                'name' => 'Two'
-            ]
+                'name' => 'Two',
+            ],
         ];
     }
 

@@ -45,7 +45,7 @@ class Checksum
 
     protected function isChecksumControlDisabled(): void
     {
-        if(!config('synchronizer.checksum.control')) {
+        if (!config('synchronizer.checksum.control')) {
             throw new \Exception('Checksum checking is turned off');
         }
     }

@@ -31,7 +31,7 @@ class ExcludedFieldTest extends TestCase
 
         $this->model = Product::factory()->create(
             [
-                'index' => null
+                'index' => null,
             ]
         );
 
@@ -39,7 +39,7 @@ class ExcludedFieldTest extends TestCase
             [
                 'model' => Product::class,
                 'update_empty' => true,
-                'field' => 'index'
+                'field' => 'index',
             ]
         );
 

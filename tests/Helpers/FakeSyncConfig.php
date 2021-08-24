@@ -52,7 +52,7 @@ class FakeSyncConfig
             Customer::class,
             'xlId',
             config('synchronizer.jobs.default'),
-            config('synchronizer.checksum.field')
+            config('synchronizer.checksum.field'),
         ];
     }
 

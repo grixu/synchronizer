@@ -70,7 +70,7 @@ class SynchronizerTest extends TestCase
     {
         $this->data = [
             $this->makeBelongsToCase(),
-            $this->makeBelongsToManyCase()
+            $this->makeBelongsToManyCase(),
         ];
 
         $this->obj = new Synchronizer($this->data, $this->batchId);
@@ -89,8 +89,8 @@ class SynchronizerTest extends TestCase
                         'foreignField' => 'xl_id',
                         'type' => BelongsTo::class,
                         'foreignKeys' => (int)$this->operatorRole->xl_id,
-                    ]
-                ]
+                    ],
+                ],
             ]
         )->toArray();
     }
@@ -106,8 +106,8 @@ class SynchronizerTest extends TestCase
                         'foreignField' => 'xl_id',
                         'type' => BelongsToMany::class,
                         'foreignKeys' => [(int)$this->branch->xl_id],
-                    ]
-                ]
+                    ],
+                ],
             ]
         )->toArray();
     }
@@ -117,7 +117,7 @@ class SynchronizerTest extends TestCase
     {
         $this->data = [
             $this->makeBelongsToCase(),
-            $this->makeBelongsToManyCase()
+            $this->makeBelongsToManyCase(),
         ];
 
         $this->obj = new Synchronizer($this->data, $this->batchId);
@@ -133,7 +133,7 @@ class SynchronizerTest extends TestCase
 
             if ($model) {
                 $relation = $data['relations'][0]['relation'];
-                $this->assertNotEmpty($model->$relation);
+                $this->assertNotEmpty($model->{$relation});
             } else {
                 $this->assertTrue(false);
             }
@@ -183,7 +183,7 @@ class SynchronizerTest extends TestCase
             [
                 'model' => Product::class,
                 'update_empty' => true,
-                'field' => 'index'
+                'field' => 'index',
             ]
         );
 

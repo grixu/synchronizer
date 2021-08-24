@@ -5,7 +5,6 @@ namespace Grixu\Synchronizer\Tests\Config;
 use Exception;
 use Grixu\SociusModels\Description\Models\Language;
 use Grixu\Synchronizer\Config\Contracts\SyncConfig as SyncConfigInterface;
-use Grixu\Synchronizer\Config\NullSyncConfig;
 use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
@@ -29,21 +28,21 @@ class SyncConfigTest extends TestCase
     protected function createObj(): SyncConfig
     {
         return new SyncConfig(
-            loaderClass:   FakeLoader::class,
-            parserClass:   FakeParser::class,
-            localModel:    Language::class,
-            foreignKey:    'xlId',
-            jobsConfig:    config('synchronizer.jobs.default'),
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: Language::class,
+            foreignKey: 'xlId',
+            jobsConfig: config('synchronizer.jobs.default'),
             checksumField: null,
-            timestamps:    [],
-            syncClosure:   new SerializableClosure(
-                               function (Collection $dtoCollection, SyncConfig $config) {
-                               }
-                           ),
-            errorHandler:  new SerializableClosure(
-                               function (Throwable $e) {
-                               }
-                           )
+            timestamps: [],
+            syncClosure: new SerializableClosure(
+                function (Collection $dtoCollection, SyncConfig $config) {
+                }
+            ),
+            errorHandler: new SerializableClosure(
+                function (Throwable $e) {
+                }
+            )
         );
     }
 
@@ -52,21 +51,21 @@ class SyncConfigTest extends TestCase
     {
         try {
             new SyncConfig(
-                loaderClass:   Collection::class,
-                parserClass:   FakeParser::class,
-                localModel:    Language::class,
-                foreignKey:    'xlId',
-                jobsConfig:    config('synchronizer.jobs.default'),
+                loaderClass: Collection::class,
+                parserClass: FakeParser::class,
+                localModel: Language::class,
+                foreignKey: 'xlId',
+                jobsConfig: config('synchronizer.jobs.default'),
                 checksumField: null,
-                timestamps:    [],
-                syncClosure:   new SerializableClosure(
-                                   function (Collection $dtoCollection, SyncConfig $config) {
-                                   }
-                               ),
-                errorHandler:  new SerializableClosure(
-                                   function (Throwable $e) {
-                                   }
-                               )
+                timestamps: [],
+                syncClosure: new SerializableClosure(
+                    function (Collection $dtoCollection, SyncConfig $config) {
+                    }
+                ),
+                errorHandler: new SerializableClosure(
+                    function (Throwable $e) {
+                    }
+                )
             );
 
             $this->assertTrue(false);
@@ -137,21 +136,21 @@ class SyncConfigTest extends TestCase
     protected function makeObjWithChecksum($timestamps = []): SyncConfig
     {
         return new SyncConfig(
-            loaderClass:   FakeLoader::class,
-            parserClass:   FakeParser::class,
-            localModel:    Language::class,
-            foreignKey:    'xlId',
-            jobsConfig:    config('synchronizer.jobs.default'),
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: Language::class,
+            foreignKey: 'xlId',
+            jobsConfig: config('synchronizer.jobs.default'),
             checksumField: 'checksum',
-            timestamps:    $timestamps,
-            syncClosure:   new SerializableClosure(
-                               function (Collection $dtoCollection, SyncConfig $config) {
-                               }
-                           ),
-            errorHandler:  new SerializableClosure(
-                               function (Throwable $e) {
-                               }
-                           )
+            timestamps: $timestamps,
+            syncClosure: new SerializableClosure(
+                function (Collection $dtoCollection, SyncConfig $config) {
+                }
+            ),
+            errorHandler: new SerializableClosure(
+                function (Throwable $e) {
+                }
+            )
         );
     }
 
@@ -205,22 +204,22 @@ class SyncConfigTest extends TestCase
     protected function makeObjWithIds($ids = []): SyncConfig
     {
         return new SyncConfig(
-            loaderClass:   FakeLoader::class,
-            parserClass:   FakeParser::class,
-            localModel:    Language::class,
-            foreignKey:    'xlId',
-            jobsConfig:    config('synchronizer.jobs.default'),
+            loaderClass: FakeLoader::class,
+            parserClass: FakeParser::class,
+            localModel: Language::class,
+            foreignKey: 'xlId',
+            jobsConfig: config('synchronizer.jobs.default'),
             checksumField: 'checksum',
-            timestamps:    [],
-            ids:           $ids,
-            syncClosure:   new SerializableClosure(
-                               function (Collection $dtoCollection, SyncConfig $config) {
-                               }
-                           ),
-            errorHandler:  new SerializableClosure(
-                               function (Throwable $e) {
-                               }
-                           )
+            timestamps: [],
+            ids: $ids,
+            syncClosure: new SerializableClosure(
+                function (Collection $dtoCollection, SyncConfig $config) {
+                }
+            ),
+            errorHandler: new SerializableClosure(
+                function (Throwable $e) {
+                }
+            )
         );
     }
 

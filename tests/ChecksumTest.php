@@ -74,7 +74,7 @@ class ChecksumTest extends TestCase
     public function it_generate_checksum()
     {
         $data = [
-            'test' => 'Testing'
+            'test' => 'Testing',
         ];
         $checksumGenerated = Checksum::generate($data);
 

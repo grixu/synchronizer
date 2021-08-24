@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer;
 
 use Exception;
 use Grixu\Synchronizer\Config\Contracts\SyncConfig as SyncConfigInterface;
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsTo;
 use Grixu\Synchronizer\Engine\BelongsToMany;
 use Grixu\Synchronizer\Engine\ExcludedField;

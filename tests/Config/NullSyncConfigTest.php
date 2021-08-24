@@ -35,8 +35,10 @@ class NullSyncConfigTest extends TestCase
 
         try {
             $obj->setCurrentJob(0);
-            $obj->setErrorHandler(function () {});
-            $obj->setSyncClosure(function () {});
+            $obj->setErrorHandler(function () {
+            });
+            $obj->setSyncClosure(function () {
+            });
 
             $this->assertTrue(true);
         } catch (\Throwable) {

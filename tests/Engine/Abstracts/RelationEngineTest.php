@@ -62,8 +62,8 @@ class RelationEngineTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -95,8 +95,8 @@ class RelationEngineTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -128,8 +128,8 @@ class RelationEngineTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );

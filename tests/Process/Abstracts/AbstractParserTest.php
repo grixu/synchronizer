@@ -49,6 +49,5 @@ class AbstractParserTest extends SyncTestCase
         $takeTwo = $this->obj->parse($this->data);
 
         $this->assertEquals($takeOne, $takeTwo);
-
     }
 }

@@ -33,7 +33,7 @@ class MapTest extends TestCase
             [
                 'name',
                 'country',
-                'updated_at'
+                'updated_at',
             ]
         );
     }
@@ -63,7 +63,7 @@ class MapTest extends TestCase
             [
                 'field' => 'country',
                 'model' => Customer::class,
-                'update_empty' => false
+                'update_empty' => false,
             ]
         );
     }
@@ -92,7 +92,7 @@ class MapTest extends TestCase
         $this->obj = new Map(
             [
                 'name',
-                'updated_at'
+                'updated_at',
             ],
         );
 

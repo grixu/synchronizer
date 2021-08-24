@@ -51,7 +51,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         $job = new ChunkRestParseJob($this->config);
         $batch = $bus->batch(
             [
-                $job
+                $job,
             ]
         );
 
@@ -70,7 +70,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         $obj = new ChunkRestParseJob($this->config);
         $batch = Bus::batch(
             [
-                $obj
+                $obj,
             ]
         )
             ->allowFailures()
@@ -85,7 +85,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         $obj = new ChunkRestParseJob($this->config, 400);
         $batch = Bus::batch(
             [
-                $obj
+                $obj,
             ]
         )
             ->allowFailures()
@@ -103,7 +103,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         $job = new ChunkRestParseJob($this->config);
         $batch = $bus->batch(
             [
-                $job
+                $job,
             ]
         );
 
@@ -123,7 +123,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
-                $job->delay(1000)
+                $job->delay(1000),
             ]
         );
 

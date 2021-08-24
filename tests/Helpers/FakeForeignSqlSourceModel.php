@@ -63,4 +63,3 @@ class FakeForeignSqlSourceModel extends Model
         return FakeForeignSqlSourceFactory::new();
     }
 }
-

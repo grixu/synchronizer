@@ -9,7 +9,8 @@ class Transformer implements TransformerInterface
 {
     public function __construct(
         protected Map $map,
-    ) {}
+    ) {
+    }
 
     public function sync(
         array $data,

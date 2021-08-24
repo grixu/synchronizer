@@ -113,16 +113,16 @@ class ModelTest extends TestCase
                             'relation' => 'branches',
                             'foreignField' => 'xl_id',
                             'type' => BelongsToMany::class,
-                            'foreignKeys' => (int)rand(100,999),
+                            'foreignKeys' => (int)rand(100, 999),
                         ],
                         [
                             'foreignClass' => OperatorRole::class,
                             'relation' => 'role',
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
-                            'foreignKeys' => (int)rand(100,999),
-                        ]
-                    ]
+                            'foreignKeys' => (int)rand(100, 999),
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -130,5 +130,4 @@ class ModelTest extends TestCase
         $map = MapFactory::makeFromArray($this->data->first());
         $this->transformer = new Transformer($map);
     }
-
 }

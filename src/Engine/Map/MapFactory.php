@@ -2,7 +2,6 @@
 
 namespace Grixu\Synchronizer\Engine\Map;
 
-use Grixu\Synchronizer\Config\Contracts\SyncConfig;
 use Spatie\DataTransferObject\DataTransferObject;
 
 class MapFactory

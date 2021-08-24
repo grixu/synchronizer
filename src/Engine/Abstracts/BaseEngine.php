@@ -47,14 +47,12 @@ abstract class BaseEngine implements Engine
             ->flatten()
             ->filter()
             ->filter(function ($relation) {
-                if ($this->model->$relation() instanceof BelongsToRelation) {
-                    return true;
-                }
+                return (bool) ($this->model->{$relation}() instanceof BelongsToRelation)
 
-                return false;
+                 ;
             })
             ->each(function ($relation) use ($transformer, &$allRelations) {
-                $fieldName = $this->model->$relation()->getForeignKeyName();
+                $fieldName = $this->model->{$relation}()->getForeignKeyName();
                 $transformer->getMap()->add($fieldName);
                 $allRelations[$relation] = $fieldName;
             })

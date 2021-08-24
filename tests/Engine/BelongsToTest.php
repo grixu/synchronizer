@@ -86,8 +86,8 @@ class BelongsToTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->secondRelatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -128,8 +128,8 @@ class BelongsToTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -200,8 +200,8 @@ class BelongsToTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -260,8 +260,8 @@ class BelongsToTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id+1,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
