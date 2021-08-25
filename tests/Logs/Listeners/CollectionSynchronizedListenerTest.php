@@ -53,7 +53,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         DB::table('job_batches')->where('id', $this->batch->id)->update(['finished_at' => now()->subDay()]);
 
         $obj = new CollectionSynchronizedListener();
-        $obj->handle(new CollectionSynchronizedEvent(Product::class, $this->batch->id));
+        $obj->handle(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
         Notification::assertTimesSent(1, LoggerNotification::class);
     }
@@ -64,7 +64,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         Notification::fake();
 
         $obj = new CollectionSynchronizedListener();
-        $obj->handle(new CollectionSynchronizedEvent(Product::class, $this->batch->id));
+        $obj->handle(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
         Notification::assertTimesSent(0, LoggerNotification::class);
     }
@@ -77,7 +77,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         $this->createLog($this->batch->id);
 
         $obj = new CollectionSynchronizedListener();
-        $obj->handle(new CollectionSynchronizedEvent(Product::class, $this->batch->id));
+        $obj->handle(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
         Notification::assertTimesSent(0, LoggerNotification::class);
     }
@@ -88,7 +88,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         Notification::fake();
         DB::table('job_batches')->where('id', $this->batch->id)->update(['finished_at' => now()->subDay()]);
 
-        event(new CollectionSynchronizedEvent(Product::class, $this->batch->id));
+        event(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
         Notification::assertTimesSent(1, LoggerNotification::class);
     }
