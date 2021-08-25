@@ -75,7 +75,15 @@ class Synchronizer
             }
         }
 
-        event(new SynchronizerEvent($this->syncConfig->getLocalModel(), $this->input->toArray()));
+        if (!empty($this->syncConfig->getChecksumField())) {
+            event(
+                new SynchronizerEvent(
+                    $this->syncConfig->getLocalModel(),
+                    $this->syncConfig->getChecksumField(),
+                    $this->input->toArray()
+                )
+            );
+        }
     }
 
     protected function diffCompleted(array $ids): Collection
