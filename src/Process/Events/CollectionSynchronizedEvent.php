@@ -10,7 +10,7 @@ class CollectionSynchronizedEvent
     use Dispatchable;
     use InteractsWithSockets;
 
-    public function __construct(public string $model, public string $checksumField, public string|null $batchId = null)
+    public function __construct(public string $model, public string|null $checksumField, public string|null $batchId = null)
     {
     }
 }

@@ -10,7 +10,7 @@ class SynchronizerEvent
     use Dispatchable;
     use InteractsWithSockets;
 
-    public function __construct(public string $model, public string $checksumField, public array $changed)
+    public function __construct(public string $model, public string|null $checksumField, public array $changed)
     {
     }
 }

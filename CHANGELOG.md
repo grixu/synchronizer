@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 4.3.1 - 2021-08-25
+
+- Minor bugs fixed
+
 ## 4.3.0 - 2021-08-25
 
 - Changed way of providing checksum field name & timestamp fields. Now it's possible to declare separate settings for
