@@ -23,7 +23,7 @@ class StartSyncAction
             ->then(function (Batch $batch) use ($configCollection) {
                 foreach ($configCollection as $config) {
                     /** @var SyncConfig $config */
-                    event(new CollectionSynchronizedEvent($config->getLocalModel(), $batch->id));
+                    event(new CollectionSynchronizedEvent($config->getLocalModel(), $config->getChecksumField(), $batch->id));
                 }
             })
             ->catch(function (Batch $batch, Throwable $exception) use ($configCollection) {
