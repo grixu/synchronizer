@@ -17,7 +17,7 @@ class BelongsToMany extends RelationEngine
                     return false;
                 }
 
-                return array_filter($item['relations'], fn($item) => $item['type'] === BelongsToManyRelation::class);
+                return array_filter($item['relations'], fn ($item) => $item['type'] === BelongsToManyRelation::class);
             }
         );
     }
@@ -28,14 +28,13 @@ class BelongsToMany extends RelationEngine
         $this->input->groupBy('relations.*.relation')
             ->each(
                 function ($collection, $relation) use ($collectionToSync) {
-                    if (!$this->model->$relation() instanceof BelongsToManyRelation) {
+                    if (!$this->model->{$relation}() instanceof BelongsToManyRelation) {
                         return;
                     }
 
                     /** @var Collection $collection */
                     $collection->each(
                         function ($item) use ($relation, $collectionToSync) {
-
                             foreach ($item['relations'] as $rel) {
                                 if (empty($rel['foreignKeys']) || !is_array($rel['foreignKeys']) || $rel['type'] !== BelongsToManyRelation::class) {
                                     continue;
@@ -65,7 +64,7 @@ class BelongsToMany extends RelationEngine
             $relations = $collectionToSync[$model->xl_id];
 
             foreach ($relations as $relation => $fks) {
-                $model->$relation()->sync($fks);
+                $model->{$relation}()->sync($fks);
             }
         }
 

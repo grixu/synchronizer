@@ -58,7 +58,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
         $job = new ParseLoadedDataJob($this->dataCollection, $this->config);
         $batch = $bus->batch(
             [
-                $job
+                $job,
             ]
         );
 
@@ -77,7 +77,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
         $obj = new ParseLoadedDataJob($this->dataCollection, $this->config);
         $batch = Bus::batch(
             [
-                $obj
+                $obj,
             ]
         )
             ->allowFailures()
@@ -93,7 +93,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
-                $job->delay(1000)
+                $job->delay(1000),
             ]
         );
 

@@ -10,8 +10,8 @@ class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
         CollectionSynchronizedEvent::class => [
-            CollectionSynchronizedListener::class
-        ]
+            CollectionSynchronizedListener::class,
+        ],
     ];
 
     public function boot()

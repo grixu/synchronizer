@@ -3,18 +3,26 @@
 namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
-use Grixu\SociusModels\Product\Models\Product;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class MapFactoryTest extends TestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        SyncConfig::setInstance(FakeSyncConfig::make());
+    }
+
     /** @test */
     public function making_map_based_on_dto()
     {
         $dto = ProductDataFactory::new()->create();
-        $map = MapFactory::makeFromDto($dto, Product::class);
+        $map = MapFactory::makeFromDto($dto);
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());
@@ -26,9 +34,8 @@ class MapFactoryTest extends TestCase
     {
         $map = MapFactory::make(
             [
-                'name' => 'name'
-            ],
-            Product::class
+                'name' => 'name',
+            ]
         );
 
         $this->assertEquals(Map::class, get_class($map));
@@ -40,7 +47,7 @@ class MapFactoryTest extends TestCase
     public function making_map_based_on_array()
     {
         $dto = ProductDataFactory::new()->create()->toArray();
-        $map = MapFactory::makeFromArray($dto, Product::class);
+        $map = MapFactory::makeFromArray($dto);
 
         $this->assertEquals(Map::class, get_class($map));
         $this->assertNotEmpty($map->get());

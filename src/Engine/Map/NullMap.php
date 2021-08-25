@@ -35,7 +35,6 @@ class NullMap implements MapInterface
     #[Pure]
     public static function make(): MapInterface
     {
-        return new static;
+        return new static();
     }
-
 }

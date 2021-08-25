@@ -8,6 +8,7 @@ use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
+use Grixu\Synchronizer\Config\SyncConfigFactory;
 use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Grixu\Synchronizer\Synchronizer;
 use Grixu\Synchronizer\Config\SyncConfig;
@@ -54,8 +55,10 @@ class SynchronizerTest extends TestCase
             FakeParser::class,
             Operator::class,
             'xlId',
-            config('synchronizer.jobs.default')
+            config('synchronizer.jobs.default'),
+            config('synchronizer.checksum.field')
         );
+        SyncConfig::setInstance($this->config);
         $this->batchId = '11-111-111-11';
 
         $this->operatorRole = OperatorRole::factory()->create();
@@ -67,10 +70,10 @@ class SynchronizerTest extends TestCase
     {
         $this->data = [
             $this->makeBelongsToCase(),
-            $this->makeBelongsToManyCase()
+            $this->makeBelongsToManyCase(),
         ];
 
-        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        $this->obj = new Synchronizer($this->data, $this->batchId);
 
         $this->assertEquals(Synchronizer::class, get_class($this->obj));
     }
@@ -86,8 +89,8 @@ class SynchronizerTest extends TestCase
                         'foreignField' => 'xl_id',
                         'type' => BelongsTo::class,
                         'foreignKeys' => (int)$this->operatorRole->xl_id,
-                    ]
-                ]
+                    ],
+                ],
             ]
         )->toArray();
     }
@@ -103,8 +106,8 @@ class SynchronizerTest extends TestCase
                         'foreignField' => 'xl_id',
                         'type' => BelongsToMany::class,
                         'foreignKeys' => [(int)$this->branch->xl_id],
-                    ]
-                ]
+                    ],
+                ],
             ]
         )->toArray();
     }
@@ -114,10 +117,10 @@ class SynchronizerTest extends TestCase
     {
         $this->data = [
             $this->makeBelongsToCase(),
-            $this->makeBelongsToManyCase()
+            $this->makeBelongsToManyCase(),
         ];
 
-        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        $this->obj = new Synchronizer($this->data, $this->batchId);
 
         $this->assertDatabaseCount('operators', 0);
 
@@ -130,7 +133,7 @@ class SynchronizerTest extends TestCase
 
             if ($model) {
                 $relation = $data['relations'][0]['relation'];
-                $this->assertNotEmpty($model->$relation);
+                $this->assertNotEmpty($model->{$relation});
             } else {
                 $this->assertTrue(false);
             }
@@ -163,7 +166,7 @@ class SynchronizerTest extends TestCase
         $this->data = [];
 
         try {
-            $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+            $this->obj = new Synchronizer($this->data, $this->batchId);
             $this->assertTrue(false);
         } catch (\Exception) {
             $this->assertTrue(true);
@@ -180,13 +183,13 @@ class SynchronizerTest extends TestCase
             [
                 'model' => Product::class,
                 'update_empty' => true,
-                'field' => 'index'
+                'field' => 'index',
             ]
         );
 
         $this->data = [];
         $this->data[] = ProductDataFactory::new()->create()->toArray();
-        $this->config = new SyncConfig(
+        $this->config = (app(SyncConfigFactory::class))->make(
             FakeLoader::class,
             FakeParser::class,
             Product::class,
@@ -194,7 +197,9 @@ class SynchronizerTest extends TestCase
             config('synchronizer.jobs.default')
         );
 
-        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        SyncConfig::setInstance($this->config);
+
+        $this->obj = new Synchronizer($this->data, $this->batchId);
 
         $this->assertDatabaseCount('products', 0);
 
@@ -218,19 +223,33 @@ class SynchronizerTest extends TestCase
         ];
         $this->data[0]['checksum'] = 'aaa';
 
-        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        $this->obj = new Synchronizer($this->data, $this->batchId);
         $this->obj->sync();
 
         $takeOne = Operator::where('xl_id', $this->data[0]['xlId'])->first();
         $this->assertNotEmpty($takeOne);
 
         $this->data[0]['updatedAt'] = now()->addSeconds(10);
-        $this->obj = new Synchronizer($this->data, $this->config, $this->batchId);
+        $this->obj = new Synchronizer($this->data, $this->batchId);
         $this->obj->sync();
 
         $takeTwo = Operator::where('xl_id', $this->data[0]['xlId'])->first();
         $this->assertNotEmpty($takeTwo);
 
         $this->assertEquals($takeOne->checksum, $takeTwo->checksum);
+    }
+
+    /**
+     * @test
+     * @environment-setup useDisabledChecksum
+     */
+    public function it_sync_with_checksum_control_off()
+    {
+        $this->it_sync_both_belongs_to_and_belongs_to_many();
+    }
+
+    protected function useDisabledChecksum($app)
+    {
+        $app->config->set('synchronizer.checksum.control', false);
     }
 }

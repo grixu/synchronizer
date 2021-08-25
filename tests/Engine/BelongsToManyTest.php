@@ -7,8 +7,10 @@ use Grixu\SociusModels\Operator\Factories\OperatorDataFactory;
 use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsToMany as BelongsToManyEngine;
 use Grixu\Synchronizer\Engine\Transformer\NullTransformer;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +24,13 @@ class BelongsToManyTest extends TestCase
     protected Model $secondRelatedModel;
     protected BelongsToManyEngine $obj;
     protected Collection $data;
+    protected SyncConfig $config;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->config = FakeSyncConfig::makeWithCustomModel(Operator::class);
+    }
 
     /** @test */
     public function it_creates_obj_properly_on_belongs_to_many_case()
@@ -29,7 +38,7 @@ class BelongsToManyTest extends TestCase
         $this->makeBelongsToManyCase();
 
         try {
-            $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
+            $this->obj = new BelongsToManyEngine($this->config, $this->data);
             $this->assertTrue(true);
         } catch (Exception $e) {
             ray($e);
@@ -70,8 +79,8 @@ class BelongsToManyTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => [(int)$this->secondRelatedModel->xl_id],
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -83,7 +92,7 @@ class BelongsToManyTest extends TestCase
     public function it_sync_belongs_to_many_properly()
     {
         $this->makeBelongsToManyCase();
-        $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new BelongsToManyEngine($this->config, $this->data);
         $this->obj->sync(NullTransformer::make());
 
         $this->localModel->refresh();
@@ -105,7 +114,7 @@ class BelongsToManyTest extends TestCase
         $this->makeBelongsToManyCase();
         $this->makeExtraRelationsData();
 
-        $this->obj = new BelongsToManyEngine($this->data, 'xlId', Operator::class);
+        $this->obj = new BelongsToManyEngine($this->config, $this->data);
         $this->obj->sync(NullTransformer::make());
 
         $this->localModel->refresh();
@@ -126,8 +135,8 @@ class BelongsToManyTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -149,8 +158,8 @@ class BelongsToManyTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );

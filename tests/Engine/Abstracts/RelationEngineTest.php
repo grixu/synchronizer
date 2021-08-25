@@ -9,6 +9,7 @@ use Grixu\SociusModels\Product\Models\Category;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -41,7 +42,7 @@ class RelationEngineTest extends TestCase
         $this->makeBrokenRelationCase();
 
         try {
-            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+            $this->obj = new BelongsToEngine(FakeSyncConfig::makeWithCustomModel(Product::class), $this->data);
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);
@@ -61,8 +62,8 @@ class RelationEngineTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -74,7 +75,7 @@ class RelationEngineTest extends TestCase
         $this->makeNotRelationCase();
 
         try {
-            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+            $this->obj = new BelongsToEngine(FakeSyncConfig::makeWithCustomModel(Product::class), $this->data);
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);
@@ -94,8 +95,8 @@ class RelationEngineTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );
@@ -107,7 +108,7 @@ class RelationEngineTest extends TestCase
         $this->makeNotThisModelCase();
 
         try {
-            $this->obj = new BelongsToEngine($this->data, 'xlId', Product::class);
+            $this->obj = new BelongsToEngine(FakeSyncConfig::makeWithCustomModel(Product::class), $this->data);
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);
@@ -127,8 +128,8 @@ class RelationEngineTest extends TestCase
                             'foreignField' => 'xl_id',
                             'type' => BelongsTo::class,
                             'foreignKeys' => (int)$this->relatedModel->xl_id,
-                        ]
-                    ]
+                        ],
+                    ],
                 ]
             )->toArray()
         );

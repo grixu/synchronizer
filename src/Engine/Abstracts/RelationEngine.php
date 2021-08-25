@@ -3,6 +3,7 @@
 namespace Grixu\Synchronizer\Engine\Abstracts;
 
 use Exception;
+use Grixu\Synchronizer\Config\Contracts\SyncConfig;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use ReflectionClass;
@@ -11,9 +12,9 @@ abstract class RelationEngine extends BaseEngine
 {
     protected Collection $loaded;
 
-    public function __construct(protected Collection $input, protected string $key, string $model)
+    public function __construct(SyncConfig $config, protected Collection $input)
     {
-        parent::__construct($input, $key, $model);
+        parent::__construct($config, $input);
         $this->loaded = collect();
 
         $this->checkRelations();
@@ -41,11 +42,11 @@ abstract class RelationEngine extends BaseEngine
                         throw new Exception('Relation ' . $relation . ' do not exist!');
                     }
 
-                    if (!$test->$relation() instanceof Relation) {
+                    if (!$test->{$relation}() instanceof Relation) {
                         throw new Exception($relation . ' in ' . $this->model::class . ' is not relation');
                     }
 
-                    if (!$test->$relation()->getRelated() instanceof $class) {
+                    if (!$test->{$relation}()->getRelated() instanceof $class) {
                         throw new Exception(
                             $relation . ' in ' . $this->model::class . ' is not related with ' . $class
                         );
@@ -68,7 +69,7 @@ abstract class RelationEngine extends BaseEngine
             ->each(
                 function ($collection, $relation) {
                     $data = collect();
-                    $model = $this->model->$relation()->getRelated();
+                    $model = $this->model->{$relation}()->getRelated();
 
                     $collection->groupBy('foreignField')
                         ->filter()

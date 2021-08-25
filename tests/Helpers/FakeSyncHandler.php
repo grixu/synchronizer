@@ -11,6 +11,7 @@ class FakeSyncHandler implements SyncHandlerInterface
     #[Pure]
     public static function make(): SerializableClosure
     {
-        return new SerializableClosure(function ($collection, $config) {});
+        return new SerializableClosure(function ($collection, $config) {
+        });
     }
 }

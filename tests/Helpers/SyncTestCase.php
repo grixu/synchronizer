@@ -35,11 +35,13 @@ class SyncTestCase extends \Orchestra\Testbench\TestCase
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_customers_table.stub';
         try {
             (new \CreateCustomersTable())->up();
-        } catch (\Throwable) {}
+        } catch (\Throwable) {
+        }
 
         try {
             $this->artisan('queue:batches-table')->run();
-        } catch (\Exception) {}
+        } catch (\Exception) {
+        }
 
         $this->artisan('migrate')->run();
     }

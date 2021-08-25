@@ -32,7 +32,7 @@ class StartSyncActionTest extends SyncTestCase
         $this->runBatchAndCheckIt(
             [
                 'customer' => FakeSyncConfig::makeArray(),
-                'another_but_same' => FakeSyncConfig::makeArray()
+                'another_but_same' => FakeSyncConfig::makeArray(),
             ]
         );
     }
@@ -70,10 +70,12 @@ class StartSyncActionTest extends SyncTestCase
                 'xlId',
                 null,
                 null,
-                new SerializableClosure(function() {
+                [],
+                [],
+                new SerializableClosure(function () {
                     Http::get('http://testable.dev');
-                })
-            ]
+                }),
+            ],
         ];
 
         $this->obj->execute($config, 'sync');
@@ -89,7 +91,7 @@ class StartSyncActionTest extends SyncTestCase
         $this->runBatchAndCheckIt(
             [
                 'customer' => FakeSyncConfig::make(),
-                'another_but_same' => FakeSyncConfig::make()
+                'another_but_same' => FakeSyncConfig::make(),
             ]
         );
     }

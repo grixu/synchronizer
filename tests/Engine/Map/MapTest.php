@@ -2,19 +2,22 @@
 
 namespace Grixu\Synchronizer\Tests\Engine\Map;
 
-use Grixu\SociusModels\Product\Models\Product;
+use Grixu\SociusModels\Customer\Models\Customer;
+use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Engine\Models\ExcludedField;
+use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
-use Illuminate\Database\Eloquent\Model;
 
 class MapTest extends TestCase
 {
     protected Map $obj;
+    protected SyncConfig $config;
 
     protected function setUp(): void
     {
         parent::setUp();
+        SyncConfig::setInstance(FakeSyncConfig::make('checksum', ['updated_at']));
     }
 
     /** @test */
@@ -29,10 +32,9 @@ class MapTest extends TestCase
         $this->obj = new Map(
             [
                 'name',
-                'spam',
-                'updatedAt'
-            ],
-            Model::class
+                'country',
+                'updated_at',
+            ]
         );
     }
 
@@ -59,9 +61,9 @@ class MapTest extends TestCase
     {
         ExcludedField::factory()->create(
             [
-                'field' => 'spam',
-                'model' => Model::class,
-                'update_empty' => false
+                'field' => 'country',
+                'model' => Customer::class,
+                'update_empty' => false,
             ]
         );
     }
@@ -76,28 +78,22 @@ class MapTest extends TestCase
         $this->assertCount(1, $this->obj->getUpdatableOnNullFields());
     }
 
-    protected function createObjAndRealModel(): Model
+    protected function createObjAndRealModel(): Customer
     {
         ExcludedField::factory()->create(
             [
                 'field' => 'name',
-                'model' => Product::class,
+                'model' => Customer::class,
                 'update_empty' => true,
             ]
         );
-        $model = Product::factory()->make(
-            [
-                'brand_id' => null,
-                'product_type_id' => null,
-            ]
-        );
+        $model = Customer::factory()->make();
 
         $this->obj = new Map(
             [
                 'name',
-                'updatedAt'
+                'updated_at',
             ],
-            Product::class
         );
 
         return $model;
@@ -147,15 +143,5 @@ class MapTest extends TestCase
 
         $this->assertBasicThingsAboutArray();
         $this->assertCount(2, $this->obj->getModelFieldsArray());
-    }
-
-    /** @test */
-    public function get_array_with_models_fields_when_timestamps_exclude_is_off()
-    {
-        Map::setTimestamps([]);
-        $this->createObj();
-
-        $this->assertBasicThingsAboutArray();
-        $this->assertCount(4, $this->obj->getModelFieldsArray());
     }
 }

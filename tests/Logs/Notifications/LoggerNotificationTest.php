@@ -1,8 +1,6 @@
 <?php
 
-
 namespace Grixu\Synchronizer\Tests\Logs\Notifications;
-
 
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Logs\Notifications\LoggerNotification;
@@ -19,5 +17,4 @@ class LoggerNotificationTest extends TestCase
 
         $this->assertEquals(SlackMessage::class, $message::class);
     }
-
 }

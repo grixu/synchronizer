@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Engine\Map;
 
-use Grixu\Synchronizer\Checksum;
+use Grixu\Synchronizer\Config\Contracts\SyncConfig;
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
 use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Illuminate\Support\Collection;
@@ -14,14 +14,15 @@ class Map implements MapInterface
     protected array $mapWithoutTimestamps = [];
     protected array $updatableOnNull = [];
     protected Collection $excludedFields;
-    protected static array $timestamps;
+    protected SyncConfig $config;
 
-    public function __construct(array $fields, protected string $model)
+    public function __construct(array $fields)
     {
-        $this->excludedFields = $this->getExcludedFields($model);
+        $this->config = app(SyncConfig::class);
+        $this->excludedFields = $this->getExcludedFields($this->config->getLocalModel());
 
-        if (!empty(Checksum::$checksumField)) {
-            $fields[] = Checksum::$checksumField;
+        if (!empty($this->config->getChecksumField())) {
+            $fields[] = $this->config->getChecksumField();
         }
 
         $fields = array_diff($fields, ['relations']);
@@ -57,7 +58,7 @@ class Map implements MapInterface
 
         $this->map[$field] = $modelField;
 
-        if (!in_array($modelField, static::$timestamps)) {
+        if (!in_array($modelField, $this->config->getTimestamps())) {
             $this->mapWithoutTimestamps[$field] = $modelField;
         }
     }
@@ -80,15 +81,5 @@ class Map implements MapInterface
     public function getUpdatableOnNullFields(): array
     {
         return $this->updatableOnNull;
-    }
-
-    public static function setTimestamps(array $fields): void
-    {
-        static::$timestamps = $fields;
-    }
-
-    public static function getTimestamps(): array
-    {
-        return static::$timestamps;
     }
 }

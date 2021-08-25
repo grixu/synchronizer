@@ -8,7 +8,6 @@ use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
@@ -47,10 +46,12 @@ class LoadAllAndParseJob implements ShouldQueue
             return;
         }
 
+        SyncConfig::setInstance($this->config);
+
         $loaderClass = $this->config->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
-        $loader->buildQuery($this->config->getIdsToSync());
+        $loader->buildQuery($this->config->getIds());
 
         $parserClass = $this->config->getParserClass();
         /** @var ParserInterface $parser */

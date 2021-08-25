@@ -6,7 +6,6 @@ use Grixu\Synchronizer\Process\Abstracts\AbstractLoader;
 
 class FakeLoader extends AbstractLoader
 {
-
     public function buildQuery(?array $foreignKeys = []): static
     {
         $this->query = FakeForeignSqlSourceModel::query()

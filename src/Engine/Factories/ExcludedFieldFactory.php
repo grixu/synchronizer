@@ -14,7 +14,7 @@ class ExcludedFieldFactory extends Factory
         return [
             'field' => $this->faker->name,
             'model' => $this->faker->name,
-            'update_empty' => $this->faker->numberBetween(0,1),
+            'update_empty' => $this->faker->numberBetween(0, 1),
         ];
     }
 }

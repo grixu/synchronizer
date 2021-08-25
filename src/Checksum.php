@@ -2,25 +2,30 @@
 
 namespace Grixu\Synchronizer;
 
+use Grixu\Synchronizer\Config\Contracts\SyncConfig;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Checksum
 {
-    public static string|null $checksumField = 'checksum';
     protected Collection $diff;
 
-    public function __construct(Collection $data, string $key, string $model)
+    public function __construct(Collection $data, SyncConfig $config)
     {
+        $this->isChecksumControlDisabled();
+        $key = $config->getForeignKey();
+        $model = $config->getLocalModel();
+        $checksumField = $config->getChecksumField();
+
         $modelKey = Str::snake($key);
 
-        $checksums = $data->pluck(static::$checksumField, $key);
+        $checksums = $data->pluck($checksumField, $key);
         /** @var Model $model */
         $storedChecksums = $model::query()
             ->whereIn($modelKey, $checksums->keys())
-            ->whereNotNull(static::$checksumField)
-            ->pluck(static::$checksumField, $modelKey);
+            ->whereNotNull($checksumField)
+            ->pluck($checksumField, $modelKey);
 
         $diff = collect();
 
@@ -38,6 +43,13 @@ class Checksum
         $this->diff = $diff->filter();
     }
 
+    protected function isChecksumControlDisabled(): void
+    {
+        if (!config('synchronizer.checksum.control')) {
+            throw new \Exception('Checksum checking is turned off');
+        }
+    }
+
     public function get(): Collection
     {
         return $this->diff;
@@ -46,10 +58,5 @@ class Checksum
     public static function generate(array $data): string
     {
         return hash('crc32c', json_encode($data));
-    }
-
-    public static function setChecksumField(string|null $fieldName)
-    {
-        static::$checksumField = $fieldName;
     }
 }

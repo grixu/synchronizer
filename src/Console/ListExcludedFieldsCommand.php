@@ -24,7 +24,7 @@ class ListExcludedFieldsCommand extends Command
         ExcludedField::query()->where(
             [
                 ['model', '=', $model],
-                ['field', '=', $entry]
+                ['field', '=', $entry],
             ]
         )->delete();
         $this->info('DELETED');

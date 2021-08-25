@@ -4,16 +4,19 @@ namespace Grixu\Synchronizer\Config;
 
 use Closure;
 use Exception;
+use Grixu\Synchronizer\Config\Contracts\SyncConfig as SyncConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Config\Traits\CheckClassImplementsInterface;
 use Illuminate\Queue\SerializableClosure;
 
-class SyncConfig
+class SyncConfig implements SyncConfigInterface
 {
     use CheckClassImplementsInterface;
 
-    private $currentJob = 0;
+    private int $currentJob = 0;
+
+    private static SyncConfigInterface|null $instance = null;
 
     public function __construct(
         protected string $loaderClass,
@@ -21,12 +24,37 @@ class SyncConfig
         protected string $localModel,
         protected string $foreignKey,
         protected array $jobsConfig,
-        protected ?array $idsToSync = [],
+        protected string|null $checksumField = null,
+        protected array $timestamps = [],
+        protected array $ids = [],
         protected Closure|SerializableClosure|null $syncClosure = null,
         protected Closure|SerializableClosure|null $errorHandler = null
     ) {
+        $this->validateChecksum();
         $this->checkClassIsImplementingInterface($loaderClass, LoaderInterface::class);
         $this->checkClassIsImplementingInterface($parserClass, ParserInterface::class);
+    }
+
+    protected function validateChecksum(): void
+    {
+        if (!config('synchronizer.checksum.control')) {
+            $this->checksumField = null;
+            $this->timestamps = [];
+        }
+    }
+
+    public static function getInstance(): SyncConfigInterface
+    {
+        if (empty(static::$instance)) {
+            static::$instance = new NullSyncConfig();
+        }
+
+        return static::$instance;
+    }
+
+    public static function setInstance(SyncConfigInterface $instance)
+    {
+        static::$instance = $instance;
     }
 
     public function getLoaderClass(): string
@@ -49,14 +77,14 @@ class SyncConfig
         return $this->foreignKey;
     }
 
-    public function getIdsToSync(): ?array
+    public function getTimestamps(): array
     {
-        return $this->idsToSync;
+        return $this->timestamps;
     }
 
-    public function setIdsToSync(?array $idsToSync): void
+    public function getIds(): array
     {
-        $this->idsToSync = $idsToSync;
+        return $this->ids;
     }
 
     public function getCurrentJob(): string
@@ -79,7 +107,7 @@ class SyncConfig
             throw new Exception('Value is too low');
         }
 
-        if($currentJob > count($this->jobsConfig)-1) {
+        if ($currentJob > count($this->jobsConfig)-1) {
             throw new Exception('Value is too high');
         }
 
@@ -112,5 +140,10 @@ class SyncConfig
         }
 
         $this->errorHandler = $errorHandler;
+    }
+
+    public function getChecksumField(): string | null
+    {
+        return $this->checksumField;
     }
 }

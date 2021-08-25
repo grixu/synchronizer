@@ -11,6 +11,7 @@ class FakeErrorHandler implements ErrorHandlerInterface
     #[Pure]
     public static function make(): SerializableClosure
     {
-        return new SerializableClosure(function ($e) {});
+        return new SerializableClosure(function ($e) {
+        });
     }
 }

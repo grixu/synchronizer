@@ -43,10 +43,12 @@ class SyncParsedDataJob implements ShouldQueue
             return;
         }
 
+        SyncConfig::setInstance($this->config);
+
         $closure = $this->config->getSyncClosure();
 
         if ($closure) {
-            $closure($this->data, $this->config);
+            $closure($this->config, $this->data);
         } else {
             $this->defaultSyncHandler();
         }
@@ -57,15 +59,14 @@ class SyncParsedDataJob implements ShouldQueue
         try {
             $synchronizer = new Synchronizer(
                 $this->data,
-                $this->config,
                 $this->batchId
             );
 
             $synchronizer->sync();
         } catch (Throwable $e) {
-            ray($e);
-            if ($this->config->getErrorHandler() !== null)
+            if ($this->config->getErrorHandler() !== null) {
                 $this->config->getErrorHandler()($e);
+            }
 
             return;
         }
