@@ -39,7 +39,7 @@ jobs:
         AWS_DEFAULT_REGION: "us-east-1"
 
     - name: Run test suite
-      run: composer run-script test
+      run: composer run-script test:unit
 
     - name: Send Slack notification
       uses: 8398a7/action-slack@v2
