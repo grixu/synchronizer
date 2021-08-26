@@ -1,13 +1,13 @@
 <?php
 
-namespace Grixu\Synchronizer\Config\Traits;
+namespace Grixu\Synchronizer\Config\Helpers;
 
 use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
 use ReflectionClass;
 
-trait CheckClassImplementsInterface
+class CheckInterface
 {
-    protected function checkClassIsImplementingInterface(string $className, string $interfaceName)
+    public function __invoke(string $className, string $interfaceName)
     {
         $classReflection = new ReflectionClass($className);
 
