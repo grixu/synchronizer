@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Config\Contracts;
 
-interface EngineConfig
+interface EngineConfigInterface
 {
     public function getModel(): string;
     public function getKey(): string;

@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Config\Contracts;
 
-interface ProcessConfig
+interface ProcessConfigInterface
 {
     public function getLoaderClass(): string;
     public function getParserClass(): string;
