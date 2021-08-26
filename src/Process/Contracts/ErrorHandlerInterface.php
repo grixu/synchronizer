@@ -2,9 +2,7 @@
 
 namespace Grixu\Synchronizer\Process\Contracts;
 
-use Illuminate\Queue\SerializableClosure;
-
 interface ErrorHandlerInterface
 {
-    public static function make(): SerializableClosure;
+    public static function handle(\Throwable $e): void;
 }
