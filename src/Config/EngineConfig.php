@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Config;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfig as EngineConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 
 class EngineConfig implements EngineConfigInterface
 {

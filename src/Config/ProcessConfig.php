@@ -4,7 +4,7 @@ namespace Grixu\Synchronizer\Config;
 
 use Closure;
 use Exception;
-use Grixu\Synchronizer\Config\Contracts\ProcessConfig as ProcessConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\Config\Exceptions\EmptyHandlersConfiguration;
 use Grixu\Synchronizer\Config\Exceptions\EmptyJobsConfiguration;
 use Grixu\Synchronizer\Config\Helpers\CheckInterface;

@@ -2,6 +2,8 @@
 
 namespace Grixu\Synchronizer\Config;
 
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+
 class EngineConfigFactory
 {
     public static function make(
@@ -11,7 +13,7 @@ class EngineConfigFactory
         string|bool|null $checksumField = null,
         array|bool $timestamps = [],
         array $ids = [],
-    ): EngineConfig {
+    ): EngineConfigInterface {
         if (config('synchronizer.checksum.control')) {
             if (empty($checksumField) && $checksumField !== false) {
                 $checksumField = config('synchronizer.checksum.field');

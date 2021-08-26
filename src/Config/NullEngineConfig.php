@@ -2,9 +2,9 @@
 
 namespace Grixu\Synchronizer\Config;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 
-class NullEngineConfig implements EngineConfig
+class NullEngineConfig implements EngineConfigInterface
 {
     public function getModel(): string
     {
