@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Log;
 
 class DefaultErrorHandler implements ErrorHandlerInterface
 {
-    public static function handle(\Throwable $e): void
+    public function handle(\Throwable $e): void
     {
         Log::critical($e->getMessage());
     }
