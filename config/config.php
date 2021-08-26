@@ -49,7 +49,7 @@ return [
     ],
 
     'handlers' => [
-        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,
-        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class
+        'error' => \Grixu\Synchronizer\Process\Handlers\DefaultErrorHandler::class,
+        'sync' => \Grixu\Synchronizer\Process\Handlers\DefaultSyncHandler::class,
     ],
 ];
