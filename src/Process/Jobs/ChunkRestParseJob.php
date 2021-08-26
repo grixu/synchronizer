@@ -2,7 +2,9 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
+use Grixu\Synchronizer\Config\EngineConfig;
 use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Illuminate\Bus\Batchable;
@@ -24,13 +26,11 @@ class ChunkRestParseJob implements ShouldQueue
     public $tries = 0;
     public $maxExceptions = 3;
 
-    public function __construct(public SyncConfig $config, public int $part = 1)
-    {
-    }
-
-    public function backoff(): int
-    {
-        return 60 * $this->attempts();
+    public function __construct(
+        public ProcessConfigInterface $processConfig,
+        public EngineConfigInterface $engineConfig,
+        public int $part = 1
+    ) {
     }
 
     public function retryUntil(): Carbon
@@ -41,24 +41,29 @@ class ChunkRestParseJob implements ShouldQueue
             );
     }
 
+    public function backoff(): int
+    {
+        return 60 * $this->attempts();
+    }
+
     public function handle()
     {
         if (optional($this->batch())->cancelled() || !$this->batch()) {
             return;
         }
 
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->engineConfig);
 
-        $loaderClass = $this->config->getLoaderClass();
+        $loaderClass = $this->processConfig->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
-        $loader->buildQuery($this->config->getIds());
+        $loader->buildQuery($this->engineConfig->getIds());
 
-        $parserClass = $this->config->getParserClass();
+        $parserClass = $this->processConfig->getParserClass();
         /** @var ParserInterface $parser */
         $parser = app($parserClass);
 
-        $jobClass = $this->config->getNextJob();
+        $jobClass = $this->processConfig->getNextJob();
         try {
             $data = $loader->getPiece($this->part);
         } catch (Throwable) {
@@ -70,9 +75,9 @@ class ChunkRestParseJob implements ShouldQueue
         }
 
         $parsedData = $parser->parse($data)->toArray();
-        $this->batch()->add((new $jobClass($parsedData, $this->config)));
+        $this->batch()->add((new $jobClass($this->processConfig, $this->engineConfig, $parsedData)));
 
         $this->part++;
-        $this->batch()->add([new static($this->config, $this->part)]);
+        $this->batch()->add([new static($this->processConfig, $this->engineConfig, $this->part)]);
     }
 }

@@ -2,7 +2,9 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
+use Grixu\Synchronizer\Config\EngineConfig;
 use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Illuminate\Bus\Batchable;
@@ -23,7 +25,7 @@ class ChunkLoadAndParseJob implements ShouldQueue
     public $tries = 0;
     public $maxExceptions = 3;
 
-    public function __construct(public SyncConfig $config)
+    public function __construct(public ProcessConfigInterface $processConfig, public EngineConfigInterface $engineConfig)
     {
     }
 
@@ -46,23 +48,23 @@ class ChunkLoadAndParseJob implements ShouldQueue
             return;
         }
 
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->engineConfig);
 
-        $loaderClass = $this->config->getLoaderClass();
+        $loaderClass = $this->processConfig->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
-        $loader->buildQuery($this->config->getIds());
+        $loader->buildQuery($this->engineConfig->getIds());
 
-        $parserClass = $this->config->getParserClass();
+        $parserClass = $this->processConfig->getParserClass();
         /** @var ParserInterface $parser */
         $parser = app($parserClass);
 
-        $jobClass = $this->config->getNextJob();
+        $jobClass = $this->processConfig->getNextJob();
 
         $loader->chunk(
             function ($data) use ($jobClass, $parser) {
                 $parsedData = $parser->parse($data)->toArray();
-                $this->batch()->add((new $jobClass($parsedData, $this->config)));
+                $this->batch()->add((new $jobClass($this->processConfig, $this->engineConfig, $parsedData)));
             }
         );
     }

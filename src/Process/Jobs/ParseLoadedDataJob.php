@@ -2,7 +2,10 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
+use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -10,7 +13,6 @@ use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
-use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 
 class ParseLoadedDataJob implements ShouldQueue
 {
@@ -23,8 +25,11 @@ class ParseLoadedDataJob implements ShouldQueue
     public $tries = 0;
     public $maxExceptions = 3;
 
-    public function __construct(public Collection $dataToParse, public SyncConfig $config)
-    {
+    public function __construct(
+        public ProcessConfigInterface $processConfig,
+        public EngineConfigInterface $engineConfig,
+        public Collection $dataToParse
+    ) {
     }
 
     public function backoff(): int
@@ -43,20 +48,20 @@ class ParseLoadedDataJob implements ShouldQueue
             return;
         }
 
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->engineConfig);
 
-        $parserClass = $this->config->getParserClass();
+        $parserClass = $this->processConfig->getParserClass();
         /** @var ParserInterface $parser */
         $parser = app($parserClass);
 
         $data = $parser->parse($this->dataToParse)->toArray();
 
         if ($this->batch()) {
-            $jobClass = $this->config->getNextJob();
+            $jobClass = $this->processConfig->getNextJob();
 
             $this->batch()->add(
                 [
-                    new $jobClass($data, $this->config),
+                    new $jobClass($this->processConfig, $this->engineConfig, $data),
                 ]
             );
         }

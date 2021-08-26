@@ -2,14 +2,17 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
+use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
-use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 
 class LoadDataToSyncJob implements ShouldQueue
 {
@@ -22,8 +25,10 @@ class LoadDataToSyncJob implements ShouldQueue
     public $tries = 0;
     public $maxExceptions = 2;
 
-    public function __construct(public SyncConfig $config)
-    {
+    public function __construct(
+        public ProcessConfigInterface $processConfig,
+        public EngineConfigInterface $engineConfig
+    ) {
     }
 
     public function backoff(): int
@@ -42,21 +47,22 @@ class LoadDataToSyncJob implements ShouldQueue
             return;
         }
 
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->engineConfig);
 
-        $loaderClass = $this->config->getLoaderClass();
+        $loaderClass = $this->processConfig->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
 
-        $loader->buildQuery($this->config->getIds());
+        $loader->buildQuery($this->engineConfig->getIds());
         $dataCollection = $loader->get();
 
         if ($this->batch()) {
             $jobs = [];
-            $jobClass = $this->config->getNextJob();
+            $jobClass = $this->processConfig->getNextJob();
 
+            /** @var Collection $data */
             foreach ($dataCollection as $data) {
-                $jobs[] = new $jobClass($data, $this->config);
+                $jobs[] = new $jobClass($this->processConfig, $this->engineConfig, $data);
             }
 
             $this->batch()->add($jobs);
