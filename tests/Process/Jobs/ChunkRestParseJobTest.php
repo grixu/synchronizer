@@ -2,10 +2,9 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Process\Jobs\ChunkRestParseJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeProcessConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
@@ -15,19 +14,17 @@ class ChunkRestParseJobTest extends SyncTestCase
 {
     use DatabaseMigrations;
 
-    protected SyncConfig $config;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->config = FakeSyncConfig::makeChunkLoadAndParse();
+        $this->processConfig = FakeProcessConfig::make(jobs: 'chunk-rest-parse');
     }
 
     /** @test */
     public function it_constructs()
     {
-        $obj = new ChunkRestParseJob($this->config);
+        $obj = new ChunkRestParseJob($this->processConfig, $this->engineConfig);
 
         $this->assertEquals(ChunkRestParseJob::class, $obj::class);
     }
@@ -37,7 +34,7 @@ class ChunkRestParseJobTest extends SyncTestCase
     {
         Queue::fake();
 
-        dispatch(new ChunkRestParseJob($this->config));
+        dispatch(new ChunkRestParseJob($this->processConfig, $this->engineConfig));
 
         Queue::assertPushed(ChunkRestParseJob::class, 1);
     }
@@ -48,7 +45,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new ChunkRestParseJob($this->config);
+        $job = new ChunkRestParseJob($this->processConfig, $this->engineConfig);
         $batch = $bus->batch(
             [
                 $job,
@@ -67,7 +64,7 @@ class ChunkRestParseJobTest extends SyncTestCase
     /** @test */
     public function it_start_parsing_job()
     {
-        $obj = new ChunkRestParseJob($this->config);
+        $obj = new ChunkRestParseJob($this->processConfig, $this->engineConfig);
         $batch = Bus::batch(
             [
                 $obj,
@@ -82,7 +79,7 @@ class ChunkRestParseJobTest extends SyncTestCase
     /** @test */
     public function it_quit_if_offset_is_too_high()
     {
-        $obj = new ChunkRestParseJob($this->config, 400);
+        $obj = new ChunkRestParseJob($this->processConfig, $this->engineConfig, 400);
         $batch = Bus::batch(
             [
                 $obj,
@@ -100,7 +97,7 @@ class ChunkRestParseJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new ChunkRestParseJob($this->config);
+        $job = new ChunkRestParseJob($this->processConfig, $this->engineConfig);
         $batch = $bus->batch(
             [
                 $job,
@@ -119,7 +116,7 @@ class ChunkRestParseJobTest extends SyncTestCase
     /** @test */
     public function it_reacts_to_cancellation()
     {
-        $job = new ChunkRestParseJob($this->config);
+        $job = new ChunkRestParseJob($this->processConfig, $this->engineConfig);
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
