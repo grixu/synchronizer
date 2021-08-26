@@ -3,8 +3,9 @@
 namespace Grixu\Synchronizer\Tests\Config;
 
 use Grixu\SociusModels\Description\Models\Language;
-use Grixu\Synchronizer\Config\Contracts\EngineConfig as EngineConfigInterface;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Config\EngineConfigFactory;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class EngineConfigTest extends TestCase
@@ -14,12 +15,12 @@ class EngineConfigTest extends TestCase
     {
         $obj = $this->createObj();
 
-        $this->assertEquals(EngineConfig::class, $obj::class);
+        $this->assertInstanceOf(EngineConfigInterface::class, $obj);
     }
 
-    protected function createObj($timestamps = [], $excludedFields = [], $checksumField = 'checksum', $ids = []): EngineConfig
+    protected function createObj($timestamps = [], $excludedFields = [], $checksumField = 'checksum', $ids = []): EngineConfigInterface
     {
-        return new EngineConfig(
+        return EngineConfigFactory::make(
             model: Language::class,
             key: 'xlId',
             excludedFields: $excludedFields,

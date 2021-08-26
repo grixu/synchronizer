@@ -2,6 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Config;
 
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Config\EngineConfig;
 use Grixu\Synchronizer\Config\EngineConfigFactory;
 use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
@@ -20,7 +21,7 @@ class EngineConfigFactoryTest extends TestCase
         $this->assertNotEmpty($config->getKey());
     }
 
-    protected function makeObj(array|bool $timestamps = [], array $ids = [], array $excluded = [], array|bool|null $checksum = null): EngineConfig
+    protected function makeObj(array|bool $timestamps = [], array $ids = [], array $excluded = [], array|bool|null $checksum = null): EngineConfigInterface
     {
         return EngineConfigFactory::make(
             model: FakeForeignSqlSourceModel::class,
@@ -32,9 +33,9 @@ class EngineConfigFactoryTest extends TestCase
         );
     }
 
-    protected function basicAssertions(EngineConfig $config)
+    protected function basicAssertions(EngineConfigInterface $config)
     {
-        $this->assertEquals(EngineConfig::class, $config::class);
+        $this->assertEquals(EngineConfigInterface::class, $config::class);
         $this->assertNotEmpty($config->getModel());
         $this->assertNotEmpty($config->getKey());
     }
