@@ -3,6 +3,7 @@
 namespace Grixu\Synchronizer\Config;
 
 use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Illuminate\Support\Str;
 
 class EngineConfigFactory
 {
@@ -35,9 +36,9 @@ class EngineConfigFactory
         return new EngineConfig(
             model: $model,
             key: $key,
-            excludedFields: $excludedFields,
-            checksumField: $checksumField,
-            timestamps: $timestamps,
+            excludedFields: array_map(fn ($item) => Str::camel($item), $excludedFields),
+            checksumField: Str::camel($checksumField),
+            timestamps: array_map(fn ($item) => Str::camel($item), $timestamps),
             ids: $ids,
         );
     }
