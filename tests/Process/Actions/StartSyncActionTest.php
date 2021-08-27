@@ -5,6 +5,7 @@ namespace Grixu\Synchronizer\Tests\Process\Actions;
 use Grixu\Synchronizer\Process\Actions\StartSyncAction;
 use Grixu\Synchronizer\Process\Events\CollectionSynchronizedEvent;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeExceptionJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeProcessConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Grixu\Synchronizer\Tests\Helpers\TestErrorHandler;
@@ -53,12 +54,20 @@ class StartSyncActionTest extends SyncTestCase
         Http::fake();
 
         $config = [
-            'process' => FakeProcessConfig::make(error: TestErrorHandler::class),
-            'engine' => FakeEngineConfig::make(),
+            [
+                'process' => FakeProcessConfig::make(
+                    jobs: [FakeExceptionJob::class],
+                    error: TestErrorHandler::class
+                ),
+                'engine' => FakeEngineConfig::make(),
+            ],
         ];
         $obj = new StartSyncAction($config);
 
-        $this->runBatchAndCheckIt($obj, $config);
+        try {
+            $obj->dispatch();
+        } catch (\Throwable) {
+        }
 
         Http::assertSent(function (Request $request) {
             return $request->url() == 'http://testable.dev';
@@ -91,8 +100,7 @@ class StartSyncActionTest extends SyncTestCase
             ],
         ];
         $obj = new StartSyncAction($config);
-
-        $batch = $this->runBatchAndCheckIt($obj, $config);
+        $batch = $obj->dispatch();
 
         $this->assertTrue($batch->finished());
         Event::assertDispatched(CollectionSynchronizedEvent::class, 1);
@@ -104,12 +112,14 @@ class StartSyncActionTest extends SyncTestCase
         Http::fake();
 
         $config = [
-            'process' => FakeProcessConfig::make(sync: TestSyncHandler::class),
-            'engine' => FakeEngineConfig::make(),
+            [
+                'process' => FakeProcessConfig::make(sync: TestSyncHandler::class),
+                'engine' => FakeEngineConfig::make(),
+            ],
         ];
-        $obj = new StartSyncAction($config);
 
-        $this->runBatchAndCheckIt($obj, $config);
+        $obj = new StartSyncAction($config);
+        $obj->dispatch();
 
         Http::assertSent(function (Request $request) {
             return $request->url() == 'http://testable.dev';
