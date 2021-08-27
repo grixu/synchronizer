@@ -1,11 +1,11 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Config;
+namespace Grixu\Synchronizer\Tests\Engine\Config;
 
 use Grixu\SociusModels\Description\Models\Language;
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
-use Grixu\Synchronizer\Config\EngineConfig;
-use Grixu\Synchronizer\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class EngineConfigTest extends TestCase
@@ -40,7 +40,7 @@ class EngineConfigTest extends TestCase
     public function it_provide_access_to_checksum_field_name()
     {
         $obj = $this->createObj();
-        $returnedValue = $obj->getChecksumField();
+        $returnedValue = $obj->getChecksumFieldAsDtoField();
 
         $this->assertEquals('checksum', $returnedValue);
     }
@@ -52,7 +52,7 @@ class EngineConfigTest extends TestCase
     public function it_not_allows_checksum_field_if_checking_system_is_off()
     {
         $obj = $this->createObj();
-        $this->assertEmpty($obj->getChecksumField());
+        $this->assertEmpty($obj->getChecksumFieldAsDtoField());
     }
 
     protected function useDisabledChecksum($app)

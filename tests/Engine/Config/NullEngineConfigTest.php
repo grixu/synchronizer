@@ -1,8 +1,8 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Config;
+namespace Grixu\Synchronizer\Tests\Engine\Config;
 
-use Grixu\Synchronizer\Config\NullEngineConfig;
+use Grixu\Synchronizer\Engine\Config\NullEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class NullEngineConfigTest extends TestCase
@@ -23,9 +23,13 @@ class NullEngineConfigTest extends TestCase
 
         $this->assertEmpty($obj->getModel());
         $this->assertEmpty($obj->getKey());
-        $this->assertEmpty($obj->getExcludedFields());
-        $this->assertEmpty($obj->getChecksumField());
+        $this->assertEmpty($obj->getExcluded());
+        $this->assertEmpty($obj->getFillable());
+        $this->assertEmpty($obj->getOnly());
+        $this->assertEmpty($obj->isOnlyMode());
+        $this->assertEmpty($obj->getChecksumFieldAsDtoField());
         $this->assertEmpty($obj->getTimestamps());
         $this->assertEmpty($obj->getIds());
+        $this->assertEmpty($obj->getChecksumFieldAsModelField());
     }
 }

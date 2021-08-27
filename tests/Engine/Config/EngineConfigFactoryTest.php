@@ -1,10 +1,10 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Config;
+namespace Grixu\Synchronizer\Tests\Engine\Config;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
-use Grixu\Synchronizer\Config\EngineConfig;
-use Grixu\Synchronizer\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Support\Str;
@@ -51,7 +51,7 @@ class EngineConfigFactoryTest extends TestCase
     public function it_allows_to_define_checksum()
     {
         $config = $this->makeObj(checksum: 'checksum');
-        $this->assertNotEmpty($config->getChecksumField());
+        $this->assertNotEmpty($config->getChecksumFieldAsDtoField());
     }
 
     /**
@@ -61,7 +61,7 @@ class EngineConfigFactoryTest extends TestCase
     public function it_allows_to_empty_checksum()
     {
         $config = $this->makeObj();
-        $this->assertEmpty($config->getChecksumField());
+        $this->assertEmpty($config->getChecksumFieldAsDtoField());
     }
 
     protected function useDisabledChecksum($app)
@@ -73,7 +73,7 @@ class EngineConfigFactoryTest extends TestCase
     public function it_allows_to_disable_checksum()
     {
         $config = $this->makeObj(checksum: false);
-        $this->assertEmpty($config->getChecksumField());
+        $this->assertEmpty($config->getChecksumFieldAsDtoField());
     }
 
     /** @test */
