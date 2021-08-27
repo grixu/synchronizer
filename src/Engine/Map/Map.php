@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Engine\Map;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
 use Illuminate\Support\Str;
 
@@ -20,8 +20,8 @@ class Map implements MapInterface
         $this->excludedFields = array_map(fn ($item) => Str::snake($item), $this->config->getExcluded());
         $this->updatableOnNull = array_map(fn ($item) => Str::snake($item), $this->config->getFillable());
 
-        if (!empty($this->config->getChecksumField())) {
-            $fields[] = $this->config->getChecksumField();
+        if (!empty($this->config->getChecksumFieldAsDtoField())) {
+            $fields[] = $this->config->getChecksumFieldAsDtoField();
         }
 
         $fields = array_diff($fields, ['relations']);
@@ -49,7 +49,7 @@ class Map implements MapInterface
 
         $this->map[$field] = $modelField;
 
-        if (!in_array($modelField, $this->config->getTimestampsAsSnake())) {
+        if (!in_array($field, $this->config->getTimestamps())) {
             $this->mapWithoutTimestamps[$field] = $modelField;
         }
     }
