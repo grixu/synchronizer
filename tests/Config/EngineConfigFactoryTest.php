@@ -7,6 +7,7 @@ use Grixu\Synchronizer\Config\EngineConfig;
 use Grixu\Synchronizer\Config\EngineConfigFactory;
 use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Illuminate\Support\Str;
 
 class EngineConfigFactoryTest extends TestCase
 {
@@ -92,6 +93,10 @@ class EngineConfigFactoryTest extends TestCase
         $config = $this->makeObj();
 
         $this->assertNotEmpty($config->getTimestamps());
-        $this->assertEquals(config('synchronizer.checksum.timestamps'), $config->getTimestamps());
+        $this->assertNotEquals(config('synchronizer.checksum.timestamps'), $config->getTimestamps());
+        $this->assertEquals(
+            array_map(fn ($item) => Str::camel($item), config('synchronizer.checksum.timestamps')),
+            $config->getTimestamps()
+        );
     }
 }
