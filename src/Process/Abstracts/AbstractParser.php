@@ -3,27 +3,26 @@
 namespace Grixu\Synchronizer\Process\Abstracts;
 
 use Grixu\Synchronizer\Checksum;
-use Grixu\Synchronizer\Config\Contracts\SyncConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Process\Contracts\SingleElementParserInterface;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 
 abstract class AbstractParser implements ParserInterface, SingleElementParserInterface
 {
     public function parse(Collection $collection): Collection
     {
-        $config = app(SyncConfig::class);
+        /** @var EngineConfigInterface $config */
+        $config = app(EngineConfigInterface::class);
         $timestampExcluded = config('synchronizer.checksum.timestamps_excluded');
-        $timestamps = $config->getTimestamps();
-        $timestamps = array_map(fn ($item) => Str::camel($item), $timestamps);
 
-        return $collection->map(function ($item) use ($timestampExcluded, $timestamps) {
+        return $collection->map(function ($item) use ($timestampExcluded, $config) {
             $item = $this->parseElement($item);
+            $item = $item->except(...$config->getExcludedFields());
             $checksumBase = clone $item;
 
             if ($timestampExcluded) {
-                $checksumBase = $checksumBase->except(...$timestamps);
+                $checksumBase = $checksumBase->except(...$config->getTimestamps());
             }
 
             $item = $item->toArray();
