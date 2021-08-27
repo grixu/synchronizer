@@ -18,7 +18,7 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 
         return $collection->map(function ($item) use ($timestampExcluded, $config) {
             $item = $this->parseElement($item);
-            $item = $item->except(...$config->getExcludedFields());
+            $item = $item->except(...$config->getExcluded());
             $checksumBase = clone $item;
 
             if ($timestampExcluded) {
