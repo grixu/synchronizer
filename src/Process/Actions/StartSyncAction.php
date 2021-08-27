@@ -53,9 +53,9 @@ class StartSyncAction
     {
         foreach ($this->configs as ['process' => $process, 'engine' => $engine]) {
             /** @var ProcessConfigInterface $config */
-            $jobClass = $config->getCurrentJob();
+            $jobClass = $process->getCurrentJob();
 
-            $this->jobs[] = new $jobClass($config, $engine);
+            $this->jobs[] = new $jobClass($process, $engine);
         }
     }
 
