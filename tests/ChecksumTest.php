@@ -5,7 +5,7 @@ namespace Grixu\Synchronizer\Tests;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Checksum;
-use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Contracts\Map;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
