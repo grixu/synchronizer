@@ -3,9 +3,9 @@
 namespace Grixu\Synchronizer\Tests\Helpers;
 
 use Grixu\SociusModels\Customer\Models\Customer;
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
-use Grixu\Synchronizer\Config\EngineConfig;
-use Grixu\Synchronizer\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 
 class FakeEngineConfig
 {

@@ -8,7 +8,7 @@ use Grixu\Synchronizer\Process\Handlers\DefaultSyncHandler;
 
 class FakeProcessConfig
 {
-    public static function make(string $jobs = 'default', string|null $sync = null, string|null $error = null): ProcessConfig
+    public static function make(string|array $jobs = 'default', string|null $sync = null, string|null $error = null): ProcessConfig
     {
         if (empty($sync)) {
             $sync = DefaultSyncHandler::class;

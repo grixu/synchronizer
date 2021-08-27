@@ -2,8 +2,8 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\SynchronizerServiceProvider;
 
 class SyncTestCase extends \Orchestra\Testbench\TestCase
