@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Process\Abstracts;
 
 use Grixu\Synchronizer\Checksum;
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Process\Contracts\SingleElementParserInterface;
 use Illuminate\Support\Collection;
@@ -18,7 +18,6 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 
         return $collection->map(function ($item) use ($timestampExcluded, $config) {
             $item = $this->parseElement($item);
-            $item = $item->except(...$config->getExcluded());
             $checksumBase = clone $item;
 
             if ($timestampExcluded) {

@@ -2,9 +2,9 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
-use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
