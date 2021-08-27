@@ -22,12 +22,18 @@ class EngineConfigFactoryTest extends TestCase
         $this->assertNotEmpty($config->getKey());
     }
 
-    protected function makeObj(array|bool $timestamps = [], array $ids = [], array $excluded = [], array|bool|null $checksum = null): EngineConfigInterface
-    {
+    protected function makeObj(
+        array|bool $timestamps = [],
+        array $ids = [],
+        array $fields = [],
+        int $mode = EngineConfig::EXCLUDED,
+        array|bool|null $checksum = null
+    ): EngineConfigInterface {
         return EngineConfigFactory::make(
             model: FakeForeignSqlSourceModel::class,
             key: 'xlId',
-            excludedFields: $excluded,
+            fields: $fields,
+            mode: $mode,
             checksumField: $checksum,
             timestamps: $timestamps,
             ids: $ids
