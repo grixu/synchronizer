@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
-use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;

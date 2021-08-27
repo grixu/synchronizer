@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Customer\Models\Customer;
-use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
@@ -26,7 +26,7 @@ class MapTest extends TestCase
             [
                 'name',
                 'country',
-                'updated_at',
+                'updatedAt',
             ]
         );
     }
