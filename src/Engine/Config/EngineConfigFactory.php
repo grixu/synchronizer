@@ -1,8 +1,8 @@
 <?php
 
-namespace Grixu\Synchronizer\Config;
+namespace Grixu\Synchronizer\Engine\Config;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 
 class EngineConfigFactory
 {

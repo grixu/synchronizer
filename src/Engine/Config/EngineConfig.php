@@ -1,8 +1,8 @@
 <?php
 
-namespace Grixu\Synchronizer\Config;
+namespace Grixu\Synchronizer\Engine\Config;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Illuminate\Support\Str;
 
 class EngineConfig implements EngineConfigInterface
@@ -105,19 +105,14 @@ class EngineConfig implements EngineConfigInterface
         return $this->ids;
     }
 
-    public function getChecksumField(): string | null
+    public function getChecksumFieldAsDtoField(): string | null
     {
         return $this->checksumField;
     }
 
-    public function getChecksumFieldAsSnake(): string|null
+    public function getChecksumFieldAsModelField(): string|null
     {
-        return Str::snake($this->getChecksumField());
-    }
-
-    public function getTimestampsAsSnake(): array
-    {
-        return array_map(fn ($item) => Str::snake($item), $this->getTimestamps());
+        return Str::snake($this->getChecksumFieldAsDtoField());
     }
 
     public function getExcluded(): array

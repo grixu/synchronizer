@@ -1,8 +1,8 @@
 <?php
 
-namespace Grixu\Synchronizer\Config;
+namespace Grixu\Synchronizer\Engine\Config;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 
 class NullEngineConfig implements EngineConfigInterface
 {
@@ -26,17 +26,12 @@ class NullEngineConfig implements EngineConfigInterface
         return [];
     }
 
-    public function getTimestampsAsSnake(): array
-    {
-        return [];
-    }
-
-    public function getChecksumField(): string|null
+    public function getChecksumFieldAsDtoField(): string|null
     {
         return null;
     }
 
-    public function getChecksumFieldAsSnake(): string|null
+    public function getChecksumFieldAsModelField(): string|null
     {
         return null;
     }
