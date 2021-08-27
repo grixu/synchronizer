@@ -4,8 +4,6 @@ namespace Grixu\Synchronizer;
 
 use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Config\EngineConfig;
-use Grixu\Synchronizer\Console\AddExcludedFieldCommand;
-use Grixu\Synchronizer\Console\ListExcludedFieldsCommand;
 use Grixu\Synchronizer\Providers\EventServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -21,13 +19,6 @@ class SynchronizerServiceProvider extends ServiceProvider
                     __DIR__ . '/../config/config.php' => config_path('synchronizer.php'),
                 ],
                 'config'
-            );
-
-            $this->commands(
-                [
-                    AddExcludedFieldCommand::class,
-                    ListExcludedFieldsCommand::class,
-                ]
             );
         }
     }
