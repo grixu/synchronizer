@@ -3,20 +3,64 @@
 namespace Grixu\Synchronizer\Config;
 
 use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
+use Illuminate\Support\Str;
 
 class EngineConfig implements EngineConfigInterface
 {
     private static EngineConfigInterface|null $instance = null;
 
+    public const ONLY = 1;
+    public const EXCLUDED = 2;
+
+    protected array $excludedFields = [];
+    protected array $fillableFields = [];
+    protected array $onlyFields = [];
+
     public function __construct(
         protected string $model,
         protected string $key,
-        protected array $excludedFields = [],
+        array $fields = [],
+        int $mode = self::EXCLUDED,
         protected string|null $checksumField = null,
         protected array $timestamps = [],
         protected array $ids = [],
     ) {
+        $this->checksumField = Str::camel($checksumField);
+        $this->timestamps = array_map(fn ($item) => Str::camel($item), $timestamps);
+
+        $this->mapFields($mode, $fields);
         $this->validateChecksum();
+    }
+
+    protected function mapFields(int $mode, array $fields)
+    {
+        switch ($mode) {
+            case self::ONLY:
+                $this->onlyFields = array_map(fn ($item) => Str::camel($item), $fields);
+                $this->excludedFields = [];
+                $this->fillableFields = [];
+                break;
+            case self::EXCLUDED:
+                $this->onlyFields = [];
+                $this->mapFieldsExcluded($fields);
+                break;
+        }
+    }
+
+    private function mapFieldsExcluded(array $excludedFields)
+    {
+        foreach ($excludedFields as $key => $value) {
+            if (is_array($value)) {
+                if (in_array('fillable', $value)) {
+                    $this->fillableFields[] = Str::camel($key);
+                    continue;
+                }
+
+                $this->excludedFields[] = Str::camel($key);
+            } else {
+                $this->excludedFields[] = Str::camel($value);
+            }
+        }
     }
 
     protected function validateChecksum(): void
@@ -66,8 +110,33 @@ class EngineConfig implements EngineConfigInterface
         return $this->checksumField;
     }
 
-    public function getExcludedFields(): array
+    public function getChecksumFieldAsSnake(): string|null
+    {
+        return Str::snake($this->getChecksumField());
+    }
+
+    public function getTimestampsAsSnake(): array
+    {
+        return array_map(fn ($item) => Str::snake($item), $this->getTimestamps());
+    }
+
+    public function getExcluded(): array
     {
         return $this->excludedFields;
+    }
+
+    public function getFillable(): array
+    {
+        return $this->fillableFields;
+    }
+
+    public function getOnly(): array
+    {
+        return $this->onlyFields;
+    }
+
+    public function isOnlyMode(): bool
+    {
+        return count($this->onlyFields) > 0;
     }
 }
