@@ -52,4 +52,17 @@ class AbstractParserTest extends SyncTestCase
 
         $this->assertEquals($takeOne, $takeTwo);
     }
+
+    /** @test */
+    public function it_excluding_field_from_dto()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(excludedFields: ['name'])
+        );
+
+        $result = $this->obj->parse($this->data);
+
+        $this->assertNotEmpty($result);
+        $result->each(fn ($item) => $this->assertArrayNotHasKey('name', $item));
+    }
 }
