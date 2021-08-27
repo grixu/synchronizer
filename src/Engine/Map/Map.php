@@ -39,11 +39,11 @@ class Map implements MapInterface
             return;
         }
 
-        if (in_array($modelField, $this->excludedFields)) {
+        if (in_array($field, $this->config->getExcluded())) {
             return;
         }
 
-        if (in_array($modelField, $this->updatableOnNull)) {
+        if (in_array($field, $this->config->getFillable())) {
             return;
         }
 
