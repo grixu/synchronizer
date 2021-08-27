@@ -2,8 +2,8 @@
 
 namespace Grixu\Synchronizer;
 
-use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
-use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Providers\EventServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
