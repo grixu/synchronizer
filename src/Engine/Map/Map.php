@@ -2,9 +2,8 @@
 
 namespace Grixu\Synchronizer\Engine\Map;
 
-use Grixu\Synchronizer\Config\Contracts\SyncConfig;
+use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
-use Grixu\Synchronizer\Engine\Models\ExcludedField;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
@@ -14,12 +13,13 @@ class Map implements MapInterface
     protected array $mapWithoutTimestamps = [];
     protected array $updatableOnNull = [];
     protected Collection $excludedFields;
-    protected SyncConfig $config;
+    protected EngineConfigInterface $config;
 
     public function __construct(array $fields)
     {
-        $this->config = app(SyncConfig::class);
-        $this->excludedFields = $this->getExcludedFields($this->config->getLocalModel());
+        $this->config = app(EngineConfigInterface::class);
+        $this->excludedFields = collect();
+        $this->transformExcludedField();
 
         if (!empty($this->config->getChecksumField())) {
             $fields[] = $this->config->getChecksumField();
@@ -32,12 +32,23 @@ class Map implements MapInterface
         }
     }
 
-    protected function getExcludedFields(string $model): Collection
+    private function transformExcludedField()
     {
-        return ExcludedField::query()
-            ->where('model', $model)
-            ->get();
+        foreach ($this->config->getExcludedFields() as $key => $value) {
+            if (is_array($value)) {
+                $this->excludedFields->put(
+                    Str::snake($key),
+                    new ExcludedField($key, $value['nullable'] ?? true)
+                );
+            } else {
+                $this->excludedFields->put(
+                    Str::snake($value),
+                    new ExcludedField($value)
+                );
+            }
+        }
     }
+
 
     public function add(string $field, string|null $modelField = null): void
     {
@@ -46,10 +57,11 @@ class Map implements MapInterface
             return;
         }
 
-        $excludedField = $this->excludedFields->where('field', $modelField)->first();
+        /** @var ExcludedField $excludedField */
+        $excludedField = $this->excludedFields->get($modelField);
 
         if ($excludedField) {
-            if ($excludedField->update_empty) {
+            if ($excludedField->isFillable()) {
                 $this->updatableOnNull[] = $modelField;
             }
 
