@@ -8,6 +8,11 @@ interface EngineConfigInterface
     public function getKey(): string;
     public function getIds(): array;
     public function getTimestamps(): array;
+    public function getTimestampsAsSnake(): array;
     public function getChecksumField(): string | null;
-    public function getExcludedFields(): array;
+    public function getChecksumFieldAsSnake(): string | null;
+    public function getExcluded(): array;
+    public function getFillable(): array;
+    public function getOnly(): array;
+    public function isOnlyMode(): bool;
 }
