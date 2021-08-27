@@ -26,13 +26,38 @@ class NullEngineConfig implements EngineConfigInterface
         return [];
     }
 
+    public function getTimestampsAsSnake(): array
+    {
+        return [];
+    }
+
     public function getChecksumField(): string|null
     {
         return null;
     }
 
-    public function getExcludedFields(): array
+    public function getChecksumFieldAsSnake(): string|null
+    {
+        return null;
+    }
+
+    public function getExcluded(): array
     {
         return [];
+    }
+
+    public function getFillable(): array
+    {
+        return [];
+    }
+
+    public function getOnly(): array
+    {
+        return [];
+    }
+
+    public function isOnlyMode(): bool
+    {
+        return false;
     }
 }
