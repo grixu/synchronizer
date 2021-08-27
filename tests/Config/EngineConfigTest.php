@@ -18,12 +18,18 @@ class EngineConfigTest extends TestCase
         $this->assertInstanceOf(EngineConfigInterface::class, $obj);
     }
 
-    protected function createObj($timestamps = [], $excludedFields = [], $checksumField = 'checksum', $ids = []): EngineConfigInterface
-    {
+    protected function createObj(
+        $timestamps = [],
+        $fields = [],
+        $mode = EngineConfig::EXCLUDED,
+        $checksumField = 'checksum',
+        $ids = []
+    ): EngineConfigInterface {
         return EngineConfigFactory::make(
             model: Language::class,
             key: 'xlId',
-            excludedFields: $excludedFields,
+            fields: $fields,
+            mode: $mode,
             checksumField: $checksumField,
             timestamps: $timestamps,
             ids: $ids
@@ -103,5 +109,41 @@ class EngineConfigTest extends TestCase
 
         $this->assertNotEquals($instanceBefore, EngineConfig::getInstance());
         $this->assertEquals($obj, app(EngineConfigInterface::class));
+    }
+
+    /** @test */
+    public function it_provide_excluded_fields_mode()
+    {
+        $excluded = ['name'];
+        $obj = $this->createObj(fields: $excluded);
+
+        $this->assertNotEmpty($obj->getExcluded());
+        $this->assertEmpty($obj->getFillable());
+        $this->assertEmpty($obj->getOnly());
+        $this->assertFalse($obj->isOnlyMode());
+    }
+
+    /** @test */
+    public function it_provide_fillable_fields_mode()
+    {
+        $fillable = ['name' => ['fillable']];
+        $obj = $this->createObj(fields: $fillable);
+
+        $this->assertEmpty($obj->getExcluded());
+        $this->assertNotEmpty($obj->getFillable());
+        $this->assertEmpty($obj->getOnly());
+        $this->assertFalse($obj->isOnlyMode());
+    }
+
+    /** @test */
+    public function it_provide_only_fields_mode()
+    {
+        $only = ['name'];
+        $obj = $this->createObj(fields: $only, mode: EngineConfig::ONLY);
+
+        $this->assertEmpty($obj->getExcluded());
+        $this->assertEmpty($obj->getFillable());
+        $this->assertNotEmpty($obj->getOnly());
+        $this->assertTrue($obj->isOnlyMode());
     }
 }
