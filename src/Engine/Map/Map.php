@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer\Engine\Map;
 
 use Grixu\Synchronizer\Config\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 class Map implements MapInterface
@@ -12,14 +11,14 @@ class Map implements MapInterface
     protected array $map = [];
     protected array $mapWithoutTimestamps = [];
     protected array $updatableOnNull = [];
-    protected Collection $excludedFields;
+    protected array $excludedFields;
     protected EngineConfigInterface $config;
 
     public function __construct(array $fields)
     {
         $this->config = app(EngineConfigInterface::class);
-        $this->excludedFields = collect();
-        $this->transformExcludedField();
+        $this->excludedFields = array_map(fn ($item) => Str::snake($item), $this->config->getExcluded());
+        $this->updatableOnNull = array_map(fn ($item) => Str::snake($item), $this->config->getFillable());
 
         if (!empty($this->config->getChecksumField())) {
             $fields[] = $this->config->getChecksumField();
@@ -32,45 +31,25 @@ class Map implements MapInterface
         }
     }
 
-    private function transformExcludedField()
-    {
-        foreach ($this->config->getExcludedFields() as $key => $value) {
-            if (is_array($value)) {
-                $this->excludedFields->put(
-                    Str::snake($key),
-                    new ExcludedField($key, $value['nullable'] ?? true)
-                );
-            } else {
-                $this->excludedFields->put(
-                    Str::snake($value),
-                    new ExcludedField($value)
-                );
-            }
-        }
-    }
-
-
     public function add(string $field, string|null $modelField = null): void
     {
         $modelField = (empty($modelField)) ? Str::snake($field) : $modelField;
+
         if (in_array($modelField, $this->map)) {
             return;
         }
 
-        /** @var ExcludedField $excludedField */
-        $excludedField = $this->excludedFields->get($modelField);
+        if (in_array($modelField, $this->excludedFields)) {
+            return;
+        }
 
-        if ($excludedField) {
-            if ($excludedField->isFillable()) {
-                $this->updatableOnNull[] = $modelField;
-            }
-
+        if (in_array($modelField, $this->updatableOnNull)) {
             return;
         }
 
         $this->map[$field] = $modelField;
 
-        if (!in_array($modelField, $this->config->getTimestamps())) {
+        if (!in_array($modelField, $this->config->getTimestampsAsSnake())) {
             $this->mapWithoutTimestamps[$field] = $modelField;
         }
     }
