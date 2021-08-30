@@ -4,7 +4,6 @@ namespace Grixu\Synchronizer\Engine;
 
 use Grixu\Synchronizer\Engine\Abstracts\BaseEngine;
 use Grixu\Synchronizer\Engine\Contracts\Transformer;
-use Illuminate\Support\Str;
 
 class ExcludedField extends BaseEngine
 {
@@ -14,22 +13,22 @@ class ExcludedField extends BaseEngine
         $updatable = $transformer->getMap()->getUpdatableOnNullFields();
 
         if (!empty($updatable)) {
-            foreach ($updatable as $field) {
+            foreach ($updatable as $dtoField => $modelField) {
                 $data = $this->model::query()
                     ->whereIn($this->modelKey, $allIds)
-                    ->whereNull($field)
+                    ->whereNull($modelField)
                     ->get();
 
-                $data = $data->map(function ($item) use ($field) {
+                $data = $data->map(function ($item) use ($dtoField, $modelField) {
                     $inputValue = $this->input->where($this->key, $item->{$this->modelKey})->first();
 
-                    $item->{$field} = $inputValue[Str::snake($field)];
+                    $item->{$dtoField} = $inputValue[$modelField];
 
                     return $item;
                 });
 
                 if ($data->count() > 0) {
-                    $this->model::upsert($data->toArray(), [$this->modelKey], [$field]);
+                    $this->model::upsert($data->toArray(), [$this->modelKey], [$modelField]);
 
                     $this->ids->push($data->pluck($this->modelKey));
                 }
