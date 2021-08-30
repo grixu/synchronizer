@@ -18,16 +18,23 @@ class Map implements MapInterface
     {
         $this->config = app(EngineConfigInterface::class);
         $this->excludedFields = array_map(fn ($item) => Str::snake($item), $this->config->getExcluded());
-        $this->updatableOnNull = array_map(fn ($item) => Str::snake($item), $this->config->getFillable());
+        $this->loadUpdatable();
 
-        if (!empty($this->config->getChecksumFieldAsDtoField())) {
-            $fields[] = $this->config->getChecksumFieldAsDtoField();
+        if (!empty($this->config->getChecksumField())) {
+            $fields[] = $this->config->getChecksumField();
         }
 
         $fields = array_diff($fields, ['relations']);
 
         foreach ($fields as $field) {
             $this->add($field);
+        }
+    }
+
+    private function loadUpdatable()
+    {
+        foreach ($this->config->getFillable() as $item) {
+            $this->updatableOnNull[$item] = Str::snake($item);
         }
     }
 
