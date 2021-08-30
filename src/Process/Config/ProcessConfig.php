@@ -1,15 +1,14 @@
 <?php
 
-namespace Grixu\Synchronizer\Config;
+namespace Grixu\Synchronizer\Process\Config;
 
-use Closure;
 use Exception;
-use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
-use Grixu\Synchronizer\Config\Exceptions\EmptyHandlersConfiguration;
-use Grixu\Synchronizer\Config\Exceptions\EmptyJobsConfiguration;
-use Grixu\Synchronizer\Config\Helpers\CheckInterface;
+use Grixu\Synchronizer\Helpers\CheckInterface;
 use Grixu\Synchronizer\Process\Contracts\ErrorHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\SyncHandlerInterface;
+use Grixu\Synchronizer\Process\Exceptions\EmptyHandlersConfiguration;
+use Grixu\Synchronizer\Process\Exceptions\EmptyJobsConfiguration;
 
 class ProcessConfig implements ProcessConfigInterface
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace Grixu\Synchronizer\Config\Helpers;
+namespace Grixu\Synchronizer\Helpers;
 
-use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
+use Grixu\Synchronizer\Process\Exceptions\InterfaceNotImplemented;
 use ReflectionClass;
 
 class CheckInterface

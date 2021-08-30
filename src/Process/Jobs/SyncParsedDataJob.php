@@ -2,10 +2,10 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ErrorHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\SyncHandlerInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;

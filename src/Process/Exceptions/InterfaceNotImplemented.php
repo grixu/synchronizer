@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer\Config\Exceptions;
+namespace Grixu\Synchronizer\Process\Exceptions;
 
 use Exception;
 

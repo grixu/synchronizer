@@ -1,6 +1,6 @@
 <?php
 
-namespace Grixu\Synchronizer\Config\Contracts;
+namespace Grixu\Synchronizer\Process\Contracts;
 
 interface ProcessConfigInterface
 {

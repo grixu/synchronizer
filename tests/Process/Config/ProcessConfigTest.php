@@ -1,10 +1,10 @@
 <?php
 
-namespace Grixu\Synchronizer\Tests\Config;
+namespace Grixu\Synchronizer\Tests\Process\Config;
 
 use Exception;
-use Grixu\Synchronizer\Config\Exceptions\InterfaceNotImplemented;
-use Grixu\Synchronizer\Config\ProcessConfig;
+use Grixu\Synchronizer\Process\Config\ProcessConfig;
+use Grixu\Synchronizer\Process\Exceptions\InterfaceNotImplemented;
 use Grixu\Synchronizer\Process\Handlers\DefaultErrorHandler;
 use Grixu\Synchronizer\Process\Handlers\DefaultSyncHandler;
 use Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler;

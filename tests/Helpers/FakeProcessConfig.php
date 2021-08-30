@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
-use Grixu\Synchronizer\Config\ProcessConfig;
+use Grixu\Synchronizer\Process\Config\ProcessConfig;
 use Grixu\Synchronizer\Process\Handlers\DefaultErrorHandler;
 use Grixu\Synchronizer\Process\Handlers\DefaultSyncHandler;
 
