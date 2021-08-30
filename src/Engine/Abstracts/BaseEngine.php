@@ -2,8 +2,8 @@
 
 namespace Grixu\Synchronizer\Engine\Abstracts;
 
-use Grixu\Synchronizer\Config\Contracts\SyncConfig;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Contracts\Transformer;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo as BelongsToRelation;
@@ -18,12 +18,12 @@ abstract class BaseEngine implements Engine
     protected string $key;
     protected string|null $checksum = null;
 
-    public function __construct(SyncConfig $config, protected Collection $input)
+    public function __construct(EngineConfigInterface $config, protected Collection $input)
     {
-        $this->key = $config->getForeignKey();
+        $this->key = $config->getKey();
         $this->checksum = $config->getChecksumField();
         $this->ids = collect();
-        $this->model = new ($config->getLocalModel());
+        $this->model = new ($config->getModel());
         $this->modelKey = Str::snake($this->key);
 
         $this->filterByKeyExistence();

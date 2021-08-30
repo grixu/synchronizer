@@ -3,7 +3,7 @@
 namespace Grixu\Synchronizer\Engine\Abstracts;
 
 use Exception;
-use Grixu\Synchronizer\Config\Contracts\SyncConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection;
 use ReflectionClass;
@@ -12,7 +12,7 @@ abstract class RelationEngine extends BaseEngine
 {
     protected Collection $loaded;
 
-    public function __construct(SyncConfig $config, protected Collection $input)
+    public function __construct(EngineConfigInterface $config, protected Collection $input)
     {
         parent::__construct($config, $input);
         $this->loaded = collect();
