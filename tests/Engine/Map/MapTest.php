@@ -138,6 +138,30 @@ class MapTest extends TestCase
         $this->assertCount(2, $this->obj->getModelFieldsArray());
     }
 
+    /** @test */
+    public function it_transform_updatable_fields_to_map()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(
+                timestamps: ['updated_at'],
+                checksumField: 'checksum',
+                fields: ['postal_code' => ['fillable']]
+            )
+        );
+        $model = Customer::factory()->make();
+
+        $this->obj = new Map(
+            [
+                'name',
+                'postalCode',
+                'updatedAt',
+            ],
+        );
+
+        $this->assertCount(1, $this->obj->getUpdatableOnNullFields());
+        $this->assertEquals(['postalCode'=>'postal_code'], $this->obj->getUpdatableOnNullFields());
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
