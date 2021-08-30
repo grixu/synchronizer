@@ -22,7 +22,7 @@ class ExcludedField extends BaseEngine
                 $data = $data->map(function ($item) use ($dtoField, $modelField) {
                     $inputValue = $this->input->where($this->key, $item->{$this->modelKey})->first();
 
-                    $item->{$dtoField} = $inputValue[$modelField];
+                    $item->{$dtoField} = $inputValue['fillable'][$modelField];
 
                     return $item;
                 });
