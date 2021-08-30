@@ -52,4 +52,50 @@ class AbstractParserTest extends SyncTestCase
 
         $this->assertEquals($takeOne, $takeTwo);
     }
+
+    /** @test */
+    public function it_excluding_fields()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(fields: ['name'])
+        );
+
+        $test = $this->obj->parse($this->data);
+        $this->assertNotEmpty($test);
+        $test->each(fn ($item) => $this->assertArrayNotHasKey('name', $item));
+    }
+
+    /** @test */
+    public function it_gathering_fillable_fields()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(fields: ['name'=>['fillable']])
+        );
+
+        $test = $this->obj->parse($this->data);
+        $this->assertNotEmpty($test);
+        $test->each(function ($item) {
+            $this->assertArrayNotHasKey('name', $item);
+            $this->assertArrayHasKey('name', $item['fillable']);
+        });
+    }
+
+
+    /** @test */
+    public function it_strip_all_fields_in_only_mode()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(fields: ['name', 'country'], mode: EngineConfig::ONLY)
+        );
+
+        $test = $this->obj->parse($this->data);
+        $this->assertNotEmpty($test);
+        $test->each(function ($item) {
+            $this->assertArrayHasKey('name', $item);
+            $this->assertArrayHasKey('country', $item);
+            $this->assertArrayNotHasKey('fillable', $item);
+            // checksum field - that's why +1
+            $this->assertCount(3, $item);
+        });
+    }
 }
