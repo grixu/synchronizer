@@ -4,20 +4,18 @@ namespace Grixu\Synchronizer\Tests\Engine;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Engine\ExcludedField;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
-use Grixu\Synchronizer\Engine\Models\ExcludedField as ExcludedFieldModel;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Support\Collection;
 
 class ExcludedFieldTest extends TestCase
 {
     protected Product $model;
-    protected ExcludedFieldModel $excludedField;
     protected Engine $obj;
     protected Collection $data;
     protected Transformer $transformer;
@@ -35,14 +33,6 @@ class ExcludedFieldTest extends TestCase
             ]
         );
 
-        $this->excludedField = ExcludedFieldModel::create(
-            [
-                'model' => Product::class,
-                'update_empty' => true,
-                'field' => 'index',
-            ]
-        );
-
         $this->data = collect();
         $this->data->push(
             ProductDataFactory::new()->create(
@@ -52,13 +42,13 @@ class ExcludedFieldTest extends TestCase
             )->toArray()
         );
 
-        SyncConfig::setInstance(FakeSyncConfig::makeWithCustomModel(Product::class));
+        EngineConfig::setInstance(FakeEngineConfig::make(model: Product::class, fields: ['index'=>['fillable']]));
         $map = MapFactory::makeFromArray($this->data->first());
         $this->transformer = new Transformer($map);
 
         $this->assertCount(1, $map->getUpdatableOnNullFields());
 
-        $this->obj = new ExcludedField(SyncConfig::getInstance(), $this->data);
+        $this->obj = new ExcludedField(EngineConfig::getInstance(), $this->data);
     }
 
     /** @test */
