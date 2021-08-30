@@ -2,6 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.0.0 - 2021-08-30
+
+- Huge rebuilt of sync configuration, separated SyncConfig to two separate classes.
+- Changed way of declaring config in array form for StartSyncAction
+- Created dedicated Docs
+
 ## 4.3.1 - 2021-08-25
 
 - Minor bugs fixed
