@@ -2,11 +2,11 @@
 
 namespace Grixu\Synchronizer\Process\Actions;
 
-use Grixu\Synchronizer\Config\Contracts\ProcessConfigInterface;
-use Grixu\Synchronizer\Config\ProcessConfig;
 use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
 use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Process\Config\ProcessConfig;
 use Grixu\Synchronizer\Process\Contracts\ErrorHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\Process\Events\CollectionSynchronizedEvent;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Collection;
@@ -34,15 +34,9 @@ class StartSyncAction
             if (is_array($process)) {
                 $process = ProcessConfig::make(...$process);
             }
-            if (!$process instanceof ProcessConfigInterface) {
-                continue;
-            }
 
             if (is_array($engine)) {
                 $engine = EngineConfigFactory::make(...$engine);
-            }
-            if (!$engine instanceof EngineConfigInterface) {
-                continue;
             }
 
             $this->configs->push(['process' => $process, 'engine' => $engine]);
@@ -74,7 +68,7 @@ class StartSyncAction
             ->then(function (Batch $batch) {
                 foreach ($this->configs as ['engine' => $config]) {
                     /** @var EngineConfigInterface $config */
-                    event(new CollectionSynchronizedEvent($config->getModel(), $config->getChecksumFieldAsDtoField(), $batch->id));
+                    event(new CollectionSynchronizedEvent($config->getModel(), $config->getChecksumField(), $batch->id));
                 }
             })
             ->catch(function (Batch $batch, Throwable $exception) {
