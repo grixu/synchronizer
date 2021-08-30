@@ -8,13 +8,11 @@ use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Product;
-use Grixu\Synchronizer\Config\SyncConfigFactory;
-use Grixu\Synchronizer\Engine\Models\ExcludedField;
-use Grixu\Synchronizer\Synchronizer;
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Events\SynchronizerEvent;
-use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
-use Grixu\Synchronizer\Tests\Helpers\FakeParser;
+use Grixu\Synchronizer\Synchronizer;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
@@ -27,7 +25,7 @@ class SynchronizerTest extends TestCase
     use RefreshDatabase;
 
     protected array $data = [];
-    protected SyncConfig $config;
+    protected EngineConfigInterface $config;
     protected string $batchId;
     protected Synchronizer $obj;
 
@@ -50,15 +48,12 @@ class SynchronizerTest extends TestCase
         require_once __DIR__ . '/../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.stub';
         (new \CreateOperatorBranchPivotTable())->up();
 
-        $this->config = new SyncConfig(
-            FakeLoader::class,
-            FakeParser::class,
-            Operator::class,
-            'xlId',
-            config('synchronizer.jobs.default'),
-            config('synchronizer.checksum.field')
+        $this->config = EngineConfigFactory::make(
+            model: Operator::class,
+            key: 'xlId',
+            checksumField: config('synchronizer.checksum.field')
         );
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->config);
         $this->batchId = '11-111-111-11';
 
         $this->operatorRole = OperatorRole::factory()->create();
@@ -179,25 +174,14 @@ class SynchronizerTest extends TestCase
         require_once __DIR__ . '/../vendor/grixu/socius-models/migrations/create_products_table.stub';
         (new \CreateProductsTable())->up();
 
-        $this->excludedField = ExcludedField::create(
-            [
-                'model' => Product::class,
-                'update_empty' => true,
-                'field' => 'index',
-            ]
-        );
-
         $this->data = [];
         $this->data[] = ProductDataFactory::new()->create()->toArray();
-        $this->config = (app(SyncConfigFactory::class))->make(
-            FakeLoader::class,
-            FakeParser::class,
-            Product::class,
-            'xlId',
-            config('synchronizer.jobs.default')
+        $this->config = EngineConfigFactory::make(
+            model: Product::class,
+            key: 'xlId',
+            fields: ['index'=>['fillable']]
         );
-
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->config);
 
         $this->obj = new Synchronizer($this->data, $this->batchId);
 
