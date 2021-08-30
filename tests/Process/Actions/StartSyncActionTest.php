@@ -125,4 +125,19 @@ class StartSyncActionTest extends SyncTestCase
             return $request->url() == 'http://testable.dev';
         });
     }
+
+    /** @test */
+    public function it_run_jobs_on_specified_queue()
+    {
+        $config = [
+            [
+                'process' => FakeProcessConfig::make(),
+                'engine' => FakeEngineConfig::make(),
+            ],
+        ];
+        $obj = new StartSyncAction($config);
+        $obj->onQueue('another');
+
+        $this->runBatchAndCheckIt($obj, $config);
+    }
 }
