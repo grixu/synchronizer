@@ -27,9 +27,8 @@ class NullEngineConfigTest extends TestCase
         $this->assertEmpty($obj->getFillable());
         $this->assertEmpty($obj->getOnly());
         $this->assertEmpty($obj->isOnlyMode());
-        $this->assertEmpty($obj->getChecksumFieldAsDtoField());
+        $this->assertEmpty($obj->getChecksumField());
         $this->assertEmpty($obj->getTimestamps());
         $this->assertEmpty($obj->getIds());
-        $this->assertEmpty($obj->getChecksumFieldAsModelField());
     }
 }

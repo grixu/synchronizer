@@ -51,7 +51,7 @@ class EngineConfigFactoryTest extends TestCase
     public function it_allows_to_define_checksum()
     {
         $config = $this->makeObj(checksum: 'checksum');
-        $this->assertNotEmpty($config->getChecksumFieldAsDtoField());
+        $this->assertNotEmpty($config->getChecksumField());
     }
 
     /**
@@ -61,7 +61,7 @@ class EngineConfigFactoryTest extends TestCase
     public function it_allows_to_empty_checksum()
     {
         $config = $this->makeObj();
-        $this->assertEmpty($config->getChecksumFieldAsDtoField());
+        $this->assertEmpty($config->getChecksumField());
     }
 
     protected function useDisabledChecksum($app)
@@ -73,7 +73,7 @@ class EngineConfigFactoryTest extends TestCase
     public function it_allows_to_disable_checksum()
     {
         $config = $this->makeObj(checksum: false);
-        $this->assertEmpty($config->getChecksumFieldAsDtoField());
+        $this->assertEmpty($config->getChecksumField());
     }
 
     /** @test */

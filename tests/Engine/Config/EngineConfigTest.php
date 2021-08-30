@@ -40,7 +40,7 @@ class EngineConfigTest extends TestCase
     public function it_provide_access_to_checksum_field_name()
     {
         $obj = $this->createObj();
-        $returnedValue = $obj->getChecksumFieldAsDtoField();
+        $returnedValue = $obj->getChecksumField();
 
         $this->assertEquals('checksum', $returnedValue);
     }
@@ -52,7 +52,7 @@ class EngineConfigTest extends TestCase
     public function it_not_allows_checksum_field_if_checking_system_is_off()
     {
         $obj = $this->createObj();
-        $this->assertEmpty($obj->getChecksumFieldAsDtoField());
+        $this->assertEmpty($obj->getChecksumField());
     }
 
     protected function useDisabledChecksum($app)
@@ -145,5 +145,17 @@ class EngineConfigTest extends TestCase
         $this->assertEmpty($obj->getFillable());
         $this->assertNotEmpty($obj->getOnly());
         $this->assertTrue($obj->isOnlyMode());
+    }
+
+    /** @test */
+    public function it_is_bulletproof_for_wrong_field_config()
+    {
+        $excluded = ['name'=>[]];
+        $obj = $this->createObj(fields: $excluded);
+
+        $this->assertNotEmpty($obj->getExcluded());
+        $this->assertEmpty($obj->getFillable());
+        $this->assertEmpty($obj->getOnly());
+        $this->assertFalse($obj->isOnlyMode());
     }
 }
