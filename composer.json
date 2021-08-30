@@ -31,7 +31,7 @@
     "require-dev": {
         "fakerphp/faker": "^1.11",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "grixu/socius-models": "^2.4",
+        "grixu/socius-models": "^2.4.1",
         "nunomaduro/larastan": "^0.7.12",
         "nunomaduro/phpinsights": "^2.0",
         "orchestra/testbench": "^6.0",
