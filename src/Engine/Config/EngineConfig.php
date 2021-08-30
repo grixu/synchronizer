@@ -73,9 +73,11 @@ class EngineConfig implements EngineConfigInterface
 
     public static function getInstance(): EngineConfigInterface
     {
+        // @codeCoverageIgnoreStart
         if (empty(static::$instance)) {
             static::$instance = new NullEngineConfig();
         }
+        // @codeCoverageIgnoreEnd
 
         return static::$instance;
     }
@@ -105,14 +107,9 @@ class EngineConfig implements EngineConfigInterface
         return $this->ids;
     }
 
-    public function getChecksumFieldAsDtoField(): string | null
+    public function getChecksumField(): string | null
     {
         return $this->checksumField;
-    }
-
-    public function getChecksumFieldAsModelField(): string|null
-    {
-        return Str::snake($this->getChecksumFieldAsDtoField());
     }
 
     public function getExcluded(): array

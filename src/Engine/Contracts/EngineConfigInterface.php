@@ -7,8 +7,7 @@ interface EngineConfigInterface
     public function getModel(): string;
     public function getKey(): string;
     public function getIds(): array;
-    public function getChecksumFieldAsDtoField(): string | null;
-    public function getChecksumFieldAsModelField(): string | null;
+    public function getChecksumField(): string | null;
     public function getTimestamps(): array;
     public function getExcluded(): array;
     public function getFillable(): array;

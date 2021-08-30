@@ -26,12 +26,7 @@ class NullEngineConfig implements EngineConfigInterface
         return [];
     }
 
-    public function getChecksumFieldAsDtoField(): string|null
-    {
-        return null;
-    }
-
-    public function getChecksumFieldAsModelField(): string|null
+    public function getChecksumField(): string|null
     {
         return null;
     }
