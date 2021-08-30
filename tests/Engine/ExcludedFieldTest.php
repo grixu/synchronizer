@@ -2,49 +2,44 @@
 
 namespace Grixu\Synchronizer\Tests\Engine;
 
-use Grixu\SociusModels\Product\Factories\ProductDataFactory;
-use Grixu\SociusModels\Product\Models\Product;
+use Grixu\SociusModels\Customer\Models\Customer;
 use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
 use Grixu\Synchronizer\Engine\ExcludedField;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
+use Grixu\Synchronizer\Engine\Model;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
-use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
+use Grixu\Synchronizer\Tests\Helpers\FakeParser;
+use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Collection;
 
-class ExcludedFieldTest extends TestCase
+class ExcludedFieldTest extends SyncTestCase
 {
-    protected Product $model;
+    use RefreshDatabase;
+
     protected Engine $obj;
     protected Collection $data;
+    protected Collection $input;
     protected Transformer $transformer;
 
     protected function setUp(): void
     {
         parent::setUp();
 
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
-        (new \CreateProductsTable())->up();
+        EngineConfig::setInstance(FakeEngineConfig::make(fields: ['country'=>['fillable']]));
 
-        $this->model = Product::factory()->create(
-            [
-                'index' => null,
-            ]
-        );
+        $this->input = FakeForeignSqlSourceModel::limit(10)->get();
+        $parser = new FakeParser();
+        $this->data = $parser->parse($this->input);
 
-        $this->data = collect();
-        $this->data->push(
-            ProductDataFactory::new()->create(
-                [
-                    'xlId' => $this->model->xl_id,
-                ]
-            )->toArray()
-        );
-
-        EngineConfig::setInstance(FakeEngineConfig::make(model: Product::class, fields: ['index'=>['fillable']]));
         $map = MapFactory::makeFromArray($this->data->first());
         $this->transformer = new Transformer($map);
+
+        $model = new Model(EngineConfig::getInstance(), $this->data);
+        $model->sync($this->transformer);
 
         $this->assertCount(1, $map->getUpdatableOnNullFields());
 
@@ -60,11 +55,11 @@ class ExcludedFieldTest extends TestCase
     /** @test */
     public function it_sync_empty_field_properly()
     {
-        $this->assertEmpty($this->model->index);
+        $this->input->each(fn ($item) => $this->assertArrayNotHasKey('country', $item));
 
         $this->obj->sync($this->transformer);
 
-        $this->model->refresh();
-        $this->assertNotEmpty($this->model->index);
+        $checkData = Customer::all();
+        $checkData->each(fn ($item) => $this->assertArrayHasKey('country', $item));
     }
 }
