@@ -24,7 +24,7 @@ class Map implements MapInterface
             $fields[] = $this->config->getChecksumField();
         }
 
-        $fields = array_diff($fields, ['relations']);
+        $fields = array_diff($fields, ['relations', 'fillable']);
 
         foreach ($fields as $field) {
             $this->add($field);
