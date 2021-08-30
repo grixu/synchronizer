@@ -1,10 +1,9 @@
 build
 composer.lock
-docs/
 vendor
 coverage
 .idea
 .phpunit.result.cache
 ray.php
 .php-cs-fixer.cache
-/docs/
+.DS_Store
