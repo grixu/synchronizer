@@ -9,7 +9,7 @@ use Grixu\SociusModels\Product\Models\Category;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -42,7 +42,7 @@ class RelationEngineTest extends TestCase
         $this->makeBrokenRelationCase();
 
         try {
-            $this->obj = new BelongsToEngine(FakeSyncConfig::makeWithCustomModel(Product::class), $this->data);
+            $this->obj = new BelongsToEngine(FakeEngineConfig::make(model: Product::class), $this->data);
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);
@@ -75,7 +75,7 @@ class RelationEngineTest extends TestCase
         $this->makeNotRelationCase();
 
         try {
-            $this->obj = new BelongsToEngine(FakeSyncConfig::makeWithCustomModel(Product::class), $this->data);
+            $this->obj = new BelongsToEngine(FakeEngineConfig::make(model: Product::class), $this->data);
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);
@@ -108,7 +108,7 @@ class RelationEngineTest extends TestCase
         $this->makeNotThisModelCase();
 
         try {
-            $this->obj = new BelongsToEngine(FakeSyncConfig::makeWithCustomModel(Product::class), $this->data);
+            $this->obj = new BelongsToEngine(FakeEngineConfig::make(model: Product::class), $this->data);
             $this->assertTrue(false);
         } catch (Exception) {
             $this->assertTrue(true);

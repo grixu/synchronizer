@@ -9,7 +9,8 @@ use Grixu\Synchronizer\Logs\Logger;
 use Grixu\Synchronizer\Logs\Models\Log;
 use Grixu\Synchronizer\Logs\Notifications\LoggerNotification;
 use Grixu\Synchronizer\Process\Jobs\LoadDataToSyncJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeProcessConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Facades\Bus;
@@ -26,7 +27,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
 
         $this->batch = Bus::batch(
             [
-                new LoadDataToSyncJob(FakeSyncConfig::make()),
+                new LoadDataToSyncJob(FakeProcessConfig::make(), FakeEngineConfig::make()),
             ]
         )->dispatch();
         $this->createLog($this->batch->id);

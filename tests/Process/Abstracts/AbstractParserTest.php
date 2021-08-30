@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Abstracts;
 
-use Grixu\Synchronizer\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
@@ -51,18 +51,5 @@ class AbstractParserTest extends SyncTestCase
         $takeTwo = $this->obj->parse($this->data);
 
         $this->assertEquals($takeOne, $takeTwo);
-    }
-
-    /** @test */
-    public function it_excluding_field_from_dto()
-    {
-        EngineConfig::setInstance(
-            FakeEngineConfig::make(excludedFields: ['name'])
-        );
-
-        $result = $this->obj->parse($this->data);
-
-        $this->assertNotEmpty($result);
-        $result->each(fn ($item) => $this->assertArrayNotHasKey('name', $item));
     }
 }
