@@ -11,12 +11,13 @@ use Grixu\SociusModels\Product\Factories\ProductDataFactory;
 use Grixu\SociusModels\Product\Models\Brand;
 use Grixu\SociusModels\Product\Models\Product;
 use Grixu\SociusModels\Product\Models\ProductType;
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsTo as BelongsToEngine;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Contracts\Engine;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -31,13 +32,13 @@ class BelongsToTest extends TestCase
     protected Engine $obj;
     protected Collection $data;
     protected Transformer $transformer;
-    protected SyncConfig $config;
+    protected EngineConfigInterface $config;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->config = FakeSyncConfig::makeWithCustomModel(Product::class);
-        SyncConfig::setInstance($this->config);
+        $this->config = FakeEngineConfig::make(model: Product::class);
+        EngineConfig::setInstance($this->config);
     }
 
     /** @test */
@@ -59,9 +60,11 @@ class BelongsToTest extends TestCase
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_brands_table.stub';
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_product_types_table.stub';
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
+        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/update_products_table_add_availabilities.stub';
         (new \CreateBrandsTable())->up();
         (new \CreateProductTypesTable())->up();
         (new \CreateProductsTable())->up();
+        (new \UpdateProductsTableAddAvailabilities())->up();
 
         $this->localModel = Product::factory()->create();
         $this->relatedModel = Brand::factory()->create();
@@ -154,10 +157,10 @@ class BelongsToTest extends TestCase
     /** @test */
     public function it_handles_even_when_two_different_type_relations()
     {
-        SyncConfig::setInstance(FakeSyncConfig::makeWithCustomModel(Operator::class));
+        EngineConfig::setInstance(FakeEngineConfig::make(model: Operator::class));
         $this->makeComplicatedCase();
 
-        $this->obj = new BelongsToEngine(SyncConfig::getInstance(), $this->data);
+        $this->obj = new BelongsToEngine(EngineConfig::getInstance(), $this->data);
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();
@@ -216,12 +219,12 @@ class BelongsToTest extends TestCase
     /** @test */
     public function it_handles_no_rel_entries()
     {
-        SyncConfig::setInstance(FakeSyncConfig::makeWithCustomModel(Operator::class));
+        EngineConfig::setInstance(FakeEngineConfig::make(model: Operator::class));
         $this->makeComplicatedCase();
 
         $this->data->push(OperatorDataFactory::new()->create()->toArray());
 
-        $this->obj = new BelongsToEngine(SyncConfig::getInstance(), $this->data);
+        $this->obj = new BelongsToEngine(EngineConfig::getInstance(), $this->data);
         $this->obj->sync($this->transformer);
 
         $this->localModel->refresh();

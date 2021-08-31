@@ -2,10 +2,8 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Process\Jobs\LoadDataToSyncJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
@@ -15,19 +13,10 @@ class LoadDataToSyncJobTest extends SyncTestCase
 {
     use DatabaseMigrations;
 
-    protected SyncConfig $config;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->config = FakeSyncConfig::make();
-    }
-
     /** @test */
     public function it_constructs()
     {
-        $obj = new LoadDataToSyncJob($this->config);
+        $obj = new LoadDataToSyncJob($this->processConfig, $this->engineConfig);
 
         $this->assertEquals(LoadDataToSyncJob::class, $obj::class);
     }
@@ -37,7 +26,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
     {
         Queue::fake();
 
-        dispatch(new LoadDataToSyncJob($this->config));
+        dispatch(new LoadDataToSyncJob($this->processConfig, $this->engineConfig));
 
         Queue::assertPushed(LoadDataToSyncJob::class, 1);
     }
@@ -48,7 +37,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new LoadDataToSyncJob($this->config);
+        $job = new LoadDataToSyncJob($this->processConfig, $this->engineConfig);
         $batch = $bus->batch(
             [
                 $job,
@@ -67,7 +56,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
     /** @test */
     public function it_start_parsing_job()
     {
-        $obj = new LoadDataToSyncJob($this->config);
+        $obj = new LoadDataToSyncJob($this->processConfig, $this->engineConfig);
         $batch = Bus::batch(
             [
                 $obj,
@@ -85,7 +74,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new LoadDataToSyncJob($this->config);
+        $job = new LoadDataToSyncJob($this->processConfig, $this->engineConfig);
         $batch = $bus->batch(
             [
                 $job,
@@ -104,7 +93,7 @@ class LoadDataToSyncJobTest extends SyncTestCase
     /** @test */
     public function it_reacts_to_cancellation()
     {
-        $job = new LoadDataToSyncJob($this->config);
+        $job = new LoadDataToSyncJob($this->processConfig, $this->engineConfig);
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),

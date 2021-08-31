@@ -3,7 +3,6 @@
 namespace Grixu\Synchronizer\Engine\Map;
 
 use Grixu\Synchronizer\Engine\Contracts\Map as MapInterface;
-use JetBrains\PhpStorm\Pure;
 
 class NullMap implements MapInterface
 {
@@ -32,7 +31,6 @@ class NullMap implements MapInterface
         return [];
     }
 
-    #[Pure]
     public static function make(): MapInterface
     {
         return new static();

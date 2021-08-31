@@ -2,10 +2,9 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Process\Jobs\LoadAllAndParseJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeProcessConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
@@ -15,19 +14,17 @@ class LoadAllAndParseJobTest extends SyncTestCase
 {
     use DatabaseMigrations;
 
-    protected SyncConfig $config;
-
     protected function setUp(): void
     {
         parent::setUp();
 
-        $this->config = FakeSyncConfig::makeLoadAllAndParse();
+        $this->processConfig = FakeProcessConfig::make('load-all-and-parse');
     }
 
     /** @test */
     public function it_constructs()
     {
-        $obj = new LoadAllAndParseJob($this->config);
+        $obj = new LoadAllAndParseJob($this->processConfig, $this->engineConfig);
 
         $this->assertEquals(LoadAllAndParseJob::class, $obj::class);
     }
@@ -37,7 +34,7 @@ class LoadAllAndParseJobTest extends SyncTestCase
     {
         Queue::fake();
 
-        dispatch(new LoadAllAndParseJob($this->config));
+        dispatch(new LoadAllAndParseJob($this->processConfig, $this->engineConfig));
 
         Queue::assertPushed(LoadAllAndParseJob::class, 1);
     }
@@ -48,7 +45,7 @@ class LoadAllAndParseJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new LoadAllAndParseJob($this->config);
+        $job = new LoadAllAndParseJob($this->processConfig, $this->engineConfig);
         $batch = $bus->batch(
             [
                 $job,
@@ -67,7 +64,7 @@ class LoadAllAndParseJobTest extends SyncTestCase
     /** @test */
     public function it_start_parsing_job()
     {
-        $obj = new LoadAllAndParseJob($this->config);
+        $obj = new LoadAllAndParseJob($this->processConfig, $this->engineConfig);
         $batch = Bus::batch(
             [
                 $obj,
@@ -85,7 +82,7 @@ class LoadAllAndParseJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new LoadAllAndParseJob($this->config);
+        $job = new LoadAllAndParseJob($this->processConfig, $this->engineConfig);
         $batch = $bus->batch(
             [
                 $job,
@@ -104,7 +101,7 @@ class LoadAllAndParseJobTest extends SyncTestCase
     /** @test */
     public function it_reacts_to_cancellation()
     {
-        $job = new LoadAllAndParseJob($this->config);
+        $job = new LoadAllAndParseJob($this->processConfig, $this->engineConfig);
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),

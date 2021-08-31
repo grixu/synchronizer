@@ -2,7 +2,7 @@
 
 namespace Grixu\Synchronizer;
 
-use Grixu\Synchronizer\Config\Contracts\SyncConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -11,13 +11,13 @@ class Checksum
 {
     protected Collection $diff;
 
-    public function __construct(Collection $data, SyncConfig $config)
+    public function __construct(Collection $data, EngineConfigInterface $config)
     {
         $this->isChecksumControlDisabled();
-        $key = $config->getForeignKey();
-        $model = $config->getLocalModel();
-        $checksumField = $config->getChecksumField();
+        $key = $config->getKey();
+        $model = $config->getModel();
 
+        $checksumField = Str::snake($config->getChecksumField());
         $modelKey = Str::snake($key);
 
         $checksums = $data->pluck($checksumField, $key);

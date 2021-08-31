@@ -3,22 +3,15 @@
 namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Customer\Models\Customer;
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Map\Map;
-use Grixu\Synchronizer\Engine\Models\ExcludedField;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class MapTest extends TestCase
 {
     protected Map $obj;
-    protected SyncConfig $config;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-        SyncConfig::setInstance(FakeSyncConfig::make('checksum', ['updated_at']));
-    }
+    protected EngineConfig $config;
 
     /** @test */
     public function create_map(): void
@@ -33,7 +26,7 @@ class MapTest extends TestCase
             [
                 'name',
                 'country',
-                'updated_at',
+                'updatedAt',
             ]
         );
     }
@@ -59,12 +52,12 @@ class MapTest extends TestCase
 
     protected function createSimpleExclude(): void
     {
-        ExcludedField::factory()->create(
-            [
-                'field' => 'country',
-                'model' => Customer::class,
-                'update_empty' => false,
-            ]
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(
+                timestamps: ['updated_at'],
+                checksumField: 'checksum',
+                fields: ['country']
+            )
         );
     }
 
@@ -80,19 +73,19 @@ class MapTest extends TestCase
 
     protected function createObjAndRealModel(): Customer
     {
-        ExcludedField::factory()->create(
-            [
-                'field' => 'name',
-                'model' => Customer::class,
-                'update_empty' => true,
-            ]
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(
+                timestamps: ['updated_at'],
+                checksumField: 'checksum',
+                fields: ['name' => ['fillable']]
+            )
         );
         $model = Customer::factory()->make();
 
         $this->obj = new Map(
             [
                 'name',
-                'updated_at',
+                'updatedAt',
             ],
         );
 
@@ -143,5 +136,40 @@ class MapTest extends TestCase
 
         $this->assertBasicThingsAboutArray();
         $this->assertCount(2, $this->obj->getModelFieldsArray());
+    }
+
+    /** @test */
+    public function it_transform_updatable_fields_to_map()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(
+                timestamps: ['updated_at'],
+                checksumField: 'checksum',
+                fields: ['postal_code' => ['fillable']]
+            )
+        );
+        $model = Customer::factory()->make();
+
+        $this->obj = new Map(
+            [
+                'name',
+                'postalCode',
+                'updatedAt',
+            ],
+        );
+
+        $this->assertCount(1, $this->obj->getUpdatableOnNullFields());
+        $this->assertEquals(['postalCode'=>'postal_code'], $this->obj->getUpdatableOnNullFields());
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(
+                timestamps: ['updated_at'],
+                checksumField: 'checksum'
+            )
+        );
     }
 }

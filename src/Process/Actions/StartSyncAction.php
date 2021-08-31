@@ -2,8 +2,11 @@
 
 namespace Grixu\Synchronizer\Process\Actions;
 
-use Grixu\Synchronizer\Config\SyncConfig;
-use Grixu\Synchronizer\Config\SyncConfigFactory;
+use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Process\Config\ProcessConfig;
+use Grixu\Synchronizer\Process\Contracts\ErrorHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\Process\Events\CollectionSynchronizedEvent;
 use Illuminate\Bus\Batch;
 use Illuminate\Support\Collection;
@@ -12,63 +15,75 @@ use Throwable;
 
 class StartSyncAction
 {
-    public function execute(SyncConfig|array $config, string $queue = 'default'): Batch
-    {
-        $configCollection = $this->prepareConfig($config);
-        $jobs = $this->prepareJobs($configCollection);
+    private Collection $configs;
+    private array $jobs;
+    private string $queue = 'default';
 
-        return Bus::batch($jobs)
+    public function __construct(array $configs)
+    {
+        $this->configs = collect();
+        $this->jobs = [];
+
+        $this->processConfigs($configs);
+        $this->processJobs();
+    }
+
+    protected function processConfigs(array $configs)
+    {
+        foreach ($configs as ['process' => $process, 'engine' => $engine]) {
+            if (is_array($process)) {
+                $process = ProcessConfig::make(...$process);
+            }
+
+            if (is_array($engine)) {
+                $engine = EngineConfigFactory::make(...$engine);
+            }
+
+            $this->configs->push(['process' => $process, 'engine' => $engine]);
+        }
+    }
+
+    protected function processJobs()
+    {
+        foreach ($this->configs as ['process' => $process, 'engine' => $engine]) {
+            /** @var ProcessConfigInterface $process */
+            /** @var EngineConfigInterface $engine */
+
+            $jobClass = $process->getCurrentJob();
+
+            $this->jobs[] = new $jobClass($process, $engine);
+        }
+    }
+
+    public function onQueue(string $queue): static
+    {
+        $this->queue = $queue;
+
+        return $this;
+    }
+
+    public function dispatch(): Batch
+    {
+        return Bus::batch($this->jobs)
             ->allowFailures()
             // @codeCoverageIgnoreStart
-            ->then(function (Batch $batch) use ($configCollection) {
-                foreach ($configCollection as $config) {
-                    /** @var SyncConfig $config */
-                    event(new CollectionSynchronizedEvent($config->getLocalModel(), $config->getChecksumField(), $batch->id));
+            ->then(function (Batch $batch) {
+                foreach ($this->configs as ['engine' => $config]) {
+                    /** @var EngineConfigInterface $config */
+                    event(new CollectionSynchronizedEvent($config->getModel(), $config->getChecksumField(), $batch->id));
                 }
             })
-            ->catch(function (Batch $batch, Throwable $exception) use ($configCollection) {
-                $configCollection->each(function ($config) use ($exception) {
-                    if ($config->getErrorHandler() != null) {
-                        $config->getErrorHandler()($exception);
-                    }
-                });
+            ->catch(function (Batch $batch, Throwable $exception) {
+                foreach ($this->configs as ['process' => $config]) {
+                    /** @var ProcessConfigInterface $config */
+                    /** @var ErrorHandlerInterface $handler */
+                    $handler = app($config->getErrorHandler());
+
+                    $handler->handle($exception);
+                };
             })
             // @codeCoverageIgnoreEnd
-            ->onQueue($queue)
+            ->onQueue($this->queue)
             ->dispatch();
-    }
-
-    protected function prepareConfig(SyncConfig|array $config): Collection
-    {
-        if (is_array($config)) {
-            $configCollection = collect($config);
-            $configCollection = $configCollection->map(function ($item) {
-                if (is_array($item)) {
-                    /** @var SyncConfigFactory $factory */
-                    $factory = app(SyncConfigFactory::class);
-                    $item = $factory->make(...$item);
-                }
-
-                return $item;
-            });
-        } else {
-            $configCollection = collect([$config]);
-        }
-
-        return $configCollection;
-    }
-
-    protected function prepareJobs(Collection $configCollection): array
-    {
-        $jobs = [];
-
-        foreach ($configCollection as $config) {
-            /** @var SyncConfig $config */
-            $jobClass = $config->getCurrentJob();
-
-            $jobs[] = new $jobClass($config);
-        }
-
-        return $jobs;
     }
 }

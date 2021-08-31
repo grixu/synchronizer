@@ -2,9 +2,7 @@
 
 namespace Grixu\Synchronizer\Process\Contracts;
 
-use Illuminate\Queue\SerializableClosure;
-
 interface SyncHandlerInterface
 {
-    public static function make(): SerializableClosure;
+    public function sync(array $data, string|null $batchId): void;
 }

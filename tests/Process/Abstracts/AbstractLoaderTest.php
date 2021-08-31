@@ -67,4 +67,12 @@ class AbstractLoaderTest extends SyncTestCase
         $this->assertNotEmpty($returnedData);
         $this->assertEquals(Builder::class, $returnedData::class);
     }
+
+    /** @test */
+    public function it_allows_to_chunk_query()
+    {
+        $this->obj->chunk(function ($data) {
+            $this->assertNotEmpty($data);
+        });
+    }
 }

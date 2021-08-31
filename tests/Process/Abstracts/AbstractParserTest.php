@@ -2,10 +2,10 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Abstracts;
 
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Config;
@@ -37,7 +37,9 @@ class AbstractParserTest extends SyncTestCase
     public function it_can_excluding_timestamps()
     {
         Config::set('synchronizer.checksum.timestamps_excluded', true);
-        SyncConfig::setInstance(FakeSyncConfig::make('checksum', ['Knt_SyncTimeStamp']));
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(timestamps: ['Knt_SyncTimeStamp'], checksumField: 'checksum')
+        );
 
         $takeOne = $this->obj->parse($this->data);
 
@@ -49,5 +51,50 @@ class AbstractParserTest extends SyncTestCase
         $takeTwo = $this->obj->parse($this->data);
 
         $this->assertEquals($takeOne, $takeTwo);
+    }
+
+    /** @test */
+    public function it_excluding_fields()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(fields: ['name'])
+        );
+
+        $test = $this->obj->parse($this->data);
+        $this->assertNotEmpty($test);
+        $test->each(fn ($item) => $this->assertArrayNotHasKey('name', $item));
+    }
+
+    /** @test */
+    public function it_gathering_fillable_fields()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(fields: ['name'=>['fillable']])
+        );
+
+        $test = $this->obj->parse($this->data);
+        $this->assertNotEmpty($test);
+        $test->each(function ($item) {
+            $this->assertArrayNotHasKey('name', $item);
+            $this->assertArrayHasKey('name', $item['fillable']);
+        });
+    }
+
+    /** @test */
+    public function it_strip_all_fields_in_only_mode()
+    {
+        EngineConfig::setInstance(
+            FakeEngineConfig::make(fields: ['name', 'country'], mode: EngineConfig::ONLY)
+        );
+
+        $test = $this->obj->parse($this->data);
+        $this->assertNotEmpty($test);
+        $test->each(function ($item) {
+            $this->assertArrayHasKey('name', $item);
+            $this->assertArrayHasKey('country', $item);
+            $this->assertArrayNotHasKey('fillable', $item);
+            // checksum & key field - that's why +2
+            $this->assertCount(4, $item);
+        });
     }
 }

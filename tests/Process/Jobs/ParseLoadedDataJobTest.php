@@ -2,11 +2,9 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Process\Jobs\ParseLoadedDataJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Collection;
@@ -17,24 +15,12 @@ class ParseLoadedDataJobTest extends SyncTestCase
 {
     use DatabaseMigrations;
 
-    protected SyncConfig $config;
     protected Collection $dataCollection;
-
-    protected function setUp(): void
-    {
-        parent::setUp();
-
-        $this->config = FakeSyncConfig::make();
-        $this->config->setCurrentJob(1);
-
-        $loader = new FakeLoader();
-        $this->dataCollection = $loader->get()->first();
-    }
 
     /** @test */
     public function it_constructs()
     {
-        $obj = new ParseLoadedDataJob($this->dataCollection, $this->config);
+        $obj = new ParseLoadedDataJob($this->processConfig, $this->engineConfig, $this->dataCollection);
 
         $this->assertEquals(ParseLoadedDataJob::class, $obj::class);
     }
@@ -44,7 +30,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
     {
         Queue::fake();
 
-        dispatch(new ParseLoadedDataJob($this->dataCollection, $this->config));
+        dispatch(new ParseLoadedDataJob($this->processConfig, $this->engineConfig, $this->dataCollection));
 
         Queue::assertPushed(ParseLoadedDataJob::class, 1);
     }
@@ -55,7 +41,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
         Queue::fake();
         $bus = Bus::fake();
 
-        $job = new ParseLoadedDataJob($this->dataCollection, $this->config);
+        $job = new ParseLoadedDataJob($this->processConfig, $this->engineConfig, $this->dataCollection);
         $batch = $bus->batch(
             [
                 $job,
@@ -74,7 +60,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
     /** @test */
     public function it_start_parsing_job()
     {
-        $obj = new ParseLoadedDataJob($this->dataCollection, $this->config);
+        $obj = new ParseLoadedDataJob($this->processConfig, $this->engineConfig, $this->dataCollection);
         $batch = Bus::batch(
             [
                 $obj,
@@ -89,7 +75,7 @@ class ParseLoadedDataJobTest extends SyncTestCase
     /** @test */
     public function it_reacts_to_cancellation()
     {
-        $job = new ParseLoadedDataJob($this->dataCollection, $this->config);
+        $job = new ParseLoadedDataJob($this->processConfig, $this->engineConfig, $this->dataCollection);
         $batch = Bus::batch(
             [
                 (new FakeCancelJob()),
@@ -100,5 +86,14 @@ class ParseLoadedDataJobTest extends SyncTestCase
         $finishedBatch = $batch->dispatch();
 
         $this->assertTrue($finishedBatch->cancelled());
+    }
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $loader = new FakeLoader();
+        $this->dataCollection = $loader->get()->first();
+        $this->processConfig->setCurrentJob(1);
     }
 }

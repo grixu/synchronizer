@@ -2,11 +2,8 @@
 
 namespace Grixu\Synchronizer;
 
-use Grixu\Synchronizer\Config\Contracts\SyncConfig as SyncConfigInterface;
-use Grixu\Synchronizer\Config\SyncConfig;
-use Grixu\Synchronizer\Config\SyncConfigFactory;
-use Grixu\Synchronizer\Console\AddExcludedFieldCommand;
-use Grixu\Synchronizer\Console\ListExcludedFieldsCommand;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Providers\EventServiceProvider;
 use Illuminate\Support\ServiceProvider;
 
@@ -23,13 +20,6 @@ class SynchronizerServiceProvider extends ServiceProvider
                 ],
                 'config'
             );
-
-            $this->commands(
-                [
-                    AddExcludedFieldCommand::class,
-                    ListExcludedFieldsCommand::class,
-                ]
-            );
         }
     }
 
@@ -37,14 +27,10 @@ class SynchronizerServiceProvider extends ServiceProvider
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/config.php', 'synchronizer');
 
-        $this->app->bind(SyncConfigInterface::class, function () {
-            return SyncConfig::getInstance();
+        $this->app->bind(EngineConfigInterface::class, function () {
+            return EngineConfig::getInstance();
         });
 
         $this->app->register(EventServiceProvider::class);
-
-        $this->app->singleton(SyncConfigFactory::class, function () {
-            return new SyncConfigFactory();
-        });
     }
 }

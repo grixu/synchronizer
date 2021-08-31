@@ -7,10 +7,9 @@ use Grixu\SociusModels\Operator\Factories\OperatorDataFactory;
 use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
-use Grixu\Synchronizer\Config\SyncConfig;
 use Grixu\Synchronizer\Engine\BelongsToMany as BelongsToManyEngine;
 use Grixu\Synchronizer\Engine\Transformer\NullTransformer;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -24,12 +23,11 @@ class BelongsToManyTest extends TestCase
     protected Model $secondRelatedModel;
     protected BelongsToManyEngine $obj;
     protected Collection $data;
-    protected SyncConfig $config;
 
     protected function setUp(): void
     {
         parent::setUp();
-        $this->config = FakeSyncConfig::makeWithCustomModel(Operator::class);
+        $this->config = FakeEngineConfig::make(model: Operator::class);
     }
 
     /** @test */

@@ -48,8 +48,8 @@ return [
         'release' => env('SYNCHRONIZER_QUEUE_RELEASE', 1),
     ],
 
-//    'handlers' => [
-//        'error' => \Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler::class,
-//        'sync' => \Grixu\Synchronizer\Tests\Helpers\FakeSyncHandler::class
-//    ],
+    'handlers' => [
+        'error' => \Grixu\Synchronizer\Process\Handlers\DefaultErrorHandler::class,
+        'sync' => \Grixu\Synchronizer\Process\Handlers\DefaultSyncHandler::class,
+    ],
 ];

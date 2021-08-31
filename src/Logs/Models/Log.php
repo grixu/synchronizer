@@ -5,10 +5,10 @@ namespace Grixu\Synchronizer\Logs\Models;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * @property string model
- * @property string batch_id
- * @property int total_changes
- * @property array log
+ * @property string $model
+ * @property string $batch_id
+ * @property int $total_changes
+ * @property array $log
  * @method static create(array $array)
  */
 class Log extends Model

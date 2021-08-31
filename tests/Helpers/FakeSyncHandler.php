@@ -2,16 +2,6 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
-use Grixu\Synchronizer\Process\Contracts\SyncHandlerInterface;
-use Illuminate\Queue\SerializableClosure;
-use JetBrains\PhpStorm\Pure;
-
-class FakeSyncHandler implements SyncHandlerInterface
+class FakeSyncHandler
 {
-    #[Pure]
-    public static function make(): SerializableClosure
-    {
-        return new SerializableClosure(function ($collection, $config) {
-        });
-    }
 }

@@ -2,8 +2,11 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
-use Grixu\Synchronizer\Synchronizer;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Process\Contracts\ErrorHandlerInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
+use Grixu\Synchronizer\Process\Contracts\SyncHandlerInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -23,8 +26,11 @@ class SyncParsedDataJob implements ShouldQueue
     public $tries = 0;
     public $maxExceptions = 4;
 
-    public function __construct(public array $data, public SyncConfig $config)
-    {
+    public function __construct(
+        public ProcessConfigInterface $processConfig,
+        public EngineConfigInterface $engineConfig,
+        public array $data,
+    ) {
     }
 
     public function backoff(): int
@@ -43,30 +49,16 @@ class SyncParsedDataJob implements ShouldQueue
             return;
         }
 
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->engineConfig);
 
-        $closure = $this->config->getSyncClosure();
-
-        if ($closure) {
-            $closure($this->config, $this->data);
-        } else {
-            $this->defaultSyncHandler();
-        }
-    }
-
-    protected function defaultSyncHandler()
-    {
         try {
-            $synchronizer = new Synchronizer(
-                $this->data,
-                $this->batchId
-            );
-
-            $synchronizer->sync();
+            /** @var SyncHandlerInterface $handler */
+            $handler = app($this->processConfig->getSyncHandler());
+            $handler->sync($this->data, $this->batchId);
         } catch (Throwable $e) {
-            if ($this->config->getErrorHandler() !== null) {
-                $this->config->getErrorHandler()($e);
-            }
+            /** @var ErrorHandlerInterface $errorHandler */
+            $errorHandler = app($this->processConfig->getErrorHandler());
+            $errorHandler->handle($e);
 
             return;
         }

@@ -3,10 +3,10 @@
 namespace Grixu\Synchronizer\Tests\Engine\Map;
 
 use Grixu\SociusModels\Product\Factories\ProductDataFactory;
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Map\Map;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
-use Grixu\Synchronizer\Tests\Helpers\FakeSyncConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 
 class MapFactoryTest extends TestCase
@@ -15,7 +15,7 @@ class MapFactoryTest extends TestCase
     {
         parent::setUp();
 
-        SyncConfig::setInstance(FakeSyncConfig::make());
+        EngineConfig::setInstance(FakeEngineConfig::make());
     }
 
     /** @test */

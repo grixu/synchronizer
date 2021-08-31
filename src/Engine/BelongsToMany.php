@@ -61,6 +61,9 @@ class BelongsToMany extends RelationEngine
             ->get();
 
         foreach ($models as $model) {
+            /** @var \Illuminate\Database\Eloquent\Model $model */
+
+            /** @phpstan-ignore-next-line */
             $relations = $collectionToSync[$model->xl_id];
 
             foreach ($relations as $relation => $fks) {

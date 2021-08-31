@@ -2,10 +2,15 @@
 
 namespace Grixu\Synchronizer\Tests\Helpers;
 
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
 use Grixu\Synchronizer\SynchronizerServiceProvider;
 
 class SyncTestCase extends \Orchestra\Testbench\TestCase
 {
+    protected ProcessConfigInterface $processConfig;
+    protected EngineConfigInterface $engineConfig;
+
     protected function getPackageProviders($app)
     {
         return [
@@ -44,6 +49,9 @@ class SyncTestCase extends \Orchestra\Testbench\TestCase
         }
 
         $this->artisan('migrate')->run();
+
+        $this->processConfig = FakeProcessConfig::make();
+        $this->engineConfig = FakeEngineConfig::make();
     }
 
     protected function timestampConfig($app)

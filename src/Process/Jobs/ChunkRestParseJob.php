@@ -2,16 +2,17 @@
 
 namespace Grixu\Synchronizer\Process\Jobs;
 
-use Grixu\Synchronizer\Config\SyncConfig;
+use Grixu\Synchronizer\Engine\Config\EngineConfig;
+use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\LoaderInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
+use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
 use Illuminate\Bus\Batchable;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
-use Throwable;
 
 class ChunkRestParseJob implements ShouldQueue
 {
@@ -24,13 +25,11 @@ class ChunkRestParseJob implements ShouldQueue
     public $tries = 0;
     public $maxExceptions = 3;
 
-    public function __construct(public SyncConfig $config, public int $part = 1)
-    {
-    }
-
-    public function backoff(): int
-    {
-        return 60 * $this->attempts();
+    public function __construct(
+        public ProcessConfigInterface $processConfig,
+        public EngineConfigInterface $engineConfig,
+        public int $part = 1
+    ) {
     }
 
     public function retryUntil(): Carbon
@@ -41,38 +40,39 @@ class ChunkRestParseJob implements ShouldQueue
             );
     }
 
+    public function backoff(): int
+    {
+        return config('synchronizer.queues.release') * $this->attempts();
+    }
+
     public function handle()
     {
-        if (optional($this->batch())->cancelled() || !$this->batch()) {
-            return;
-        }
+//        if (optional($this->batch())->cancelled() || !$this->batch()) {
+//            return;
+//        }
 
-        SyncConfig::setInstance($this->config);
+        EngineConfig::setInstance($this->engineConfig);
 
-        $loaderClass = $this->config->getLoaderClass();
+        $loaderClass = $this->processConfig->getLoaderClass();
         /** @var LoaderInterface $loader */
         $loader = app($loaderClass);
-        $loader->buildQuery($this->config->getIds());
+        $loader->buildQuery($this->engineConfig->getIds());
 
-        $parserClass = $this->config->getParserClass();
+        $parserClass = $this->processConfig->getParserClass();
         /** @var ParserInterface $parser */
         $parser = app($parserClass);
 
-        $jobClass = $this->config->getNextJob();
-        try {
-            $data = $loader->getPiece($this->part);
-        } catch (Throwable) {
-            $this->release(config('synchronizer.queues.release'));
-        }
+        $jobClass = $this->processConfig->getNextJob();
+        $data = $loader->getPiece($this->part);
 
         if ($data->count() <= 0) {
             return;
         }
 
         $parsedData = $parser->parse($data)->toArray();
-        $this->batch()->add((new $jobClass($parsedData, $this->config)));
+        $this->batch()->add((new $jobClass($this->processConfig, $this->engineConfig, $parsedData)));
 
         $this->part++;
-        $this->batch()->add([new static($this->config, $this->part)]);
+        $this->batch()->add([new static($this->processConfig, $this->engineConfig, $this->part)]);
     }
 }
