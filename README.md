@@ -20,7 +20,8 @@ composer require grixu/synchronizer
 ```
 
 ## Usage
-Details are described in [Synchronizer Docs](https://grixu.github.io/synchronizer/docs) (both in Polish and English)
+
+Details will be described in [Synchronizer Docs](https://grixu.github.io/synchronizer/docs) (both in Polish and English)
 
 ## Testing
 
