@@ -80,7 +80,6 @@ class AbstractParserTest extends SyncTestCase
         });
     }
 
-
     /** @test */
     public function it_strip_all_fields_in_only_mode()
     {

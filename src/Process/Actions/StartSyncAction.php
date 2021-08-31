@@ -46,7 +46,9 @@ class StartSyncAction
     protected function processJobs()
     {
         foreach ($this->configs as ['process' => $process, 'engine' => $engine]) {
-            /** @var ProcessConfigInterface $config */
+            /** @var ProcessConfigInterface $process */
+            /** @var EngineConfigInterface $engine */
+
             $jobClass = $process->getCurrentJob();
 
             $this->jobs[] = new $jobClass($process, $engine);

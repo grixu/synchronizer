@@ -18,11 +18,11 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 
         return $collection->map(function ($item) use ($timestampExcluded, $config) {
             $item = $this->parseElement($item);
+            $fillableFields = $item->only(...$config->getFillable())->toArray();
 
             if ($config->isOnlyMode()) {
                 $item = $item->only(...$config->getOnly());
             } else {
-                $fillableFields = $item->only(...$config->getFillable());
                 $item = $item->except(...$config->getExcluded(), ...$config->getFillable());
             }
 
@@ -37,7 +37,7 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
                 $item['checksum'] = Checksum::generate($checksumBase->toArray());
             }
             if (!$config->isOnlyMode()) {
-                $item['fillable'] = $fillableFields->toArray();
+                $item['fillable'] = $fillableFields;
             }
             return $item;
         });

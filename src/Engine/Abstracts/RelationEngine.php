@@ -38,6 +38,9 @@ abstract class RelationEngine extends BaseEngine
             ->unique()
             ->each(
                 function ($relation, $class) use ($test, $reflection) {
+                    /** @var string $relation */
+                    /** @var string $class */
+
                     if (!$reflection->hasMethod($relation)) {
                         throw new Exception('Relation ' . $relation . ' do not exist!');
                     }
@@ -74,7 +77,7 @@ abstract class RelationEngine extends BaseEngine
                     $collection->groupBy('foreignField')
                         ->filter()
                         ->each(
-                            function ($collection, $foreignField) use ($data, $relation, $model) {
+                            function ($collection, $foreignField) use ($data, $model) {
                                 $foreignKeys = $collection->pluck('foreignKeys')->flatten(1);
 
                                 $data->put(

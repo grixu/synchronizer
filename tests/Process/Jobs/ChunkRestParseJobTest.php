@@ -2,13 +2,10 @@
 
 namespace Grixu\Synchronizer\Tests\Process\Jobs;
 
-use Grixu\Synchronizer\Process\Config\ProcessConfig;
 use Grixu\Synchronizer\Process\Jobs\ChunkRestParseJob;
 use Grixu\Synchronizer\Tests\Helpers\FakeCancelJob;
-use Grixu\Synchronizer\Tests\Helpers\FakeParser;
 use Grixu\Synchronizer\Tests\Helpers\FakeProcessConfig;
 use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
-use Grixu\Synchronizer\Tests\Helpers\TroubleLoader;
 use Illuminate\Foundation\Testing\DatabaseMigrations;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\Queue;

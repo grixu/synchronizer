@@ -5,8 +5,6 @@ namespace Grixu\Synchronizer\Tests\Process\Config;
 use Exception;
 use Grixu\Synchronizer\Process\Config\ProcessConfig;
 use Grixu\Synchronizer\Process\Exceptions\InterfaceNotImplemented;
-use Grixu\Synchronizer\Process\Handlers\DefaultErrorHandler;
-use Grixu\Synchronizer\Process\Handlers\DefaultSyncHandler;
 use Grixu\Synchronizer\Tests\Helpers\FakeErrorHandler;
 use Grixu\Synchronizer\Tests\Helpers\FakeLoader;
 use Grixu\Synchronizer\Tests\Helpers\FakeParser;
