@@ -25,14 +25,16 @@ class EngineConfig implements EngineConfigInterface
         protected array $timestamps = [],
         protected array $ids = [],
     ) {
+        $this->key = Str::camel($key);
         $this->checksumField = Str::camel($checksumField);
         $this->timestamps = array_map(fn ($item) => Str::camel($item), $timestamps);
 
         $this->mapFields($mode, $fields);
+        $this->secureKeyInFields();
         $this->validateChecksum();
     }
 
-    protected function mapFields(int $mode, array $fields)
+    protected function mapFields(int $mode, array $fields): void
     {
         switch ($mode) {
             case self::ONLY:
@@ -47,7 +49,7 @@ class EngineConfig implements EngineConfigInterface
         }
     }
 
-    private function mapFieldsExcluded(array $excludedFields)
+    private function mapFieldsExcluded(array $excludedFields): void
     {
         foreach ($excludedFields as $key => $value) {
             if (is_array($value)) {
@@ -60,6 +62,18 @@ class EngineConfig implements EngineConfigInterface
             } else {
                 $this->excludedFields[] = Str::camel($value);
             }
+        }
+    }
+
+    private function secureKeyInFields(): void
+    {
+        if ($this->isOnlyMode()) {
+            if (!in_array($this->key, $this->onlyFields)) {
+                $this->onlyFields[] = $this->key;
+            }
+        } else {
+            $this->excludedFields = array_diff($this->excludedFields, [$this->key]);
+            $this->fillableFields = array_diff($this->fillableFields, [$this->key]);
         }
     }
 
