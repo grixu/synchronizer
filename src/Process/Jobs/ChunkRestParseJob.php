@@ -13,7 +13,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Support\Carbon;
-use Throwable;
 
 class ChunkRestParseJob implements ShouldQueue
 {
@@ -43,14 +42,14 @@ class ChunkRestParseJob implements ShouldQueue
 
     public function backoff(): int
     {
-        return 60 * $this->attempts();
+        return config('synchronizer.queues.release') * $this->attempts();
     }
 
     public function handle()
     {
-        if (optional($this->batch())->cancelled() || !$this->batch()) {
-            return;
-        }
+//        if (optional($this->batch())->cancelled() || !$this->batch()) {
+//            return;
+//        }
 
         EngineConfig::setInstance($this->engineConfig);
 
@@ -64,11 +63,7 @@ class ChunkRestParseJob implements ShouldQueue
         $parser = app($parserClass);
 
         $jobClass = $this->processConfig->getNextJob();
-        try {
-            $data = $loader->getPiece($this->part);
-        } catch (Throwable) {
-            $this->release(config('synchronizer.queues.release'));
-        }
+        $data = $loader->getPiece($this->part);
 
         if ($data->count() <= 0) {
             return;
