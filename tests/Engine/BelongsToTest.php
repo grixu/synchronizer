@@ -60,9 +60,11 @@ class BelongsToTest extends TestCase
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_brands_table.stub';
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_product_types_table.stub';
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
+        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/update_products_table_add_availabilities.stub';
         (new \CreateBrandsTable())->up();
         (new \CreateProductTypesTable())->up();
         (new \CreateProductsTable())->up();
+        (new \UpdateProductsTableAddAvailabilities())->up();
 
         $this->localModel = Product::factory()->create();
         $this->relatedModel = Brand::factory()->create();

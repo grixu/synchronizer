@@ -28,6 +28,8 @@ trait MigrateProductsTrait
         (new \CreateCategoriesTable())->up();
 
         require_once __DIR__.'/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
+        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/update_products_table_add_availabilities.stub';
         (new \CreateProductsTable())->up();
+        (new \UpdateProductsTableAddAvailabilities())->up();
     }
 }

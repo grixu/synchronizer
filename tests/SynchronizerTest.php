@@ -2,25 +2,27 @@
 
 namespace Grixu\Synchronizer\Tests;
 
+use Grixu\SociusModels\Customer\Models\Customer;
 use Grixu\SociusModels\Operator\Factories\OperatorDataFactory;
 use Grixu\SociusModels\Operator\Models\Branch;
 use Grixu\SociusModels\Operator\Models\Operator;
 use Grixu\SociusModels\Operator\Models\OperatorRole;
-use Grixu\SociusModels\Product\Factories\ProductDataFactory;
-use Grixu\SociusModels\Product\Models\Product;
 use Grixu\Synchronizer\Engine\Config\EngineConfig;
 use Grixu\Synchronizer\Engine\Config\EngineConfigFactory;
 use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Events\SynchronizerEvent;
 use Grixu\Synchronizer\Synchronizer;
-use Grixu\Synchronizer\Tests\Helpers\TestCase;
+use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
+use Grixu\Synchronizer\Tests\Helpers\FakeForeignSqlSourceModel;
+use Grixu\Synchronizer\Tests\Helpers\FakeParser;
+use Grixu\Synchronizer\Tests\Helpers\SyncTestCase;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Event;
 
-class SynchronizerTest extends TestCase
+class SynchronizerTest extends SyncTestCase
 {
     use RefreshDatabase;
 
@@ -171,29 +173,22 @@ class SynchronizerTest extends TestCase
     /** @test */
     public function it_synchronize_excluded_fields()
     {
-        require_once __DIR__ . '/../vendor/grixu/socius-models/migrations/create_products_table.stub';
-        (new \CreateProductsTable())->up();
+        EngineConfig::setInstance(FakeEngineConfig::make(fields: ['country'=>['fillable']]));
 
-        $this->data = [];
-        $this->data[] = ProductDataFactory::new()->create()->toArray();
-        $this->config = EngineConfigFactory::make(
-            model: Product::class,
-            key: 'xlId',
-            fields: ['index'=>['fillable']]
-        );
-        EngineConfig::setInstance($this->config);
-
+        $this->input = FakeForeignSqlSourceModel::limit(10)->get();
+        $parser = new FakeParser();
+        $this->data = $parser->parse($this->input)->toArray();
         $this->obj = new Synchronizer($this->data, $this->batchId);
 
-        $this->assertDatabaseCount('products', 0);
+        $this->assertDatabaseCount('customers', 0);
 
         $this->obj->sync();
 
-        $this->assertDatabaseCount('products', 1);
-        $product = Product::query()->where('xl_id', $this->data[0]['xlId'])->first();
+        $this->assertDatabaseCount('customers', 10);
+        $customer = Customer::query()->where('xl_id', $this->data[0]['xlId'])->first();
 
-        $this->assertNotEmpty($product);
-        $this->assertNotEmpty($product->index);
+        $this->assertNotEmpty($customer);
+        $this->assertNotEmpty($customer->country);
     }
 
     /** @test */

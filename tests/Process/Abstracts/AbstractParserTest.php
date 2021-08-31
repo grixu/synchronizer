@@ -94,8 +94,8 @@ class AbstractParserTest extends SyncTestCase
             $this->assertArrayHasKey('name', $item);
             $this->assertArrayHasKey('country', $item);
             $this->assertArrayNotHasKey('fillable', $item);
-            // checksum field - that's why +1
-            $this->assertCount(3, $item);
+            // checksum & key field - that's why +2
+            $this->assertCount(4, $item);
         });
     }
 }

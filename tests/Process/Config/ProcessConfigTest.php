@@ -30,14 +30,6 @@ class ProcessConfigTest extends TestCase
         string|null $error = null,
         string $jobs = 'default'
     ): ProcessConfig {
-        if (empty($sync)) {
-            $sync = DefaultSyncHandler::class;
-        }
-
-        if (empty($error)) {
-            $error = DefaultErrorHandler::class;
-        }
-
         return ProcessConfig::make(
             loaderClass: FakeLoader::class,
             parserClass: FakeParser::class,
