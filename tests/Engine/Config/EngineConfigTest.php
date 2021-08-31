@@ -158,4 +158,30 @@ class EngineConfigTest extends TestCase
         $this->assertEmpty($obj->getOnly());
         $this->assertFalse($obj->isOnlyMode());
     }
+
+    /** @test */
+    public function it_secure_key_by_auto_adding_in_only_mode()
+    {
+        $only = ['name'];
+        $obj = $this->createObj(fields: $only, mode: EngineConfig::ONLY);
+
+        $this->assertEmpty($obj->getExcluded());
+        $this->assertEmpty($obj->getFillable());
+        $this->assertNotEmpty($obj->getOnly());
+        $this->assertCount(2, $obj->getOnly());
+        $this->assertTrue($obj->isOnlyMode());
+    }
+
+    /** @test */
+    public function it_secure_key_by_auto_removing_in_excluding_mode()
+    {
+        $excluded = ['name', 'xlId'];
+        $obj = $this->createObj(fields: $excluded);
+
+        $this->assertNotEmpty($obj->getExcluded());
+        $this->assertCount(1, $obj->getExcluded());
+        $this->assertEmpty($obj->getFillable());
+        $this->assertEmpty($obj->getOnly());
+        $this->assertFalse($obj->isOnlyMode());
+    }
 }
