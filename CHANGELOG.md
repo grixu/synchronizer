@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.0.1 - 2021-09-01 - not released yet
+- Added PHPInsights config
+- Added dependabot
+
 ## 5.0.0 - 2021-08-31
 
 - Huge rebuilt of sync configuration, separated SyncConfig to two separate classes.
