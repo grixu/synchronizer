@@ -70,18 +70,6 @@ class ChecksumTest extends TestCase
         $this->assertCount(10, $obj->get());
     }
 
-    /** @test */
-    public function it_generate_checksum()
-    {
-        $data = [
-            'test' => 'Testing',
-        ];
-        $checksumGenerated = Checksum::generate($data);
-
-        $this->assertNotEmpty($checksumGenerated);
-        $this->assertEquals(hash('crc32c', json_encode($data)), $checksumGenerated);
-    }
-
     /**
      * @test
      * @environment-setup useDisabledChecksum
