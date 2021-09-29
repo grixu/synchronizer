@@ -7,6 +7,7 @@ use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Process\Contracts\SingleElementParserInterface;
 use Illuminate\Support\Collection;
+use Spatie\DataTransferObject\DataTransferObject;
 
 abstract class AbstractParser implements ParserInterface, SingleElementParserInterface
 {
@@ -34,12 +35,17 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 
             $item = $item->toArray();
             if (!empty($config->getChecksumField())) {
-                $item['checksum'] = Checksum::generate($checksumBase->toArray());
+                $item['checksum'] = $this->generateChecksum($checksumBase);
             }
             if (!$config->isOnlyMode()) {
                 $item['fillable'] = $fillableFields;
             }
             return $item;
         });
+    }
+
+    protected function generateChecksum(DataTransferObject $dataTransferObject): string
+    {
+        return hash('crc32c', json_encode($dataTransferObject->toArray()));
     }
 }

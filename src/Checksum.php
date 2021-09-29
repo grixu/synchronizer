@@ -54,9 +54,4 @@ class Checksum
     {
         return $this->diff;
     }
-
-    public static function generate(array $data): string
-    {
-        return hash('crc32c', json_encode($data));
-    }
 }

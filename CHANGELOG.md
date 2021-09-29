@@ -2,6 +2,14 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.1.0 - 2021-09-29
+
+- Added `generateChecksum` which gives possibility to changed default way of generating timestamp in Parsers.
+- Moved code from `Checksum::generate()` to `generateChecksum` as default implementation of generating checksum
+  in `AbstractParser`.
+- Added PHPInsights config
+- Added dependabot
+
 ## 5.0.0 - 2021-08-31
 
 - Huge rebuilt of sync configuration, separated SyncConfig to two separate classes.

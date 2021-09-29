@@ -18,6 +18,7 @@ use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
+use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -26,6 +27,8 @@ use Illuminate\Support\Collection;
 
 class BelongsToTest extends TestCase
 {
+    use MigrateProductsTrait;
+
     protected Model $localModel;
     protected Model $relatedModel;
     protected Model $secondRelatedModel;
@@ -57,14 +60,7 @@ class BelongsToTest extends TestCase
 
     protected function makeBelongsToCase(): void
     {
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_brands_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_product_types_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/update_products_table_add_availabilities.stub';
-        (new \CreateBrandsTable())->up();
-        (new \CreateProductTypesTable())->up();
-        (new \CreateProductsTable())->up();
-        (new \UpdateProductsTableAddAvailabilities())->up();
+        $this->migrateProducts();
 
         $this->localModel = Product::factory()->create();
         $this->relatedModel = Brand::factory()->create();
