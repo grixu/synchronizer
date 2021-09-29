@@ -14,6 +14,7 @@ use Grixu\Synchronizer\Engine\Map\MapFactory;
 use Grixu\Synchronizer\Engine\Model as ModelEngine;
 use Grixu\Synchronizer\Engine\Transformer\Transformer;
 use Grixu\Synchronizer\Tests\Helpers\FakeEngineConfig;
+use Grixu\Synchronizer\Tests\Helpers\MigrateProductsTrait;
 use Grixu\Synchronizer\Tests\Helpers\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,8 @@ use Illuminate\Support\Collection;
 
 class ModelTest extends TestCase
 {
+    use MigrateProductsTrait;
+
     protected Model $localModel;
     protected Engine $obj;
     protected Collection $data;
@@ -31,10 +34,7 @@ class ModelTest extends TestCase
     {
         parent::setUp();
 
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_products_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/update_products_table_add_availabilities.stub';
-        (new \CreateProductsTable())->up();
-        (new \UpdateProductsTableAddAvailabilities())->up();
+        $this->migrateProducts();
 
         $this->localModel = Product::factory()->create();
         $this->data = collect();
@@ -93,15 +93,6 @@ class ModelTest extends TestCase
 
     protected function makeComplicatedCase()
     {
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_branches_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_operator_roles_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_operators_table.stub';
-        require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_operator_branch_pivot_table.stub';
-        (new \CreateBranchesTable())->up();
-        (new \CreateOperatorRolesTable())->up();
-        (new \CreateOperatorsTable())->up();
-        (new \CreateOperatorBranchPivotTable())->up();
-
         $this->localModel = Operator::factory()->create();
 
         $this->data = collect();
