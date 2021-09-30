@@ -194,7 +194,6 @@ class SynchronizerTest extends SyncTestCase
     /** @test */
     public function it_not_even_start_sync_when_nothing_changed()
     {
-        Config::set('synchronizer.checksum.timestamps_excluded', true);
         Config::set('synchronizer.sync.timestamps', ['updated_at']);
 
         $this->data = [
