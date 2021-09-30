@@ -2,6 +2,11 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.2.0 - 2021-09-30
+
+- Simplified config by removing `checksum.timestamps_excluded`, now `AbstractParser` decide to exclude timestamps or not
+  based on what is in timestamps field - which could be defined independently in `EngineConfig`
+
 ## 5.1.0 - 2021-09-29
 
 - Added `generateChecksum` which gives possibility to changed default way of generating timestamp in Parsers.

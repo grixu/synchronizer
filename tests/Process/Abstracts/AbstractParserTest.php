@@ -36,7 +36,6 @@ class AbstractParserTest extends SyncTestCase
     /** @test */
     public function it_can_excluding_timestamps()
     {
-        Config::set('synchronizer.checksum.timestamps_excluded', true);
         EngineConfig::setInstance(
             FakeEngineConfig::make(timestamps: ['Knt_SyncTimeStamp'], checksumField: 'checksum')
         );
