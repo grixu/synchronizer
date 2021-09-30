@@ -15,9 +15,8 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
     {
         /** @var EngineConfigInterface $config */
         $config = app(EngineConfigInterface::class);
-        $timestampExcluded = config('synchronizer.checksum.timestamps_excluded');
 
-        return $collection->map(function ($item) use ($timestampExcluded, $config) {
+        return $collection->map(function ($item) use ($config) {
             $item = $this->parseElement($item);
             $fillableFields = $item->only(...$config->getFillable())->toArray();
 
@@ -29,7 +28,7 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
 
             $checksumBase = clone $item;
 
-            if ($timestampExcluded) {
+            if (!empty($config->getTimestamps())) {
                 $checksumBase = $checksumBase->except(...$config->getTimestamps());
             }
 
