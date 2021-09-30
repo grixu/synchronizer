@@ -12,7 +12,6 @@ return [
             'created_at',
             'updated_at',
         ],
-        'timestamps_excluded' => false,
     ],
 
     'logger' => [
