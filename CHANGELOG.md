@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.2.2 - 2021-10-01
+
+- Another bug fixed in BelongsTo engine 
+
 ## 5.2.1 - 2021-10-01
 
 - Bug fixed in BelongsTo engine - when checksum is off it fails when relation key not exist in database.

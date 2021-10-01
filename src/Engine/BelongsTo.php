@@ -38,15 +38,15 @@ class BelongsTo extends RelationEngine
                     if (empty($allRelations[$rel['relation']]) || (empty($rel['foreignKeys']) && $rel['foreignKeys'] !== 0)) {
                         if (!empty($this->checksum)) {
                             $relatedFields[$this->checksum] = null;
-                            continue;
                         }
+                        continue;
                     }
 
                     if (!isset($this->loaded[$rel['relation']][$rel['foreignField']][$rel['foreignKeys']])) {
                         if (!empty($this->checksum)) {
                             $relatedFields[$this->checksum] = null;
-                            continue;
                         }
+                        continue;
                     }
 
                     $fieldName = $allRelations[$rel['relation']];
