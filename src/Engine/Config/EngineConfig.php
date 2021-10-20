@@ -53,15 +53,18 @@ class EngineConfig implements EngineConfigInterface
     {
         foreach ($excludedFields as $key => $value) {
             if (is_array($value)) {
-                if (in_array('fillable', $value)) {
-                    $this->fillableFields[] = Str::camel($key);
+                if ($key === 'fillable') {
+                    $this->fillableFields = array_map(fn ($item) => Str::camel($item), $value);
                     continue;
                 }
 
-                $this->excludedFields[] = Str::camel($key);
-            } else {
-                $this->excludedFields[] = Str::camel($value);
+                if ($key === 'excluded' || $key === 0) {
+                    $this->excludedFields = array_map(fn ($item) => Str::camel($item), $value);
+                    continue;
+                }
             }
+
+            $this->excludedFields[] = Str::camel($value);
         }
     }
 
