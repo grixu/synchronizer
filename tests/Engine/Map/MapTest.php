@@ -77,7 +77,7 @@ class MapTest extends TestCase
             FakeEngineConfig::make(
                 timestamps: ['updated_at'],
                 checksumField: 'checksum',
-                fields: ['name' => ['fillable']]
+                fields: ['fillable' => ['name']]
             )
         );
         $model = Customer::factory()->make();
@@ -145,7 +145,7 @@ class MapTest extends TestCase
             FakeEngineConfig::make(
                 timestamps: ['updated_at'],
                 checksumField: 'checksum',
-                fields: ['postal_code' => ['fillable']]
+                fields: ['fillable' => ['postal_code']]
             )
         );
         $model = Customer::factory()->make();

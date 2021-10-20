@@ -73,7 +73,7 @@ class AbstractParserTest extends SyncTestCase
     public function it_gathering_fillable_fields()
     {
         EngineConfig::setInstance(
-            FakeEngineConfig::make(fields: ['name'=>['fillable']])
+            FakeEngineConfig::make(fields: ['fillable'=>['name']])
         );
 
         $test = $this->obj->parse($this->data);
