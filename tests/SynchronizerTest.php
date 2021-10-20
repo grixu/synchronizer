@@ -173,7 +173,7 @@ class SynchronizerTest extends SyncTestCase
     /** @test */
     public function it_synchronize_excluded_fields()
     {
-        EngineConfig::setInstance(FakeEngineConfig::make(fields: ['country'=>['fillable']]));
+        EngineConfig::setInstance(FakeEngineConfig::make(fields: ['fillable'=>['country']]));
 
         $this->input = FakeForeignSqlSourceModel::limit(10)->get();
         $parser = new FakeParser();

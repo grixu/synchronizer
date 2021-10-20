@@ -2,6 +2,11 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.2.3 - 2021-10-20
+
+- Bug fixed in fillable & excluded fields parsing in EngineConfig
+- Changed way of definition excluded & fillable field to easier one
+
 ## 5.2.2 - 2021-10-01
 
 - Another bug fixed in BelongsTo engine 

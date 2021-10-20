@@ -126,7 +126,7 @@ class EngineConfigTest extends TestCase
     /** @test */
     public function it_provide_fillable_fields_mode()
     {
-        $fillable = ['name' => ['fillable']];
+        $fillable = ['fillable' => ['name']];
         $obj = $this->createObj(fields: $fillable);
 
         $this->assertEmpty($obj->getExcluded());
@@ -150,7 +150,7 @@ class EngineConfigTest extends TestCase
     /** @test */
     public function it_is_bulletproof_for_wrong_field_config()
     {
-        $excluded = ['name'=>[]];
+        $excluded = ['name'];
         $obj = $this->createObj(fields: $excluded);
 
         $this->assertNotEmpty($obj->getExcluded());

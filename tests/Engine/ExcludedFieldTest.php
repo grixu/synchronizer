@@ -29,7 +29,7 @@ class ExcludedFieldTest extends SyncTestCase
     {
         parent::setUp();
 
-        EngineConfig::setInstance(FakeEngineConfig::make(fields: ['country'=>['fillable']]));
+        EngineConfig::setInstance(FakeEngineConfig::make(fields: ['fillable'=>['country']]));
 
         $this->input = FakeForeignSqlSourceModel::limit(10)->get();
         $parser = new FakeParser();
