@@ -2,7 +2,6 @@
 
 namespace Grixu\Synchronizer\Process\Abstracts;
 
-use Grixu\Synchronizer\Checksum;
 use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Process\Contracts\SingleElementParserInterface;
