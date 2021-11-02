@@ -30,7 +30,7 @@ jobs:
       run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: S3 Sync
-      run: s3 cp ${{ secrets.S3_PATH }} ./database/test.sqlite
+      run: aws s3 cp ${{ secrets.S3_PATH }} ./database/test.sqlite
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_IAM_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_IAM_SECRET }}
