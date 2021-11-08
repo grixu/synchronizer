@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.2.5 - 2021-11-08
+
+- Updated Larastan to `1.0.1`
+
 ## 5.2.4 - 2021-11-01
 
 - Unified use of PHP_CS_Fixer, PHPStan & PHP Insights throughout repositories
