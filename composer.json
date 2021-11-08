@@ -50,12 +50,11 @@
         }
     },
     "scripts": {
-        "test": "vendor/bin/phpunit && vendor/bin/phpstan analyse && vendor/bin/phpinsights",
-        "test:unit": "vendor/bin/phpunit",
+        "test": "vendor/bin/phpunit",
         "test-coverage": "vendor/bin/phpunit --coverage-html coverage",
-        "lint": "vendor/bin/php-cs-fixer fix",
         "insights": "vendor/bin/phpinsights",
-        "phpstan": "vendor/bin/phpstan analyse"
+        "cs": "vendor/bin/php-cs-fixer fix src",
+        "stan": "vendor/bin/phpstan analyse"
     },
     "config": {
         "sort-packages": true

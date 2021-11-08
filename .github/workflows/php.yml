@@ -30,23 +30,50 @@ jobs:
       run: composer install --prefer-dist --no-progress --no-suggest
 
     - name: S3 Sync
-      uses: ItsKarma/aws-cli@v1.70.0
-      with:
-        args: s3 cp ${{ secrets.S3_PATH }} ./database/test.sqlite
+      run: aws s3 cp ${{ secrets.S3_PATH }} ./database/test.sqlite
       env:
         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_IAM_KEY }}
         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_IAM_SECRET }}
-        AWS_DEFAULT_REGION: "us-east-1"
+        AWS_DEFAULT_REGION: "eu-central-1"
 
     - name: Run test suite
-      run: composer run-script test:unit
+      run: composer run-script test
 
     - name: Send Slack notification
-      uses: 8398a7/action-slack@v2
+      uses: 8398a7/action-slack@v3.10.0
       if: failure()
       with:
         status: ${{ job.status }}
         author_name: ${{ github.actor }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
       env:
-        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check code with PHP Inshights
+      run: vendor/bin/phpinsights -n --ansi --format=github-action
+
+    - name: Check code with PHP Stan
+      run: vendor/bin/phpstan --error-format=github
+
+    - name: Format files
+      run: ./vendor/bin/php-cs-fixer fix
+
+    - name: Commit files to repository
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "CS Fixer applied [GHA]"
+        commit_user_name: "Synchronizer GitHub Actions Bot"
+        commit_user_email: "synchronizer@rywal.dev"
+        commit_author: "Synchronizer GitHub Actions Bot <synchronizer@rywal.dev>"
+
+    - name: Send Slack notification
+      uses: 8398a7/action-slack@v3.10.0
+      if: success()
+      with:
+        status: ${{ job.status }}
+        author_name: ${{ github.actor }}
+        fields: repo,message,commit,author,action,eventName,ref,workflow,job,took
+      env:
+        SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
