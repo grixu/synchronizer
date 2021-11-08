@@ -2,6 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.2.4 - 2021-11-01
+
+- Unified use of PHP_CS_Fixer, PHPStan & PHP Insights throughout repositories
+- Updated CI pipeline
+- Unified composer scripts throughout repositories
+
 ## 5.2.3 - 2021-10-20
 
 - Bug fixed in fillable & excluded fields parsing in EngineConfig

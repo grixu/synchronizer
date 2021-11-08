@@ -91,17 +91,17 @@ class EngineConfig implements EngineConfigInterface
     public static function getInstance(): EngineConfigInterface
     {
         // @codeCoverageIgnoreStart
-        if (empty(static::$instance)) {
-            static::$instance = new NullEngineConfig();
+        if (empty(self::$instance)) {
+            self::$instance = new NullEngineConfig();
         }
         // @codeCoverageIgnoreEnd
 
-        return static::$instance;
+        return self::$instance;
     }
 
     public static function setInstance(EngineConfigInterface $instance)
     {
-        static::$instance = $instance;
+        self::$instance = $instance;
     }
 
     public function getModel(): string
