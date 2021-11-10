@@ -75,15 +75,13 @@ class Synchronizer
             $this->logger->log($excludedField->getIds()->toArray(), Logger::EXCLUDED_FIELDS);
         }
 
-        if (!empty($this->config->getChecksumField())) {
-            event(
-                new SynchronizerEvent(
-                    $this->config->getModel(),
-                    $this->config->getChecksumField(),
-                    $this->input->toArray()
-                )
-            );
-        }
+        event(
+            new SynchronizerEvent(
+                $this->config->getModel(),
+                $this->config->getChecksumField(),
+                $this->input->toArray()
+            )
+        );
     }
 
     protected function diffCompleted(array $ids): Collection
