@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.2.6 - 2021-11-10
+
+- Bug fixed: always fire event `SynchronizerEvent` not only when checksum is not empty
+
 ## 5.2.5 - 2021-11-08
 
 - Updated Larastan to `1.0.1`
