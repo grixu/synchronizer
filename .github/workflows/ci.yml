@@ -1,19 +1,16 @@
-name: Build & test
+name: CI
 
 on:
-  push:
-    branches:
-      - master
-      - main
   pull_request:
     branches:
       - main
-      - master
 
 jobs:
-  build:
-
+  ci:
+    name: "CI"
     runs-on: ubuntu-latest
+    if: ${{ contains(github.actor, 'dependabot') != true }}
+    timeout-minutes: 30
 
     steps:
     - uses: actions/checkout@v2
@@ -43,6 +40,15 @@ jobs:
     - name: Run test suite
       run: composer run-script test
 
+    - name: Check code with PHP Inshights
+      run: vendor/bin/phpinsights -n --ansi --format=github-action
+
+    - name: Check code with PHP Stan
+      run: vendor/bin/phpstan --error-format=github
+
+    - name: Check for ray calls
+      run: ./vendor/bin/x-ray src --github
+
     - name: Send Slack notification
       uses: 8398a7/action-slack@v3.10.0
       if: failure()
@@ -54,19 +60,13 @@ jobs:
         SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: Check code with PHP Inshights
-      run: vendor/bin/phpinsights -n --ansi --format=github-action
-
-    - name: Check code with PHP Stan
-      run: vendor/bin/phpstan --error-format=github
-
     - name: Format files
       run: ./vendor/bin/php-cs-fixer fix
 
     - name: Commit files to repository
       uses: stefanzweifel/git-auto-commit-action@v4
       with:
-        commit_message: "CS Fixer applied [GHA]"
+        commit_message: "chore: cs_fixer applied"
         commit_user_name: "Synchronizer GitHub Actions Bot"
         commit_user_email: "synchronizer@rywal.dev"
         commit_author: "Synchronizer GitHub Actions Bot <synchronizer@rywal.dev>"
