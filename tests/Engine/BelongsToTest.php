@@ -53,7 +53,6 @@ class BelongsToTest extends TestCase
             $this->obj = new BelongsToEngine($this->config, $this->data);
             $this->assertTrue(true);
         } catch (Exception $e) {
-            ray($e);
             $this->assertTrue(false);
         }
     }

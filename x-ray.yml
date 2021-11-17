@@ -1,0 +1,12 @@
+functions:
+  include:
+    - '*'
+
+paths:
+  include:
+    - 'src'
+    - 'database'
+    - 'tests'
+
+  ignore:
+    - 'src/Domain/Sync/Handlers/SyncError.php'
