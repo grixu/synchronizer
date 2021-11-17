@@ -39,7 +39,6 @@ class BelongsToManyTest extends TestCase
             $this->obj = new BelongsToManyEngine($this->config, $this->data);
             $this->assertTrue(true);
         } catch (Exception $e) {
-            ray($e);
             $this->assertTrue(false);
         }
     }
