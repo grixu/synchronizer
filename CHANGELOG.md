@@ -2,6 +2,17 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.3.0 - 2021-11-17
+
+- Dodane `composer-git-hooks`
+- Skonfigurowane hooksy + autoinstalacja/aktualizacja podczas działań composera
+- Dodanie timeoutów w CI/CD
+- Dodanie pipeline auto-merge dla małych aktualizacji dependabota
+- Dodanie `x-ray`
+- Dodanie sprawdzania kodu przez `x-ray` w CI pipeline
+- Dodanie sprawdzania `x-ray` w git hooks
+- Dodanie `changelog-updater-action` do CD pipeline
+
 ## 5.2.6 - 2021-11-10
 
 - Bug fixed: always fire event `SynchronizerEvent` not only when checksum is not empty
@@ -23,7 +34,7 @@ All notable changes to `synchronizer` will be documented in this file
 
 ## 5.2.2 - 2021-10-01
 
-- Another bug fixed in BelongsTo engine 
+- Another bug fixed in BelongsTo engine
 
 ## 5.2.1 - 2021-10-01
 
@@ -34,13 +45,13 @@ All notable changes to `synchronizer` will be documented in this file
 ## 5.2.0 - 2021-09-30
 
 - Simplified config by removing `checksum.timestamps_excluded`, now `AbstractParser` decide to exclude timestamps or not
-  based on what is in timestamps field - which could be defined independently in `EngineConfig`
+- based on what is in timestamps field - which could be defined independently in `EngineConfig`
 
 ## 5.1.0 - 2021-09-29
 
 - Added `generateChecksum` which gives possibility to changed default way of generating timestamp in Parsers.
 - Moved code from `Checksum::generate()` to `generateChecksum` as default implementation of generating checksum
-  in `AbstractParser`.
+- in `AbstractParser`.
 - Added PHPInsights config
 - Added dependabot
 
@@ -58,7 +69,7 @@ All notable changes to `synchronizer` will be documented in this file
 ## 4.3.0 - 2021-08-25
 
 - Changed way of providing checksum field name & timestamp fields. Now it's possible to declare separate settings for
-  each sync.
+- each sync.
 - Added PHP Insights
 - Added PHPStan
 - Added PHP_CS_Fixer
@@ -116,12 +127,12 @@ All notable changes to `synchronizer` will be documented in this file
 ## 3.2.0 - 2021-03-31
 
 - Created `SynchronizeWith` attribute to provide way to make relationship sync on custom(or extended) models than in
-  defined in RelationshipData
+- defined in RelationshipData
 - Rebuilt method `checkModelClass` which now checking provided in constructor object through `ReflectionClass` is it
-  have `SynchronizeWith` attribute with proper model name.
+- have `SynchronizeWith` attribute with proper model name.
 - Updated tests for `RelationshipSynchronizer` & `CollectionSynchronizer`
 - Rebuilt the `try..catch` block on `SyncDataParsedJob`. Now all exception thrown by CollectionSynchronizer in this job
-  will be handled by provided in `SyncConfig` Closure
+- will be handled by provided in `SyncConfig` Closure
 - Renamed `SyncDataParsedJob` to `SyncParsedDataJob` (finally!)
 
 ## 3.1.2 - 2021-03-30
@@ -131,7 +142,7 @@ All notable changes to `synchronizer` will be documented in this file
 ## 3.1.1 - 2021-03-30
 
 - Bug fixed in `CollectionSynchronizer`. Also added checking is Collection is not empty and filtering to eliminate empty
-  entries.
+- entries.
 - Bug fixes in `RelationshipSynchronizer`
 - Added converting `Closure` to `SerializableClosure` in setters of `syncClosure` and `errorHandler` in `SyncConfig`
 
@@ -147,22 +158,32 @@ All notable changes to `synchronizer` will be documented in this file
 ## 3.0.0 - 2021-03-24
 
 - Improvement in timestamps: added option in configuration though which you can decide to exclude timestamps from a
-  checksum. If you do so, models will not update if only timestamps have changed. Due to it is change from default way
-  of how synchronizer v2 worked, we decided to keep it off by default.
-
+- checksum. If you do so, models will not update if only timestamps have changed. Due to it is change from default way
+- of how synchronizer v2 worked, we decided to keep it off by default.
+- 
 - DTO field names are no longer checked as timestamps
+- 
 - Added Jobs fo handling sync in queues
+- 
 - An updated README with example how to use Jobs to sync big bunch of data in queues.
+- 
 - A created interfaces to provide customization of data loading & parsing
+- 
 - Added `AbstractLoader` to DRY work during SQL based data loading using models with just another database connection
+- 
 - Added `StartSyncAction` which start sync in batch
+- 
 - Unified events by common abstract base class: `AbstractSynchronizerEvent`
+- 
 - Created SyncConfig class which contains: loader, parser, local model class names, foreign key values which we want to
-  synchronize and sync & error handling closures.
-
+- synchronize and sync & error handling closures.
+- 
 - Created SyncConfigFactory
+- 
 - Created interfaces for making own factories of sync & error handlers and set them as default ones.
+- 
 - Refactored config file
+- 
 
 ## 2.3.1 - 2021-03-17
 
@@ -234,7 +255,7 @@ All notable changes to `synchronizer` will be documented in this file
 - Added calculating MD5 from fields of DTO (without timestamps excluded in the config)
 - Added method for generate a map without timestamp fields in SynchronizerMap
 - New options in the config to turn on md5 checksums checking, and point a field name in models which containing this
-  checksum.
+- checksum.
 
 ## 1.0.2 - 2020-12-04
 
