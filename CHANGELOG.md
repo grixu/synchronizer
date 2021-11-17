@@ -4,14 +4,14 @@ All notable changes to `synchronizer` will be documented in this file
 
 ## 5.3.0 - 2021-11-17
 
-- Dodane `composer-git-hooks`
-- Skonfigurowane hooksy + autoinstalacja/aktualizacja podczas działań composera
-- Dodanie timeoutów w CI/CD
-- Dodanie pipeline auto-merge dla małych aktualizacji dependabota
-- Dodanie `x-ray`
-- Dodanie sprawdzania kodu przez `x-ray` w CI pipeline
-- Dodanie sprawdzania `x-ray` w git hooks
-- Dodanie `changelog-updater-action` do CD pipeline
+- Added `composer-git-hooks`
+- Configured hooks with auto-install/update
+- Added timeouts in pipelines
+- Added  auto-merge pipeline for small updates made by dependabot
+- Added `x-ray`
+- Added `x-ray` checking in CI pipeline
+- Added `x-ray` checking in git hooks
+- Added `changelog-updater-action` to CD pipeline
 
 ## 5.2.6 - 2021-11-10
 
