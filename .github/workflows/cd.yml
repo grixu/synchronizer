@@ -1,14 +1,14 @@
 name: CI/CD
 on:
   release:
-    types: [released]
+    types: [ released ]
   workflow_dispatch:
 
 jobs:
   cd:
     runs-on: ubuntu-latest
     name: "CD"
-    timeout-minutes: 30
+    timeout-minutes: 5
 
     steps:
       - uses: actions/checkout@v2
