@@ -2,6 +2,12 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.3.1 - 2021-11-18
+
+- Fixed auto-merging on dependabot's updates
+- `commit-msg` regex updated
+- Fixed names of jobs & slack notifications in pipelines
+
 ## 5.3.0 - 2021-11-17
 
 - Added `composer-git-hooks`
