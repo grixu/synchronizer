@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 5.3.2 - 2021-11-18
+
+- Fixed auto-merge
+
 ## 5.3.1 - 2021-11-18
 
 - Fixed auto-merging on dependabot's updates
