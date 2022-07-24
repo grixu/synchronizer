@@ -18,25 +18,25 @@
     "require": {
         "php": "^8.0",
         "ext-json": "*",
-        "grixu/socius-dto": "^1.0",
-        "illuminate/broadcasting": "^8.15",
-        "illuminate/console": "^8.15",
-        "illuminate/database": "^8.15",
-        "illuminate/events": "^8.15",
-        "illuminate/queue": "^8.15",
-        "illuminate/support": "^8.15",
-        "laravel/slack-notification-channel": "^2.3",
-        "spatie/data-transfer-object": "^3.1"
+        "grixu/socius-dto": "^2.0",
+        "illuminate/broadcasting": "^9.0",
+        "illuminate/console": "^9.0",
+        "illuminate/database": "^9.0",
+        "illuminate/events": "^9.0",
+        "illuminate/queue": "^9.0",
+        "illuminate/support": "^9.0",
+        "laravel/slack-notification-channel": "^v2.4",
+        "spatie/data-transfer-object": "^3.8"
     },
     "require-dev": {
-        "brainmaestro/composer-git-hooks": "^2.8",
+        "brainmaestro/composer-git-hooks": "^v3.0.0-alpha.1",
         "doctrine/dbal": "^3.1",
         "fakerphp/faker": "^1.11",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "grixu/socius-models": "^3.0.0",
-        "nunomaduro/larastan": "^0.7.12 || ^1.0.0",
+        "grixu/socius-models": "^4.0.0",
+        "nunomaduro/larastan": "^1.0.0",
         "nunomaduro/phpinsights": "^2.0",
-        "orchestra/testbench": "^6.0",
+        "orchestra/testbench": "^7.0",
         "phpunit/phpunit": "^9.4",
         "spatie/laravel-ray": "^1.9",
         "spatie/x-ray": "^1.1"
@@ -61,7 +61,10 @@
         "xray": "vendor/bin/x-ray src"
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        }
     },
     "extra": {
         "laravel": {

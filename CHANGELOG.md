@@ -2,6 +2,10 @@
 
 All notable changes to `synchronizer` will be documented in this file
 
+## 6.0.0 - 2022-07-24
+
+- BREAKING CHANGES: compatibility only with PHP 8.0 & Laravel 9.x 
+
 ## 5.3.2 - 2021-11-18
 
 - Fixed auto-merge
