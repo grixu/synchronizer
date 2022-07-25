@@ -34,7 +34,7 @@
         "fakerphp/faker": "^1.11",
         "friendsofphp/php-cs-fixer": "^3.0",
         "grixu/socius-models": "^4.0.0",
-        "nunomaduro/larastan": "^1.0.0",
+        "nunomaduro/larastan": "^1.0.0 || ^2.0.0",
         "nunomaduro/phpinsights": "^2.0",
         "orchestra/testbench": "^7.0",
         "phpunit/phpunit": "^9.4",
