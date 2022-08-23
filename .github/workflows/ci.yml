@@ -51,7 +51,7 @@ jobs:
         run: ./vendor/bin/x-ray src --github
 
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v3.12.0
+        uses: 8398a7/action-slack@v3.13.2
         if: failure()
         with:
           status: ${{ job.status }}
@@ -73,7 +73,7 @@ jobs:
           commit_author: "Synchronizer GitHub Actions Bot <synchronizer@rywal.dev>"
 
       - name: Send Slack notification
-        uses: 8398a7/action-slack@v3.12.0
+        uses: 8398a7/action-slack@v3.13.2
         if: success()
         with:
           status: ${{ job.status }}
