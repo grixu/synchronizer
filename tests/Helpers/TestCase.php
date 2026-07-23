@@ -3,6 +3,7 @@
 namespace Grixu\Synchronizer\Tests\Helpers;
 
 use Grixu\Synchronizer\SynchronizerServiceProvider;
+use Spatie\LaravelData\LaravelDataServiceProvider;
 use Spatie\LaravelRay\RayServiceProvider;
 
 class TestCase extends \Orchestra\Testbench\TestCase
@@ -10,6 +11,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
+            LaravelDataServiceProvider::class,
             SynchronizerServiceProvider::class,
             RayServiceProvider::class,
         ];

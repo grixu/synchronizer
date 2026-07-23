@@ -5,8 +5,8 @@ namespace Grixu\Synchronizer\Process\Abstracts;
 use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ParserInterface;
 use Grixu\Synchronizer\Process\Contracts\SingleElementParserInterface;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Spatie\DataTransferObject\DataTransferObject;
 
 abstract class AbstractParser implements ParserInterface, SingleElementParserInterface
 {
@@ -16,34 +16,34 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
         $config = app(EngineConfigInterface::class);
 
         return $collection->map(function ($item) use ($config) {
-            $item = $this->parseElement($item);
-            $fillableFields = $item->only(...$config->getFillable())->toArray();
+            $data = $this->parseElement($item)->toArray();
+
+            $fillableFields = Arr::only($data, $config->getFillable());
 
             if ($config->isOnlyMode()) {
-                $item = $item->only(...$config->getOnly());
+                $item = Arr::only($data, $config->getOnly());
             } else {
-                $item = $item->except(...$config->getExcluded(), ...$config->getFillable());
+                $item = Arr::except($data, array_merge($config->getExcluded(), $config->getFillable()));
             }
 
-            $checksumBase = clone $item;
-
+            $checksumBase = $item;
             if (!empty($config->getTimestamps())) {
-                $checksumBase = $checksumBase->except(...$config->getTimestamps());
+                $checksumBase = Arr::except($checksumBase, $config->getTimestamps());
             }
 
-            $item = $item->toArray();
             if (!empty($config->getChecksumField())) {
                 $item['checksum'] = $this->generateChecksum($checksumBase);
             }
             if (!$config->isOnlyMode()) {
                 $item['fillable'] = $fillableFields;
             }
+
             return $item;
         });
     }
 
-    protected function generateChecksum(DataTransferObject $dataTransferObject): string
+    protected function generateChecksum(array $data): string
     {
-        return hash('crc32c', json_encode($dataTransferObject->toArray()));
+        return hash('crc32c', json_encode($data));
     }
 }

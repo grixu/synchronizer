@@ -2,11 +2,11 @@
 
 namespace Grixu\Synchronizer\Engine\Map;
 
-use Spatie\DataTransferObject\DataTransferObject;
+use Spatie\LaravelData\Data;
 
 class MapFactory
 {
-    public static function makeFromDto(DataTransferObject $dataTransferObject): Map
+    public static function makeFromDto(Data $dataTransferObject): Map
     {
         return new Map(array_keys($dataTransferObject->toArray()));
     }

@@ -17,6 +17,7 @@ class SyncTestCase extends \Orchestra\Testbench\TestCase
     protected function getPackageProviders($app)
     {
         return [
+            \Spatie\LaravelData\LaravelDataServiceProvider::class,
             SynchronizerServiceProvider::class,
             \Spatie\LaravelRay\RayServiceProvider::class,
         ];

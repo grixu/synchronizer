@@ -9,7 +9,7 @@ class FakeParser extends AbstractParser
 {
     public function parseElement($model): CustomerData
     {
-        return new CustomerData(
+        return CustomerData::from(
             [
                 'name' => $model->knt_nazwa1 . ' ' . $model->knt_nazwa2,
                 'country' => $model->knt_kraj,

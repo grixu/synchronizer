@@ -56,7 +56,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         $obj = new CollectionSynchronizedListener();
         $obj->handle(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
-        Notification::assertTimesSent(1, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 1);
     }
 
     /** @test */
@@ -67,7 +67,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         $obj = new CollectionSynchronizedListener();
         $obj->handle(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
-        Notification::assertTimesSent(0, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 0);
     }
 
     /** @test */
@@ -80,7 +80,7 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
         $obj = new CollectionSynchronizedListener();
         $obj->handle(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
-        Notification::assertTimesSent(0, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 0);
     }
 
     /** @test */
@@ -91,6 +91,6 @@ class CollectionSynchronizedListenerTest extends SyncTestCase
 
         event(new CollectionSynchronizedEvent(Product::class, 'checksum', $this->batch->id));
 
-        Notification::assertTimesSent(1, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 1);
     }
 }
