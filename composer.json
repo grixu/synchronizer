@@ -15,13 +15,6 @@
             "role": "Developer"
         }
     ],
-    "repositories": [
-        { "type": "path", "url": "../socius-dto" },
-        { "type": "path", "url": "../data-factories" },
-        { "type": "path", "url": "../socius-models" }
-    ],
-    "minimum-stability": "dev",
-    "prefer-stable": true,
     "require": {
         "php": "^8.1",
         "ext-json": "*",
@@ -39,7 +32,7 @@
         "doctrine/dbal": "^3.1",
         "fakerphp/faker": "^1.11",
         "friendsofphp/php-cs-fixer": "^3.0",
-        "grixu/socius-models": "@dev",
+        "grixu/socius-models": "^5.0",
         "nunomaduro/larastan": "^2.0",
         "nunomaduro/phpinsights": "^2.0",
         "orchestra/testbench": "^8.0",
