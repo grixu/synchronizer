@@ -15,35 +15,39 @@ abstract class AbstractParser implements ParserInterface, SingleElementParserInt
         /** @var EngineConfigInterface $config */
         $config = app(EngineConfigInterface::class);
 
-        return $collection->map(function ($item) use ($config) {
-            $data = $this->parseElement($item)->toArray();
-
-            $fillableFields = Arr::only($data, $config->getFillable());
-
-            if ($config->isOnlyMode()) {
-                $item = Arr::only($data, $config->getOnly());
-            } else {
-                $item = Arr::except($data, array_merge($config->getExcluded(), $config->getFillable()));
-            }
-
-            $checksumBase = $item;
-            if (!empty($config->getTimestamps())) {
-                $checksumBase = Arr::except($checksumBase, $config->getTimestamps());
-            }
-
-            if (!empty($config->getChecksumField())) {
-                $item['checksum'] = $this->generateChecksum($checksumBase);
-            }
-            if (!$config->isOnlyMode()) {
-                $item['fillable'] = $fillableFields;
-            }
-
-            return $item;
-        });
+        return $collection->map(
+            fn ($item) => $this->buildSyncRow($this->parseElement($item)->toArray(), $config)
+        );
     }
 
-    protected function generateChecksum(array $data): string
+    protected function buildSyncRow(array $parsed, EngineConfigInterface $config): array
     {
-        return hash('crc32c', json_encode($data));
+        if ($config->isOnlyMode()) {
+            return $this->withChecksum(Arr::only($parsed, $config->getOnly()), $config);
+        }
+
+        $syncRow = Arr::except($parsed, array_merge($config->getExcluded(), $config->getFillable()));
+        $syncRow = $this->withChecksum($syncRow, $config);
+        $syncRow['fillable'] = Arr::only($parsed, $config->getFillable());
+
+        return $syncRow;
+    }
+
+    protected function withChecksum(array $syncRow, EngineConfigInterface $config): array
+    {
+        if (empty($config->getChecksumField())) {
+            return $syncRow;
+        }
+
+        $syncRow['checksum'] = $this->generateChecksum(
+            Arr::except($syncRow, $config->getTimestamps())
+        );
+
+        return $syncRow;
+    }
+
+    protected function generateChecksum(array $checksumBase): string
+    {
+        return hash('crc32c', json_encode($checksumBase));
     }
 }

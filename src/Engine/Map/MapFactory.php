@@ -6,9 +6,9 @@ use Spatie\LaravelData\Data;
 
 class MapFactory
 {
-    public static function makeFromDto(Data $dataTransferObject): Map
+    public static function makeFromDto(Data $dto): Map
     {
-        return new Map(array_keys($dataTransferObject->toArray()));
+        return new Map(array_keys($dto->toArray()));
     }
 
     public static function makeFromArray(array $dataArray): Map
