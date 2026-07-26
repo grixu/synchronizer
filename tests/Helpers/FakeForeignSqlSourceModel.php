@@ -52,10 +52,7 @@ class FakeForeignSqlSourceModel extends Model
         'Knt_OpeNumer' => 'integer',
         'Knt_AtrWlascicielFrsID' => 'integer',
         'Knt_GIDNumer' => 'integer',
-    ];
-
-    protected $dates = [
-        'Knt_SyncTimeStamp',
+        'Knt_SyncTimeStamp' => 'datetime',
     ];
 
     public static function newFactory(): FakeForeignSqlSourceFactory

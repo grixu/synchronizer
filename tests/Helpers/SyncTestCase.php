@@ -4,31 +4,19 @@ namespace Grixu\Synchronizer\Tests\Helpers;
 
 use Grixu\Synchronizer\Engine\Contracts\EngineConfigInterface;
 use Grixu\Synchronizer\Process\Contracts\ProcessConfigInterface;
-use Grixu\Synchronizer\SynchronizerServiceProvider;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 
-class SyncTestCase extends \Orchestra\Testbench\TestCase
+class SyncTestCase extends TestCase
 {
     protected ProcessConfigInterface $processConfig;
     protected EngineConfigInterface $engineConfig;
 
-    protected function getPackageProviders($app)
-    {
-        return [
-            \Spatie\LaravelData\LaravelDataServiceProvider::class,
-            SynchronizerServiceProvider::class,
-            \Spatie\LaravelRay\RayServiceProvider::class,
-        ];
-    }
-
     protected function getEnvironmentSetUp($app)
     {
-        $app['config']->set('socius-models.checksum_field', 'checksum');
+        parent::getEnvironmentSetUp($app);
 
-        // The foreign ERP source (KntKarty) was a committed test.sqlite fixture that no
-        // longer exists; run it in-memory and seed it in setUp instead.
         $app['config']->set('database.connections.xl', [
             'driver' => 'sqlite',
             'url' => null,
@@ -42,8 +30,6 @@ class SyncTestCase extends \Orchestra\Testbench\TestCase
     {
         parent::setUp();
 
-        $this->loadMigrationsFrom(__DIR__ . '/../../database/migrations');
-
         require_once __DIR__ . '/../../vendor/grixu/socius-models/migrations/create_customers_table.stub';
         try {
             (new \CreateCustomersTable())->up();
@@ -52,24 +38,7 @@ class SyncTestCase extends \Orchestra\Testbench\TestCase
 
         $this->artisan('migrate')->run();
 
-        // Bus::batch() needs job_batches; create it directly instead of publishing the
-        // queue:batches-table migration, which accumulated duplicate stubs in the
-        // testbench skeleton and re-ran on every migrate ("table already exists").
-        if (! Schema::hasTable('job_batches')) {
-            Schema::create('job_batches', function (Blueprint $table) {
-                $table->string('id')->primary();
-                $table->string('name');
-                $table->integer('total_jobs');
-                $table->integer('pending_jobs');
-                $table->integer('failed_jobs');
-                $table->longText('failed_job_ids');
-                $table->mediumText('options')->nullable();
-                $table->integer('cancelled_at')->nullable();
-                $table->integer('created_at');
-                $table->integer('finished_at')->nullable();
-            });
-        }
-
+        $this->ensureJobBatchesTable();
         $this->seedForeignSource();
 
         $this->processConfig = FakeProcessConfig::make();
@@ -77,70 +46,103 @@ class SyncTestCase extends \Orchestra\Testbench\TestCase
     }
 
     /**
-     * Stand in for the missing test.sqlite fixture: build the KntKarty foreign source and
-     * seed enough rows (2+ chunks) for the loader/parser tests. Deterministic sequential
-     * keys avoid the primary-key collisions a random factory would risk at this volume.
+     * Created here rather than via queue:batches-table: publishing that migration duplicates
+     * the stub in the testbench skeleton, so the next migrate fails with "table already exists".
      */
-    protected function seedForeignSource(): void
+    protected function ensureJobBatchesTable(): void
     {
-        $schema = Schema::connection('xl');
-
-        if ($schema->hasTable('KntKarty')) {
+        if (Schema::hasTable('job_batches')) {
             return;
         }
 
-        // Columns are lower-cased: the parser reads them as $model->knt_gidnumer etc.,
-        // which only resolves when SELECT * returns lower-cased attribute keys.
-        $schema->create('KntKarty', function (Blueprint $table) {
-            $table->unsignedBigInteger('knt_gidnumer')->primary();
-            $table->string('knt_nazwa1');
-            $table->string('knt_nazwa2');
-            $table->string('knt_kraj');
-            $table->string('knt_kodp');
-            $table->string('knt_miasto');
-            $table->string('knt_ulica');
-            $table->string('knt_nip');
-            $table->string('knt_powiat');
-            $table->string('knt_wojewodztwo');
-            $table->string('knt_telefon1');
-            $table->string('knt_telefon2');
-            $table->string('knt_email');
-            $table->integer('knt_limitokres');
-            $table->integer('knt_atrwlascicielfrsid');
-            $table->integer('knt_openumer');
-            $table->dateTime('knt_synctimestamp');
+        Schema::create('job_batches', function (Blueprint $table) {
+            $table->string('id')->primary();
+            $table->string('name');
+            $table->integer('total_jobs');
+            $table->integer('pending_jobs');
+            $table->integer('failed_jobs');
+            $table->longText('failed_job_ids');
+            $table->mediumText('options')->nullable();
+            $table->integer('cancelled_at')->nullable();
+            $table->integer('created_at');
+            $table->integer('finished_at')->nullable();
         });
+    }
 
-        $syncTs = now()->subYear()->toDateTimeString();
-        $rows = [];
-        for ($i = 1; $i <= 500; $i++) {
-            $rows[] = [
-                'knt_gidnumer' => $i,
-                'knt_nazwa1' => 'Nazwa ' . $i,
-                'knt_nazwa2' => 'Nazwa2 ' . $i,
-                'knt_kraj' => 'PL',
-                'knt_kodp' => '80-000',
-                'knt_miasto' => 'Miasto',
-                'knt_ulica' => 'Ulica ' . $i,
-                'knt_nip' => '12345678' . str_pad((string) ($i % 100), 2, '0', STR_PAD_LEFT),
-                'knt_powiat' => 'Powiat',
-                'knt_wojewodztwo' => 'Pomorskie',
-                'knt_telefon1' => '58000' . $i,
-                'knt_telefon2' => '60000' . $i,
-                'knt_email' => 'kontakt' . $i . '@example.com',
-                'knt_limitokres' => 30,
-                'knt_atrwlascicielfrsid' => 1000 + $i,
-                'knt_openumer' => 2000 + $i,
-                'knt_synctimestamp' => $syncTs,
-            ];
-        }
+    protected function seedForeignSource(): void
+    {
+        $this->createForeignSourceTable();
 
         // Chunked to stay under SQLite's bound-parameter limit (~999).
-        foreach (array_chunk($rows, 50) as $chunk) {
+        foreach (array_chunk($this->foreignSourceRows(), 50) as $chunk) {
             DB::connection('xl')->table('KntKarty')->insert($chunk);
         }
     }
 
+    protected function createForeignSourceTable(): void
+    {
+        // Casing matches FakeForeignSqlSourceModel: SQLite hands back attribute keys as
+        // declared here, so lower-casing them would silently unbind every cast on the model.
+        Schema::connection('xl')->create('KntKarty', function (Blueprint $table) {
+            $table->unsignedBigInteger('Knt_GIDNumer')->primary();
+            $table->string('Knt_Nazwa1');
+            $table->string('Knt_Nazwa2');
+            $table->string('Knt_Kraj');
+            $table->string('Knt_KodP');
+            $table->string('Knt_Miasto');
+            $table->string('Knt_Ulica');
+            $table->string('Knt_Nip');
+            $table->string('Knt_Powiat');
+            $table->string('Knt_Wojewodztwo');
+            $table->string('Knt_Telefon1');
+            $table->string('Knt_Telefon2');
+            $table->string('Knt_EMail');
+            $table->integer('Knt_LimitOkres');
+            $table->integer('Knt_AtrWlascicielFrsID');
+            $table->integer('Knt_OpeNumer');
+            $table->dateTime('Knt_SyncTimeStamp');
+        });
+    }
+
+    /**
+     * Two full chunks at the default chunk size, so the loader tests have a second page to
+     * page into. Sequential keys rather than the factory — random ones collide on the
+     * primary key at this volume.
+     */
+    protected function foreignSourceRows(): array
+    {
+        $syncTs = now()->subYear()->toDateTimeString();
+        $rowCount = 2 * config('synchronizer.sync.default_chunk_size');
+        $rows = [];
+        for ($i = 1; $i <= $rowCount; $i++) {
+            $rows[] = [
+                'Knt_GIDNumer' => $i,
+                'Knt_Nazwa1' => 'Nazwa ' . $i,
+                'Knt_Nazwa2' => 'Nazwa2 ' . $i,
+                'Knt_Kraj' => 'PL',
+                'Knt_KodP' => '80-000',
+                'Knt_Miasto' => 'Miasto',
+                'Knt_Ulica' => 'Ulica ' . $i,
+                'Knt_Nip' => '12345678' . str_pad((string) ($i % 100), 2, '0', STR_PAD_LEFT),
+                'Knt_Powiat' => 'Powiat',
+                'Knt_Wojewodztwo' => 'Pomorskie',
+                'Knt_Telefon1' => '58000' . $i,
+                'Knt_Telefon2' => '60000' . $i,
+                'Knt_EMail' => 'kontakt' . $i . '@example.com',
+                'Knt_LimitOkres' => 30,
+                'Knt_AtrWlascicielFrsID' => 1000 + $i,
+                'Knt_OpeNumer' => 2000 + $i,
+                'Knt_SyncTimeStamp' => $syncTs,
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Overrides the parent's snake_case list: Map::add() matches these against DTO field
+     * names, which are camelCase.
+     */
     protected function timestampConfig($app)
     {
         $app['config']->set('synchronizer.sync.timestamps', ['updatedAt']);
