@@ -2,9 +2,9 @@
 
 namespace Grixu\Synchronizer\Process\Contracts;
 
-use Spatie\DataTransferObject\DataTransferObject;
+use Spatie\LaravelData\Data;
 
 interface SingleElementParserInterface
 {
-    public function parseElement($model): DataTransferObject;
+    public function parseElement($model): Data;
 }

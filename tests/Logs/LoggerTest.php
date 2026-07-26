@@ -73,7 +73,7 @@ class LoggerTest extends TestCase
         $this->obj->log($this->changes, Logger::BELONGS_TO_MANY);
         $this->obj->report();
 
-        Notification::assertTimesSent(1, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 1);
     }
 
     /** @test */
@@ -84,7 +84,7 @@ class LoggerTest extends TestCase
         $this->obj->log([], Logger::BELONGS_TO_MANY);
         $this->obj->report();
 
-        Notification::assertTimesSent(0, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 0);
     }
 
     /** @test */
@@ -96,6 +96,6 @@ class LoggerTest extends TestCase
         $this->obj->log(['some'], Logger::BELONGS_TO_MANY);
         $this->obj->report();
 
-        Notification::assertTimesSent(0, LoggerNotification::class);
+        Notification::assertSentTimes(LoggerNotification::class, 0);
     }
 }
